@@ -37,6 +37,10 @@
         margin-left: 1.8rem;
         letter-spacing: 0.02em;
       }
+      /* Transición suave para deslizar el carrito */
+      #cart-drawer-panel {
+        transition: transform 0.3s ease-in-out;
+      }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans">
@@ -137,7 +141,7 @@
     <div id="cart-modal" class="fixed inset-0 z-50 overflow-hidden hidden">
         <div class="absolute inset-0 bg-black bg-opacity-50" onclick="toggleCartModal()"></div>
         <div class="absolute inset-y-0 right-0 max-w-full flex pl-10">
-            <div class="w-screen max-w-md bg-white shadow-xl p-6 flex flex-col justify-between overflow-y-auto">
+            <div id="cart-drawer-panel" class="w-screen max-w-md bg-white shadow-xl p-6 flex flex-col justify-between overflow-y-auto transform translate-x-full">
                 <div>
                     <div class="flex items-center justify-between pb-4 border-b border-gray-100">
                         <h2 id="cart-modal-title" class="font-serif text-xl font-bold">Tu Carrito</h2>
@@ -364,10 +368,20 @@
         function toggleCartModal() {
             if (timerCierreAutomatico) clearTimeout(timerCierreAutomatico);
             const modal = document.getElementById('cart-modal');
-            modal.classList.toggle('hidden');
-            if(!modal.classList.contains('hidden')) {
+            const drawer = document.getElementById('cart-drawer-panel');
+
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    drawer.classList.remove('translate-x-full');
+                }, 10);
                 checkoutStep = 1;
                 updateCartUI();
+            } else {
+                drawer.classList.add('translate-x-full');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
             }
         }
 
@@ -377,17 +391,28 @@
             updateCartUI();
 
             const modal = document.getElementById('cart-modal');
+            const drawer = document.getElementById('cart-drawer-panel');
 
-            // Si es el primer producto añadido, se abre por 1 segundo y se cierra solo
+            // Si es el primer producto añadido, se abre durante 1.5 segundos y se oculta solo deslizando/desvaneciendo
             if (!hasAddedFirstItem) {
                 hasAddedFirstItem = true;
                 modal.classList.remove('hidden');
+                setTimeout(() => {
+                    drawer.classList.remove('translate-x-full');
+                }, 10);
+
                 if (timerCierreAutomatico) clearTimeout(timerCierreAutomatico);
                 timerCierreAutomatico = setTimeout(() => {
-                    modal.classList.add('hidden');
-                }, 1000);
+                    drawer.classList.add('translate-x-full');
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                    }, 300);
+                }, 1500);
             } else {
                 modal.classList.remove('hidden');
+                setTimeout(() => {
+                    drawer.classList.remove('translate-x-full');
+                }, 10);
             }
         }
 
@@ -474,43 +499,50 @@
                 actionBtn.disabled = true;
                 actionBtn.textContent = "Procesando pedido...";
 
-                let resumen = "";
-                let total = 0;
-                cart.forEach(item => {
-                    resumen += `${item.name} (${item.color}) - $${item.price} | `;
-                    total += item.price;
-                });
-
                 try {
-                    // Envío por correo con FormSubmit
-                    await fetch(`https://formsubmit.co/ajax/${CORREO_BOUTIQUE}`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-                        body: JSON.stringify({
-                            _subject: "Nuevo Pedido - Amis Boutique",
-                            Envio: shippingMethod,
-                            Metodo_Pago: paymentMethod,
-                            Productos: resumen,
-                            Total: `$${total} MXN`
-                        })
-                    });
-
-                    // Si selecciona Mercado Pago, conecta con el endpoint backend en Vercel
+                    // Estructura correcta que espera tu backend en Vercel para Mercado Pago
                     if (paymentMethod === "Mercado Pago") {
                         const respMP = await fetch('/api/crear-preferencia', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ items: cart })
+                            body: JSON.stringify({ 
+                                items: cart.map(item => ({
+                                    title: `${item.name} (${item.color})`,
+                                    unit_price: Number(item.price),
+                                    quantity: 1
+                                }))
+                            })
                         });
                         const dataMP = await respMP.json();
 
-                        if (dataMP.id) {
-                            window.location.href = `https://www.mercadopago.com.mx/checkout/v1/redirect?pref_id=${dataMP.id}`;
+                        if (dataMP.id || dataMP.init_point) {
+                            const redirectUrl = dataMP.init_point || `https://www.mercadopago.com.mx/checkout/v1/redirect?pref_id=${dataMP.id}`;
+                            window.location.href = redirectUrl;
                             return;
                         } else {
-                            alert("Pedido registrado, pero hubo un detalle al conectar con Mercado Pago.");
+                            alert("Hubo un detalle al conectar con Mercado Pago. Verifica la configuración en Vercel.");
                         }
                     } else {
+                        // Envío por correo con FormSubmit para métodos alternativos
+                        let resumen = "";
+                        let total = 0;
+                        cart.forEach(item => {
+                            resumen += `${item.name} (${item.color}) - $${item.price} | `;
+                            total += item.price;
+                        });
+
+                        await fetch(`https://formsubmit.co/ajax/${CORREO_BOUTIQUE}`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                            body: JSON.stringify({
+                                _subject: "Nuevo Pedido - Amis Boutique",
+                                Envio: shippingMethod,
+                                Metodo_Pago: paymentMethod,
+                                Productos: resumen,
+                                Total: `$${total} MXN`
+                            })
+                        });
+
                         alert(`¡Pedido procesado con éxito!\n\nEnvío: ${shippingMethod}\nPago: ${paymentMethod}\n\nRecuerda que tu pedido se procesará al confirmar el pago.`);
                         cart = [];
                         toggleCartModal();
