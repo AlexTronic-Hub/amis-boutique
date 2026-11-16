@@ -184,7 +184,6 @@
         <span id="total-precio">$0 MXN</span>
       </div>
 
-      <!-- CAMBIA TU_CORREO@gmail.com POR TU CORREO REAL -->
       <form id="form-pedido" onsubmit="procesarCheckout(event)">
         <label>Nombre completo *</label>
         <input type="text" id="cliente-nombre" required placeholder="Tu nombre">
@@ -208,8 +207,7 @@
   </div>
 
   <script>
-    // CAMBIA ESTE CORREO POR EL TUYO:
-    const CORREO_BOUTIQUE = "TU_CORREO@gmail.com";
+    const CORREO_BOUTIQUE = "tucorreo@gmail.com";
 
     const inventario = [
       { id: 1, nombre: "Blusa Satinada", categoria: "Ropa", precio: 380 },
@@ -309,7 +307,6 @@
       });
 
       try {
-        // 1. Mandar el correo en segundo plano con FormSubmit
         await fetch(`https://formsubmit.co/ajax/${CORREO_BOUTIQUE}`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "Accept": "application/json" },
@@ -318,43 +315,4 @@
             Cliente: nombre,
             WhatsApp: whatsapp,
             Direccion: direccion,
-            Metodo_Pago: metodo,
-            Productos: resumen,
-            Total: `$${total} MXN`
-          })
-        });
-
-        // 2. Si eligió Mercado Pago, pedimos el link con el monto exacto a nuestro servidor
-        if (metodo === "Mercado Pago En Línea") {
-          const respMP = await fetch('/api/crear-preferencia', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ items: carrito })
-          });
-
-          const dataMP = await respMP.json();
-
-          if (dataMP.init_point) {
-            window.location.href = dataMP.init_point;
-            return;
-          } else {
-            alert("Pedido enviado por correo, pero hubo un detalle al abrir Mercado Pago.");
-          }
-        } else {
-          alert("¡Pedido enviado por correo con éxito! Nos pondremos en contacto por WhatsApp.");
-          carrito = [];
-          actualizarCarritoUI();
-          toggleCarrito();
-        }
-      } catch (error) {
-        alert("Ocurrió un error al procesar el pedido. Revisa tu conexión.");
-        console.error(error);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = "💳 Enviar Pedido y Pagar";
-      }
-    }
-  </script>
-
-</body>
-</html>
+            Metodo_Pago: metodo
