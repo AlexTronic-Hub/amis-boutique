@@ -1,513 +1,401 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amis Boutique | Collection & Boutique</title>
-    
-    <!-- Importación de Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Importación de tipografías oficiales para el logo -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Pinyon+Script&display=swap" rel="stylesheet">
+<!DOCTYPE html> 
+<html lang="es"> 
+<head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Amis Boutique | Ropa y Maquillaje</title> 
+    <style> 
+        :root { 
+            --primario: #c85a7c; 
+            --primario-oscuro: #a64161; 
+            --fondo: #fdf9fa; 
+            --texto: #2b2b2b; 
+            --borde: #eadde1; 
+            --mp-azul: #009ee3; 
+        } 
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Segoe UI', sans-serif; 
+        } 
+        body { 
+            background-color: var(--fondo); 
+            color: var(--texto); 
+            padding-bottom: 50px; 
+        } 
+        header { 
+            background: white; 
+            padding: 15px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid var(--borde); 
+            position: sticky; 
+            top: 0; 
+            z-index: 10; 
+        } 
+        .logo { 
+            font-size: 1.3rem; 
+            font-weight: bold; 
+            color: var(--primario); 
+        } 
+        .btn-carrito { 
+            background-color: var(--primario); 
+            color: white; 
+            border: none; 
+            padding: 10px 18px; 
+            border-radius: 20px; 
+            font-weight: bold; 
+            cursor: pointer; 
+        } 
+        .btn-carrito:hover { 
+            background-color: var(--primario-oscuro); 
+        } 
+        .catalogo-container { 
+            max-width: 1000px; 
+            margin: 30px auto; 
+            padding: 0 20px; 
+        } 
+        .catalogo { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+            gap: 20px; 
+        } 
+        .tarjeta { 
+            background: white; 
+            border: 1px solid var(--borde); 
+            border-radius: 12px; 
+            padding: 16px; 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04); 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+        } 
+        .categoria { 
+            font-size: 11px; 
+            text-transform: uppercase; 
+            color: var(--primario); 
+            font-weight: bold; 
+        } 
+        .tarjeta h3 { 
+            font-size: 1.05rem; 
+            margin: 8px 0; 
+        } 
+        .precio { 
+            font-size: 18px; 
+            font-weight: bold; 
+            margin-bottom: 12px; 
+        } 
+        button.agregar { 
+            background-color: var(--texto); 
+            color: white; 
+            border: none; 
+            padding: 10px; 
+            width: 100%; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: 600; 
+        } 
+        button.agregar:hover { 
+            background-color: var(--primario); 
+        } 
+        /* Drawer Carrito con animación de desplazamiento */ 
+        .overlay { 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.4); 
+            display: flex; 
+            justify-content: flex-end; 
+            z-index: 100; 
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; 
+            transform: translateX(100%); 
+            opacity: 0; 
+            pointer-events: none; 
+        } 
+        .overlay.abierto { 
+            transform: translateX(0); 
+            opacity: 1; 
+            pointer-events: auto; 
+        } 
+        .drawer { 
+            background: white; 
+            width: 100%; 
+            max-width: 400px; 
+            height: 100%; 
+            padding: 25px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            overflow-y: auto; 
+        } 
+        .drawer-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid var(--borde); 
+            padding-bottom: 10px; 
+        } 
+        .cerrar-drawer { 
+            background: none; 
+            border: none; 
+            font-size: 1.4rem; 
+            cursor: pointer; 
+        } 
+        .item-carrito { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid #f2ecee; 
+            padding: 8px 0; 
+            font-size: 0.9rem; 
+        } 
+        .btn-quitar { 
+            background: #ffe5ec; 
+            color: #c9184a; 
+            border: none; 
+            padding: 4px 8px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 0.75rem; 
+        } 
+        .total-box { 
+            background: #fdf2f5; 
+            padding: 12px; 
+            border-radius: 8px; 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 1.1rem; 
+            font-weight: bold; 
+        } 
+        form { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+        } 
+        label { 
+            font-size: 0.8rem; 
+            font-weight: bold; 
+            color: #555; 
+        } 
+        input, textarea, select { 
+            width: 100%; 
+            padding: 9px; 
+            border: 1px solid var(--borde); 
+            border-radius: 6px; 
+            font-size: 0.9rem; 
+        } 
+        .btn-enviar { 
+            background-color: var(--mp-azul); 
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 5px; 
+        } 
+        .btn-enviar:hover { 
+            background-color: #0082bc; 
+        } 
+        .btn-enviar:disabled { 
+            background-color: #999; 
+            cursor: not-allowed; 
+        } 
+        .nota { 
+            font-size: 0.75rem; 
+            color: #777; 
+            text-align: center; 
+        } 
+    </style> 
+</head> 
+<body> 
+    <header> 
+        <div class="logo">✨ Amis Boutique</div> 
+        <button class="btn-carrito" onclick="toggleCarrito()"> 
+            🛍️ Carrito (<span id="contador">0</span>) 
+        </button> 
+    </header> 
 
-    <style>
-      .amis-logo-container {
-        display: inline-flex;
-        flex-direction: column;
-        align-items: flex-start;
-        text-decoration: none;
-      }
-      .amis-logo-title {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.8rem;
-        font-weight: 700;
-        letter-spacing: 0.12em;
-        color: #000000;
-        line-height: 1;
-        margin: 0;
-      }
-      .amis-logo-subtitle {
-        font-family: 'Pinyon Script', cursive;
-        font-size: 1.25rem;
-        color: #1a1a1a;
-        margin-top: -4px;
-        margin-left: 1.8rem;
-        letter-spacing: 0.02em;
-      }
-    </style>
-</head>
-<body class="bg-gray-50 text-gray-900 font-sans">
+    <div class="catalogo-container"> 
+        <h2 style="margin-bottom: 20px; color: var(--primario);">Catálogo Disponible</h2> 
+        <div id="contenedor-productos" class="catalogo"></div> 
+    </div> 
 
-    <!-- HEADER / NAVEGACIÓN -->
-    <header class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            
-            <!-- Botón Menú Hamburguesa -->
-            <button id="menu-btn" class="p-2 rounded-md focus:outline-none hover:bg-gray-100 transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-            </button>
+    <!-- Carrito Lateral --> 
+    <div class="overlay" id="overlay-carrito"> 
+        <div class="drawer"> 
+            <div class="drawer-header"> 
+                <h3>Tu Carrito de Compras</h3> 
+                <button class="cerrar-drawer" onclick="toggleCarrito()">✕</button> 
+            </div> 
+            <div id="lista-carrito"></div> 
+            <div class="total-box"> 
+                <span>Total:</span> 
+                <span id="total-precio">$0 MXN</span> 
+            </div> 
+            <form id="form-pedido" onsubmit="procesarCheckout(event)"> 
+                <label>Nombre completo *</label> 
+                <input type="text" id="cliente-nombre" required placeholder="Tu nombre"> 
+                <label>WhatsApp / Teléfono *</label> 
+                <input type="tel" id="cliente-whatsapp" required placeholder="33 1234 5678"> 
+                <label>Dirección de entrega *</label> 
+                <textarea id="cliente-direccion" rows="2" required placeholder="Calle, número, colonia y CP"></textarea> 
+                <label>Método de pago *</label> 
+                <select id="metodo-pago"> 
+                    <option value="Mercado Pago En Línea">Tarjeta / Mercado Pago en línea</option> 
+                    <option value="Transferencia SPEI">Transferencia Bancaria</option> 
+                </select> 
+                <button type="submit" id="btn-pagar" class="btn-enviar">💳 Enviar Pedido y Pagar</button> 
+                <p class="nota">Se enviará tu orden por correo y pasarás a pagar el monto exacto.</p> 
+            </form> 
+        </div> 
+    </div> 
 
-            <!-- LOGO OFICIAL EN CÓDIGO -->
-            <a href="#" onclick="showHome(event)" class="amis-logo-container">
-                <span class="amis-logo-title">AMIS</span>
-                <span class="amis-logo-subtitle">collection &amp; boutique</span>
-            </a>
+    <script> 
+        const CORREO_BOUTIQUE = "alexisorozcoortiz@gmail.com"; 
+        const inventario = [ 
+            { id: 1, nombre: "Blusa Satinada", categoria: "Ropa", precio: 380 }, 
+            { id: 2, nombre: "Vestido Midi", categoria: "Ropa", precio: 520 }, 
+            { id: 3, nombre: "Labial Matte", categoria: "Maquillaje", precio: 165 }, 
+            { id: 4, nombre: "Paleta Nude", categoria: "Maquillaje", precio: 290 }, 
+            { id: 5, nombre: "Vestido Fucsia", categoria: "Ropa", precio: 350 }, 
+            { id: 6, nombre: "Conjunto Navideño", categoria: "Ropa", precio: 550 } 
+        ]; 
 
-            <!-- Icono del Carrito de Compras -->
-            <button onclick="toggleCartModal()" class="p-2 relative rounded-md focus:outline-none hover:bg-gray-100 transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-                <span id="cart-count" class="absolute top-0 right-0 bg-black text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
-            </button>
-        </div>
-    </header>
+        let carrito = []; 
+        let timerCierreAutomatico = null; 
 
-    <!-- MENÚ LATERAL DESLIZANTE -->
-    <div id="mobile-menu" class="fixed inset-0 z-50 overflow-hidden hidden">
-        <div id="menu-backdrop" class="absolute inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-        
-        <div class="absolute inset-y-0 left-0 max-w-full flex">
-            <div class="w-80 bg-white shadow-xl p-6 flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between pb-6 border-b border-gray-100">
-                        <span class="font-serif text-xl tracking-wider font-bold">Menú</span>
-                        <button id="close-menu-btn" class="p-2 rounded-md hover:bg-gray-100">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
+        const contenedor = document.getElementById("contenedor-productos"); 
+        const contadorSpan = document.getElementById("contador"); 
+        const listaCarrito = document.getElementById("lista-carrito"); 
+        const totalPrecio = document.getElementById("total-precio"); 
 
-                    <nav class="mt-6 space-y-4">
-                        <div>
-                            <button id="collection-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
-                                <span class="tracking-widest uppercase text-sm">Colección</span>
-                                <svg id="collection-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            </button>
-                            <div id="collection-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
-                                <a href="#" onclick="showCategory('ropa', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Ropa</a>
-                                <a href="#" onclick="showCategory('zapatos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition">Zapatos</a>
-                            </div>
-                        </div>
+        inventario.forEach(producto => { 
+            contenedor.innerHTML += ` 
+                <div class="tarjeta"> 
+                    <div> 
+                        <span class="categoria">${producto.categoria}</span> 
+                        <h3>${producto.nombre}</h3> 
+                        <div class="precio">$${producto.precio} MXN</div> 
+                    </div> 
+                    <button class="agregar" onclick="agregarAlCarrito(${producto.id})">Agregar</button> 
+                </div> 
+            `; 
+        }); 
 
-                        <div class="pt-4 border-t border-gray-100">
-                            <span class="block py-2 text-sm font-medium text-gray-800 tracking-widest uppercase">Contáctanos</span>
-                            <div class="pl-2 mt-2 space-y-3">
-                                <a href="https://www.instagram.com/amisboutique.official?xtok=Y3V1a3oyMGhweHNy" target="_blank" class="flex items-center gap-3 text-sm text-gray-600 hover:text-black transition">
-                                    <svg class="w-5 h-5 text-pink-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
-                                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                                        <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
-                                    </svg>
-                                    <span>Instagram</span>
-                                </a>
-                                <a href="https://www.facebook.com/share/1CMqeKz5Su/" target="_blank" class="flex items-center gap-3 text-sm text-gray-600 hover:text-black transition">
-                                    <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"></path>
-                                    </svg>
-                                    <span>Facebook</span>
-                                </a>
-                                <a href="https://wa.me/523312467018" target="_blank" class="flex items-center gap-3 text-sm text-gray-600 hover:text-black transition">
-                                    <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"></path>
-                                    </svg>
-                                    <span>WhatsApp</span>
-                                </a>
-                            </div>
-                        </div>
-                    </nav>
-                </div>
+        function agregarAlCarrito(id) { 
+            const prod = inventario.find(p => p.id === id); 
+            carrito.push(prod); 
+            actualizarCarritoUI(); 
+            const overlay = document.getElementById("overlay-carrito"); 
+            if (carrito.length === 1) { 
+                overlay.classList.add("abierto"); 
+                if (timerCierreAutomatico) clearTimeout(timerCierreAutomatico); 
+                timerCierreAutomatico = setTimeout(() => { 
+                    overlay.classList.remove("abierto"); 
+                }, 1000); 
+            } 
+        } 
 
-                <div class="text-xs text-center text-gray-400 pb-4">
-                    Amis Boutique &copy; 2026
-                </div>
-            </div>
-        </div>
-    </div>
+        function quitarDelCarrito(index) { 
+            carrito.splice(index, 1); 
+            actualizarCarritoUI(); 
+        } 
 
-    <!-- MODAL DEL CARRITO Y CHECKOUT POR PASOS -->
-    <div id="cart-modal" class="fixed inset-0 z-50 overflow-hidden hidden">
-        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="toggleCartModal()"></div>
-        <div class="absolute inset-y-0 right-0 max-w-full flex pl-10">
-            <div id="cart-drawer-content" class="w-screen max-w-md bg-white shadow-xl p-6 flex flex-col justify-between overflow-y-auto transition-transform duration-300">
-                <div>
-                    <div class="flex items-center justify-between pb-4 border-b border-gray-100">
-                        <h2 id="cart-modal-title" class="font-serif text-xl font-bold">Tu Carrito</h2>
-                        <button onclick="toggleCartModal()" class="p-2 rounded-md hover:bg-gray-100">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                        </button>
-                    </div>
+        function actualizarCarritoUI() { 
+            contadorSpan.textContent = carrito.length; 
+            listaCarrito.innerHTML = ""; 
+            let total = 0; 
+            if (carrito.length === 0) { 
+                listaCarrito.innerHTML = "<p style='color:#777; text-align:center; padding:15px;'>Tu carrito está vacío.</p>"; 
+            } else { 
+                carrito.forEach((item, index) => { 
+                    total += item.precio; 
+                    listaCarrito.innerHTML += ` 
+                        <div class="item-carrito"> 
+                            <div> 
+                                <strong>${item.nombre}</strong><br> 
+                                <small>$${item.precio} MXN</small> 
+                            </div> 
+                            <button class="btn-quitar" onclick="quitarDelCarrito(${index})">Quitar</button> 
+                        </div> 
+                    `; 
+                }); 
+            } 
+            totalPrecio.textContent = `$${total} MXN`; 
+        } 
 
-                    <!-- PASO 1: VISTA DE PRODUCTOS EN EL CARRITO -->
-                    <div id="step-cart" class="py-4">
-                        <div id="cart-items" class="space-y-4 max-h-60 overflow-y-auto border-b border-gray-100 pb-4">
-                            <p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>
-                        </div>
-                    </div>
+        function toggleCarrito() { 
+            if (timerCierreAutomatico) clearTimeout(timerCierreAutomatico); 
+            document.getElementById("overlay-carrito").classList.toggle("abierto"); 
+        } 
 
-                    <!-- PASO 2: MÉTODO DE ENVÍO -->
-                    <div id="step-shipping" class="py-4 hidden">
-                        <div class="flex items-center gap-2 mb-3 text-gray-900 font-medium text-sm">
-                            <!-- Icono de carrito / envío -->
-                            <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                            <span class="tracking-wide uppercase text-xs font-bold">Selecciona tu Método de Envío</span>
-                        </div>
-                        <div class="space-y-2 text-sm">
-                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="shipping-method" value="local" checked class="text-black focus:ring-black">
-                                <div>
-                                    <span class="font-medium block">Envío local en Guadalajara</span>
-                                    <span class="text-xs text-gray-500">Disponible pago contra entrega</span>
-                                </div>
-                            </label>
-                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="shipping-method" value="nacional" class="text-black focus:ring-black">
-                                <div>
-                                    <span class="font-medium block">Envío Nacional</span>
-                                    <span class="text-xs text-gray-500">Pago por transferencia o Mercado Pago</span>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
+        async function procesarCheckout(e) { 
+            e.preventDefault(); 
+            if (carrito.length === 0) { 
+                alert("Agrega productos antes de hacer el pedido."); 
+                return; 
+            } 
 
-                    <!-- PASO 3: MÉTODO DE PAGO -->
-                    <div id="step-payment" class="py-4 hidden">
-                        <h3 class="text-xs font-bold uppercase tracking-wide text-gray-900 mb-3">Selecciona tu Método de Pago</h3>
-                        <div id="payment-options" class="space-y-2 text-sm">
-                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="payment-method" value="Mercado Pago" checked onchange="handlePaymentChange()" class="text-black focus:ring-black">
-                                <div>
-                                    <span class="font-medium block">Mercado Pago (Checkout Pro)</span>
-                                    <span class="text-xs text-gray-500">Pago seguro con tarjeta, efectivo o MSI</span>
-                                </div>
-                            </label>
-                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="payment-method" value="Transferencia Bancaria" onchange="handlePaymentChange()" class="text-black focus:ring-black">
-                                <div>
-                                    <span class="font-medium block">Transferencia Bancaria</span>
-                                    <span class="text-xs text-gray-500">CLABE de Mercado Pago Wallet</span>
-                                </div>
-                            </label>
-                            <label id="pay-cash" class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="payment-method" value="Pago contra entrega en efectivo" onchange="handlePaymentChange()" class="text-black focus:ring-black">
-                                <span class="font-medium">Pago contra entrega en efectivo (Solo GDL)</span>
-                            </label>
-                            <label id="pay-terminal" class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="payment-method" value="Pago contra entrega en terminal" onchange="handlePaymentChange()" class="text-black focus:ring-black">
-                                <span class="font-medium">Pago contra entrega en terminal (Solo GDL)</span>
-                            </label>
-                        </div>
+            const btn = document.getElementById("btn-pagar"); 
+            btn.disabled = true; 
+            btn.textContent = "Procesando pedido..."; 
 
-                        <!-- Datos Bancarios -->
-                        <div id="bank-details" class="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-700 hidden">
-                            <p class="font-bold text-gray-900 mb-1">Datos para Transferencia:</p>
-                            <p><strong>Banco/Instalación:</strong> Mercado Pago W</p>
-                            <p><strong>CLABE:</strong> <span class="select-all font-mono">722969020435527654</span></p>
-                            <p><strong>Beneficiario:</strong> Alexis Daniel Orozco Ortiz</p>
-                        </div>
+            const nombre = document.getElementById("cliente-nombre").value; 
+            const whatsapp = document.getElementById("cliente-whatsapp").value; 
+            const direccion = document.getElementById("cliente-direccion").value; 
+            const metodo = document.getElementById("metodo-pago").value; 
 
-                        <!-- Aviso Importante -->
-                        <div class="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
-                            <strong>Nota importante:</strong> Primero se debe confirmar el pago (o enviar comprobante en transferencias) para procesar y enviar el pedido.
-                        </div>
-                    </div>
-                </div>
+            let resumen = ""; 
+            let total = 0; 
+            carrito.forEach(item => { 
+                resumen += `${item.nombre} ($${item.precio}) | `; 
+                total += item.precio; 
+            }); 
 
-                <!-- Footer del Carrito con Botones de Navegación -->
-                <div class="pt-4 border-t border-gray-100 mt-4">
-                    <div class="flex justify-between text-base font-semibold text-gray-900 mb-4">
-                        <span>Total:</span>
-                        <span id="cart-total">$0 MXN</span>
-                    </div>
-                    
-                    <!-- Botón dinámico según el paso -->
-                    <button id="cart-action-btn" onclick="handleCartNext()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
-                        Ir a Pagar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+            try { 
+                await fetch(`https://formsubmit.co/ajax/${CORREO_BOUTIQUE}`, { 
+                    method: "POST", 
+                    headers: { "Content-Type": "application/json", "Accept": "application/json" }, 
+                    body: JSON.stringify({ 
+                        _subject: "Nuevo Pedido - Amis Boutique", 
+                        Cliente: nombre, 
+                        WhatsApp: whatsapp, 
+                        Direccion: direccion, 
+                        Metodo_Pago: metodo, 
+                        Productos: resumen, 
+                        Total: `$${total} MXN` 
+                    }) 
+                }); 
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        
-        <!-- INICIO -->
-        <div id="home-view" class="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
-            <h1 class="text-3xl font-light tracking-wide mb-4">Bienvenida a Amis Boutique</h1>
-            <p class="text-gray-500 max-w-md mx-auto mb-8">Explora nuestro menú para descubrir la colección de ropa y zapatos.</p>
-            <button onclick="showCategory('ropa', event)" class="inline-block bg-black text-white px-8 py-3 rounded-full text-sm tracking-widest uppercase hover:bg-gray-800 transition">Ver Colección</button>
-        </div>
-
-        <!-- VISTA DE ROPA -->
-        <div id="ropa-view" class="hidden">
-            <h2 class="text-2xl font-serif mb-6 tracking-wider">Colección de Ropa</h2>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
-                    <div class="relative bg-gray-100 h-[450px]">
-                        <img id="product-img-1" src="https://i.postimg.cc/YqXSG8fS/IMG-20261115-WA0058.jpg" alt="Conjunto Tejido Punto" class="w-full h-full object-cover transition-all duration-300">
-                        <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">Ropa</span>
-                    </div>
-
-                    <div class="p-5 flex-1 flex flex-col justify-between">
-                        <div>
-                            <h3 id="product-name-1" class="font-serif text-lg font-medium text-gray-900">Conjunto Tejido Punto con Gorro</h3>
-                            <p class="text-xs text-gray-500 mt-1">Tejido Super Strech | Unitalla (Abarca 3 a 13)</p>
-                            
-                            <div class="mt-4 flex items-center justify-between">
-                                <span class="text-xl font-semibold text-gray-900">$370 <span class="text-xs text-gray-500 font-normal">MXN</span></span>
-                                
-                                <div class="flex items-center space-x-2">
-                                    <button onclick="changeColor(1, 'https://i.postimg.cc/YqXSG8fS/IMG-20261115-WA0058.jpg', 'Rosa', this)" class="w-6 h-6 rounded-full bg-rose-300 border-2 border-black focus:outline-none transition transform hover:scale-110 color-btn-1" title="Rosa"></button>
-                                    <button onclick="changeColor(1, 'https://i.postimg.cc/jdjxbP0V/IMG-20261115-WA0059.jpg', 'Gris', this)" class="w-6 h-6 rounded-full bg-gray-400 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Gris"></button>
-                                    <button onclick="changeColor(1, 'https://i.postimg.cc/Qd2h1zFw/IMG-20261115-WA0057.jpg', 'Beige', this)" class="w-6 h-6 rounded-full bg-amber-200 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Beige"></button>
-                                    <button onclick="changeColor(1, 'https://i.postimg.cc/3NxT35q2/IMG-20261115-WA0056.jpg', 'Verde', this)" class="w-6 h-6 rounded-full bg-stone-600 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Verde"></button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button onclick="addToCart('Conjunto Tejido Punto con Gorro', 370, 'Rosa')" class="mt-6 w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
-                            Añadir al Carrito
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VISTA DE ZAPATOS -->
-        <div id="zapatos-view" class="hidden text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
-            <h2 class="text-2xl font-serif mb-4 tracking-wider">Colección de Zapatos</h2>
-            <p class="text-gray-500">Pronto agregaremos los nuevos modelos de calzado.</p>
-        </div>
-
-    </main>
-
-    <!-- Scripts de interactividad -->
-    <script>
-        const menuBtn = document.getElementById('menu-btn');
-        const closeMenuBtn = document.getElementById('close-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const menuBackdrop = document.getElementById('menu-backdrop');
-        
-        const collectionToggleBtn = document.getElementById('collection-toggle-btn');
-        const collectionSubmenu = document.getElementById('collection-submenu');
-        const collectionArrow = document.getElementById('collection-arrow');
-
-        const homeView = document.getElementById('home-view');
-        const ropaView = document.getElementById('ropa-view');
-        const zapatosView = document.getElementById('zapatos-view');
-
-        let cart = [];
-        let selectedColor = 'Rosa';
-        let checkoutStep = 1; // 1: Carrito, 2: Envío, 3: Pago
-        let hasAddedFirstItem = false; // Controla que solo abra automáticamente en la primera adición
-
-        function toggleMenu() {
-            mobileMenu.classList.toggle('hidden');
-        }
-
-        menuBtn.addEventListener('click', toggleMenu);
-        closeMenuBtn.addEventListener('click', toggleMenu);
-        menuBackdrop.addEventListener('click', toggleMenu);
-
-        collectionToggleBtn.addEventListener('click', () => {
-            collectionSubmenu.classList.toggle('hidden');
-            collectionArrow.classList.toggle('rotate-180');
-        });
-
-        function showHome(event) {
-            event.preventDefault();
-            homeView.classList.remove('hidden');
-            ropaView.classList.add('hidden');
-            zapatosView.classList.add('hidden');
-            mobileMenu.classList.add('hidden');
-        }
-
-        function showCategory(category, event) {
-            event.preventDefault();
-            homeView.classList.add('hidden');
-            ropaView.classList.add('hidden');
-            zapatosView.classList.add('hidden');
-
-            if (category === 'ropa') {
-                ropaView.classList.remove('hidden');
-            } else if (category === 'zapatos') {
-                zapatosView.classList.remove('hidden');
-            }
-
-            mobileMenu.classList.add('hidden');
-        }
-
-        function changeColor(productId, imageUrl, colorName, buttonElement) {
-            document.getElementById(`product-img-${productId}`).src = imageUrl;
-            selectedColor = colorName;
-
-            const buttons = buttonElement.parentElement.querySelectorAll('.color-btn-' + productId);
-            buttons.forEach(btn => btn.classList.remove('border-black'));
-            buttons.forEach(btn => btn.classList.add('border-transparent'));
-            
-            buttonElement.classList.remove('border-transparent');
-            buttonElement.classList.add('border-black');
-        }
-
-        function toggleCartModal() {
-            const modal = document.getElementById('cart-modal');
-            modal.classList.toggle('hidden');
-            if(!modal.classList.contains('hidden')) {
-                checkoutStep = 1;
-                updateCartUI();
-            }
-        }
-
-        function addToCart(name, price, defaultColor) {
-            const colorToAdd = selectedColor || defaultColor;
-            cart.push({ name, price, color: colorToAdd });
-            updateCartUI();
-
-            const modal = document.getElementById('cart-modal');
-
-            // Si es el primer producto añadido, abrir por 1.5 segundos y cerrar automáticamente
-            if (!hasAddedFirstItem) {
-                hasAddedFirstItem = true;
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                }, 1500);
-            } else {
-                // A partir del segundo producto ya no se abre solo
-                modal.classList.remove('hidden');
-            }
-        }
-
-        function updateCartUI() {
-            const cartCount = document.getElementById('cart-count');
-            const cartItems = document.getElementById('cart-items');
-            const cartTotal = document.getElementById('cart-total');
-            const modalTitle = document.getElementById('cart-modal-title');
-            const actionBtn = document.getElementById('cart-action-btn');
-
-            const stepCart = document.getElementById('step-cart');
-            const stepShipping = document.getElementById('step-shipping');
-            const stepPayment = document.getElementById('step-payment');
-
-            cartCount.textContent = cart.length;
-
-            stepCart.classList.add('hidden');
-            stepShipping.classList.add('hidden');
-            stepPayment.classList.add('hidden');
-
-            if (checkoutStep === 1) {
-                modalTitle.textContent = 'Tu Carrito';
-                stepCart.classList.remove('hidden');
-                actionBtn.textContent = 'Ir a Pagar';
-
-                if (cart.length === 0) {
-                    cartItems.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>';
-                    cartTotal.textContent = '$0 MXN';
-                    actionBtn.style.display = 'none';
-                    return;
-                } else {
-                    actionBtn.style.display = 'block';
-                }
-
-                let html = '';
-                let total = 0;
-                cart.forEach((item, index) => {
-                    total += item.price;
-                    html += `
-                        <div class="flex justify-between items-center text-sm border-b pb-2">
-                            <div>
-                                <p class="font-medium">${item.name}</p>
-                                <p class="text-xs text-gray-500">Color: ${item.color}</p>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <span class="font-semibold">$${item.price}</span>
-                                <button onclick="removeFromCart(${index})" class="text-red-500 text-xs hover:underline">Eliminar</button>
-                            </div>
-                        </div>
-                    `;
-                });
-                cartItems.innerHTML = html;
-                cartTotal.textContent = `$${total} MXN`;
-
-            } else if (checkoutStep === 2) {
-                modalTitle.textContent = 'Método de Envío';
-                stepShipping.classList.remove('hidden');
-                actionBtn.textContent = 'Siguiente';
-                actionBtn.style.display = 'block';
-
-            } else if (checkoutStep === 3) {
-                modalTitle.textContent = 'Método de Pago';
-                stepPayment.classList.remove('hidden');
-                actionBtn.textContent = 'Finalizar Pedido';
-                actionBtn.style.display = 'block';
-                
-                applyShippingRules();
-            }
-        }
-
-        function handleCartNext() {
-            if (checkoutStep === 1) {
-                if (cart.length === 0) return;
-                checkoutStep = 2;
-                updateCartUI();
-            } else if (checkoutStep === 2) {
-                checkoutStep = 3;
-                updateCartUI();
-            } else if (checkoutStep === 3) {
-                const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value === 'local' ? 'Envío local en GDL' : 'Envío Nacional';
-                const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
-
-                alert(`¡Pedido procesado con éxito!\n\nEnvío: ${shippingMethod}\nPago: ${paymentMethod}\n\nRecuerda que tu pedido se procesará al confirmar el pago.`);
-                cart = [];
-                toggleCartModal();
-                showHome(event);
-            }
-        }
-
-        // REGLA LÓGICA (IF): Si el envío es nacional, se ocultan los pagos contra entrega
-        function applyShippingRules() {
-            const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
-            const payCash = document.getElementById('pay-cash');
-            const payTerminal = document.getElementById('pay-terminal');
-            const mpRadio = document.querySelector('input[name="payment-method"][value="Mercado Pago"]');
-
-            if (shippingMethod === 'nacional') {
-                payCash.style.display = 'none';
-                payTerminal.style.display = 'none';
-                const currentPayment = document.querySelector('input[name="payment-method"]:checked');
-                if(currentPayment && (currentPayment.value.includes('efectivo') || currentPayment.value.includes('terminal'))) {
-                    mpRadio.checked = true;
-                }
-            } else {
-                payCash.style.display = 'flex';
-                payTerminal.style.display = 'flex';
-            }
-        }
-
-        function handlePaymentChange() {
-            const selectedMethod = document.querySelector('input[name="payment-method"]:checked').value;
-            const bankDetails = document.getElementById('bank-details');
-            if (selectedMethod === 'Transferencia Bancaria') {
-                bankDetails.classList.remove('hidden');
-            } else {
-                bankDetails.classList.add('hidden');
-            }
-        }
-
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateCartUI();
-        }
-    </script>
-</body>
+                if (metodo === "Mercado Pago En Línea") { 
+                    const respMP = await fetch('/api/crear-preferencia', { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify({ items: carrito }) 
+                    }); 
+                    const dataMP = await respMP.json(); 
+                    if (dataMP.id) { 
+                        window.location.href = `https://www.mercadopago.com.mx/checkout/v1/redirect?pref_id=${dataMP.id}`; 
+                        return; 
+                    } else { 
+                        alert("Pedido enviado por correo, pero hubo un detalle al abrir Mercado Pago."); 
+                    } 
+                } else { 
+                    alert("¡Pedido enviado por correo con éxito! Nos pondremos en contacto por WhatsApp."); 
+                    carrito = []; 
+                    actualizarCarritoUI(); 
+                    toggleCarrito(); 
+                } 
+            } catch (error) { 
+                alert("Ocurrió un error al procesar el pedido. Revisa tu conexión."); 
+                console.error(error); 
+            } finally { 
+                btn.disabled = false; 
+                btn.textContent = "💳 Enviar Pedido y Pagar"; 
+            } 
+        } 
+    </script> 
+</body> 
 </html>
