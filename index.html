@@ -534,93 +534,93 @@
         });
 
         async function loadUserDataAndOrders(uid) {
-            const ordersContent = document.getElementById('menu-user-orders');
-            const addressesContent = document.getElementById('menu-user-addresses');
-            const profileContent = document.getElementById('menu-user-profile');
-            const accountToggleBtn = document.getElementById('account-toggle-btn');
+    const ordersContent = document.getElementById('menu-user-orders');
+    const addressesContent = document.getElementById('menu-user-addresses');
+    const profileContent = document.getElementById('menu-user-profile');
+    const accountToggleBtn = document.getElementById('account-toggle-btn');
 
-            try {
-                const { collection, query, where, getDocs, doc, getDoc, setDoc } = window.FB_Methods;
-                
-                const userDocRef = doc(window.FB_Db, "users", uid);
-                let userSnap = await getDoc(userDocRef);
+    try {
+        const { collection, query, where, getDocs, doc, getDoc, setDoc } = window.FB_Methods;
+        
+        const userDocRef = doc(window.FB_Db, "users", uid);
+        let userSnap = await getDoc(userDocRef);
 
-                // Si el usuario autenticado aún no tiene un documento en Firestore, lo creamos de emergencia
-                if (!userSnap.exists()) {
-                    const defaultData = {
-                        names: currentUser.email ? currentUser.email.split('@')[0] : 'Usuario',
-                        surnames: '',
-                        phone: 'No registrado',
-                        email: currentUser.email || '',
-                        addresses: [],
-                        createdAt: new Date()
-                    };
-                    await setDoc(userDocRef, defaultData);
-                    userSnap = await getDoc(userDocRef); // Volvemos a leerlo
-                }
+        // Si el documento no existe en Firestore, lo creamos en automático
+        if (!userSnap.exists()) {
+            const defaultData = {
+                names: currentUser.email ? currentUser.email.split('@')[0] : 'Cliente',
+                surnames: '',
+                phone: 'No registrado',
+                email: currentUser.email || '',
+                addresses: [],
+                createdAt: new Date()
+            };
+            await setDoc(userDocRef, defaultData);
+            userSnap = await getDoc(userDocRef);
+        }
 
-                if (userSnap.exists()) {
-                    userData = userSnap.data();
-                    const primerNombre = userData.names ? userData.names.split(' ')[0] : 'Cliente';
-                    
-                    if (accountToggleBtn) {
-                        accountToggleBtn.querySelector('span').textContent = `Hola, ${primerNombre}`;
-                    }
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            const primerNombre = userData.names ? userData.names.split(' ')[0] : 'Cliente';
+            
+            if (accountToggleBtn) {
+                accountToggleBtn.querySelector('span').textContent = `Hola, ${primerNombre}`;
+            }
 
-                    if (profileContent) {
-                        profileContent.innerHTML = `
-                            <div class="p-2 bg-gray-50 rounded-lg border border-gray-100 space-y-1 text-gray-700">
-                                <p><strong>Nombre(s):</strong> ${userData.names || '-'}</p>
-                                <p><strong>Apellidos:</strong> ${userData.surnames || '-'}</p>
-                                <p><strong>Teléfono:</strong> ${userData.phone || '-'}</p>
-                                <p><strong>Correo:</strong> ${userData.email || '-'}</p>
-                            </div>
-                        `;
-                    }
-                }
-
-                // Cargar pedidos
-                const q = query(collection(window.FB_Db, "orders"), where("userId", "==", uid));
-                const querySnapshot = await getDocs(q);
-                
-                if (querySnapshot.empty) {
-                    ordersContent.innerHTML = '<p class="text-gray-400 italic">No tienes pedidos anteriores.</p>';
-                } else {
-                    let html = '';
-                    querySnapshot.forEach((docSnap) => {
-                        const data = docSnap.data();
-                        html += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 space-y-0.5">
-                            <p class="font-medium text-gray-900">${data.total} · ${data.shipping}</p>
-                            <p class="text-gray-500 text-[10px]">${new Date(data.date?.toDate()).toLocaleString()}</p>
-                        </div>`;
-                    });
-                    ordersContent.innerHTML = html;
-                }
-
-                // Cargar direcciones
-                let addresses = [];
-                if (userSnap.exists() && userSnap.data().addresses) {
-                    addresses = userSnap.data().addresses;
-                }
-
-                if (addresses.length === 0) {
-                    addressesContent.innerHTML = '<p class="text-gray-400 italic">No hay direcciones guardadas aún.</p>';
-                } else {
-                    let addrHtml = '';
-                    addresses.forEach(addr => {
-                        addrHtml += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 text-gray-700">
-                            <p class="font-medium text-gray-900">📍 Dirección:</p>
-                            <p class="text-[11px] text-gray-600 mt-0.5">${addr}</p>
-                        </div>`;
-                    });
-                    addressesContent.innerHTML = addrHtml;
-                }
-
-            } catch (e) {
-                console.error("Error detallado en loadUserDataAndOrders:", e);
-                if (profileContent) profileContent.innerHTML = '<p class="text-red-400">Error al cargar perfil.</p>';
+            if (profileContent) {
+                profileContent.innerHTML = `
+                    <div class="p-2 bg-gray-50 rounded-lg border border-gray-100 space-y-1 text-gray-700">
+                        <p><strong>Nombre(s):</strong> ${userData.names || '-'}</p>
+                        <p><strong>Apellidos:</strong> ${userData.surnames || '-'}</p>
+                        <p><strong>Teléfono:</strong> ${userData.phone || '-'}</p>
+                        <p><strong>Correo:</strong> ${userData.email || '-'}</p>
+                    </div>
+                `;
             }
         }
+
+        // Cargar pedidos
+        const q = query(collection(window.FB_Db, "orders"), where("userId", "==", uid));
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) {
+            ordersContent.innerHTML = '<p class="text-gray-400 italic">No tienes pedidos anteriores.</p>';
+        } else {
+            let html = '';
+            querySnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                html += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 space-y-0.5">
+                    <p class="font-medium text-gray-900">${data.total} · ${data.shipping}</p>
+                    <p class="text-gray-500 text-[10px]">${new Date(data.date?.toDate()).toLocaleString()}</p>
+                </div>`;
+            });
+            ordersContent.innerHTML = html;
+        }
+
+        // Cargar direcciones
+        let addresses = [];
+        if (userSnap.exists() && userSnap.data().addresses) {
+            addresses = userSnap.data().addresses;
+        }
+
+        if (addresses.length === 0) {
+            addressesContent.innerHTML = '<p class="text-gray-400 italic">No hay direcciones guardadas aún.</p>';
+        } else {
+            let addrHtml = '';
+            addresses.forEach(addr => {
+                addrHtml += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 text-gray-700">
+                    <p class="font-medium text-gray-900">📍 Dirección:</p>
+                    <p class="text-[11px] text-gray-600 mt-0.5">${addr}</p>
+                </div>`;
+            });
+            addressesContent.innerHTML = addrHtml;
+        }
+
+    } catch (e) {
+        console.error("Error detallado:", e);
+        if (profileContent) profileContent.innerHTML = '<p class="text-red-400">Error al cargar perfil.</p>';
+    }
+}
         function toggleAuthModal() {
             const modal = document.getElementById('auth-modal');
             const errorBox = document.getElementById('auth-error-box');
