@@ -65,6 +65,9 @@
       #cart-drawer-panel {
         transition: transform 0.3s ease-in-out;
       }
+      #mobile-menu-panel {
+        transition: transform 0.3s ease-in-out;
+      }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans">
@@ -83,11 +86,7 @@
             </a>
 
             <div class="flex items-center gap-2">
-                <button onclick="toggleAuthModal()" id="user-account-btn" class="text-xs uppercase tracking-wider font-medium px-3 py-2 rounded-full border border-gray-200 hover:bg-gray-100 transition flex items-center gap-1.5">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                    <span id="user-btn-text">Mi Cuenta</span>
-                </button>
-
+                <!-- Icono del Carrito -->
                 <button onclick="toggleCartModal()" class="p-2 relative rounded-md focus:outline-none hover:bg-gray-100 transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     <span id="cart-count" class="absolute top-0 right-0 bg-black text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
@@ -110,7 +109,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE INICIO DE SESIÓN / REGISTRO / CUENTA -->
+    <!-- MODAL DE INICIO DE SESIÓN / REGISTRO -->
     <div id="auth-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
         <div class="flex items-center justify-center min-h-screen px-4">
             <div class="fixed inset-0 bg-black bg-opacity-50" onclick="toggleAuthModal()"></div>
@@ -120,9 +119,7 @@
                     <button onclick="toggleAuthModal()" class="text-gray-400 hover:text-black">✕</button>
                 </div>
 
-                <!-- Formulario de Login / Registro -->
                 <div id="auth-form-container" class="space-y-3 text-sm">
-                    <!-- Campos extra para Registro -->
                     <div id="register-fields" class="hidden space-y-3">
                         <div>
                             <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Nombre(s)</label>
@@ -153,35 +150,27 @@
                         <button onclick="switchAuthMode()" id="auth-switch-btn" class="text-xs text-gray-600 hover:underline">¿No tienes cuenta? Regístrate aquí</button>
                     </div>
                 </div>
-
-                <!-- Vista de Cuenta Activa -->
-                <div id="auth-account-view" class="hidden space-y-4">
-                    <div class="bg-gray-50 p-4 rounded-xl text-xs space-y-1">
-                        <p class="font-bold text-gray-900" id="user-display-name">Cliente</p>
-                        <p id="user-display-email" class="text-gray-600"></p>
-                        <p id="user-display-phone" class="text-gray-600"></p>
-                    </div>
-                    <h4 class="font-serif font-bold text-sm">Mis Pedidos</h4>
-                    <div id="user-orders-list" class="space-y-2 max-h-48 overflow-y-auto text-xs text-gray-600">
-                        <p class="text-gray-400 italic">Cargando tus pedidos...</p>
-                    </div>
-                    <button onclick="handleLogout()" class="w-full bg-gray-100 text-red-600 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-red-50 transition font-medium">Salir</button>
-                </div>
             </div>
         </div>
     </div>
 
-    <!-- MENÚ LATERAL -->
+    <!-- MENÚ LATERAL (TRES BARRITAS) -->
     <div id="mobile-menu" class="fixed inset-0 z-50 overflow-hidden hidden">
-        <div id="menu-backdrop" class="absolute inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+        <div id="menu-backdrop" class="absolute inset-0 bg-black bg-opacity-50 transition-opacity" onclick="toggleMobileMenu()"></div>
         <div class="absolute inset-y-0 left-0 max-w-full flex">
-            <div class="w-80 bg-white shadow-xl p-6 flex flex-col justify-between">
+            <div id="mobile-menu-panel" class="w-80 bg-white shadow-xl p-6 flex flex-col justify-between transform -translate-x-full">
                 <div>
                     <div class="flex items-center justify-between pb-6 border-b border-gray-100">
                         <span class="font-serif text-xl tracking-wider font-bold">Menú</span>
-                        <button id="close-menu-btn" class="p-2 rounded-md hover:bg-gray-100">✕</button>
+                        <button onclick="toggleMobileMenu()" class="p-2 rounded-md hover:bg-gray-100">✕</button>
                     </div>
+
                     <nav class="mt-6 space-y-4">
+                        <!-- Sección de Cuenta en el Menú -->
+                        <div id="menu-auth-section" class="pb-4 border-b border-gray-100">
+                            <!-- Se llena dinámicamente -->
+                        </div>
+
                         <div>
                             <button id="collection-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm">Colección</span>
@@ -198,7 +187,7 @@
         </div>
     </div>
 
-    <!-- MODAL DEL CARRITO Y CHECKOUT POR PASOS -->
+    <!-- MODAL DEL CARRITO Y CHECKOUT -->
     <div id="cart-modal" class="fixed inset-0 z-50 overflow-hidden hidden">
         <div class="absolute inset-0 bg-black bg-opacity-50" onclick="toggleCartModal()"></div>
         <div class="absolute inset-y-0 right-0 max-w-full flex pl-10">
@@ -377,27 +366,23 @@
                     clearInterval(checkFB);
                     window.FB_Methods.onAuthStateChanged(window.FB_Auth, async (user) => {
                         currentUser = user;
-                        const btnText = document.getElementById('user-btn-text');
                         if (user) {
-                            // Buscar datos adicionales del usuario en Firestore
                             const { doc, getDoc } = window.FB_Methods;
                             const userDoc = await getDoc(doc(window.FB_Db, "users", user.uid));
                             if (userDoc.exists()) {
                                 userData = userDoc.data();
-                                btnText.textContent = userData.names;
-                            } else {
-                                btnText.textContent = user.email.split('@')[0];
                             }
                             loadUserOrders(user.uid);
                         } else {
                             userData = null;
-                            btnText.textContent = "Mi Cuenta";
                         }
+                        updateMenuAuthUI();
                     });
                 }
             }, 200);
 
             updateCartUI();
+            updateMenuAuthUI();
 
             // Validación de pagos Mercado Pago
             const urlParams = new URLSearchParams(window.location.search);
@@ -431,23 +416,39 @@
             }
         });
 
+        function updateMenuAuthUI() {
+            const authSection = document.getElementById('menu-auth-section');
+            if (currentUser) {
+                authSection.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="bg-gray-50 p-3 rounded-xl text-xs space-y-1">
+                            <p class="font-bold text-gray-950">${userData ? `${userData.names} ${userData.surnames}` : 'Mi Cuenta'}</p>
+                            <p class="text-gray-600">${currentUser.email}</p>
+                            <p class="text-gray-600">${userData ? userData.phone : ''}</p>
+                        </div>
+                        <div>
+                            <p class="font-serif font-bold text-xs uppercase tracking-wider mb-2 text-gray-800">Mis Pedidos</p>
+                            <div id="menu-user-orders" class="space-y-2 max-h-36 overflow-y-auto text-xs text-gray-600">
+                                <p class="text-gray-400 italic">Cargando...</p>
+                            </div>
+                        </div>
+                        <button onclick="handleLogout()" class="w-full bg-gray-100 text-red-600 py-2 rounded-full text-xs tracking-widest uppercase hover:bg-red-50 transition font-medium">Salir</button>
+                    </div>
+                `;
+                if (currentUser.uid) loadUserOrders(currentUser.uid);
+            } else {
+                authSection.innerHTML = `
+                    <button onclick="toggleAuthModal()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
+                        Iniciar Sesión / Registrarse
+                    </button>
+                `;
+            }
+        }
+
         function toggleAuthModal() {
             const modal = document.getElementById('auth-modal');
             modal.classList.toggle('hidden');
-            const accountView = document.getElementById('auth-account-view');
-            const formContainer = document.getElementById('auth-form-container');
-
-            if (currentUser) {
-                accountView.classList.remove('hidden');
-                formContainer.classList.add('hidden');
-                document.getElementById('auth-modal-title').textContent = 'Mi Cuenta';
-                document.getElementById('user-display-name').textContent = userData ? `${userData.names} ${userData.surnames}` : 'Cliente';
-                document.getElementById('user-display-email').textContent = `Correo: ${currentUser.email}`;
-                document.getElementById('user-display-phone').textContent = `Teléfono: ${userData ? userData.phone : 'No registrado'}`;
-            } else {
-                accountView.classList.add('hidden');
-                formContainer.classList.remove('hidden');
-            }
+            toggleMobileMenu();
         }
 
         function switchAuthMode() {
@@ -483,7 +484,6 @@
                     }
 
                     const res = await createUserWithEmailAndPassword(window.FB_Auth, email, password);
-                    // Guardar perfil en Firestore
                     await setDoc(doc(window.FB_Db, "users", res.user.uid), {
                         names, surnames, phone, email, createdAt: new Date()
                     });
@@ -500,12 +500,13 @@
 
         async function handleLogout() {
             await window.FB_Methods.signOut(window.FB_Auth);
-            toggleAuthModal();
             alert("Has salido de tu cuenta.");
+            toggleMobileMenu();
         }
 
         async function loadUserOrders(uid) {
-            const listEl = document.getElementById('user-orders-list');
+            const listEl = document.getElementById('menu-user-orders');
+            if (!listEl) return;
             try {
                 const { collection, query, where, getDocs } = window.FB_Methods;
                 const q = query(collection(window.FB_Db, "orders"), where("userId", "==", uid));
@@ -520,7 +521,7 @@
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     html += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100">
-                        <p class="font-medium text-gray-900">Total: ${data.total} · ${data.shipping}</p>
+                        <p class="font-medium text-gray-900">${data.total} · ${data.shipping}</p>
                         <p class="text-gray-500 text-[10px]">${new Date(data.date?.toDate()).toLocaleString()}</p>
                     </div>`;
                 });
@@ -530,18 +531,26 @@
             }
         }
 
-        // Navegación
+        // Navegación menú lateral
         const menuBtn = document.getElementById('menu-btn');
-        const closeMenuBtn = document.getElementById('close-menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
-        const menuBackdrop = document.getElementById('menu-backdrop');
+        const mobileMenuPanel = document.getElementById('mobile-menu-panel');
         const collectionToggleBtn = document.getElementById('collection-toggle-btn');
         const collectionSubmenu = document.getElementById('collection-submenu');
         const collectionArrow = document.getElementById('collection-arrow');
 
-        menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
-        closeMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
-        menuBackdrop.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+        function toggleMobileMenu() {
+            if (mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.remove('hidden');
+                setTimeout(() => mobileMenuPanel.classList.remove('-translate-x-full'), 10);
+            } else {
+                mobileMenuPanel.classList.add('-translate-x-full');
+                setTimeout(() => mobileMenu.classList.add('hidden'), 300);
+            }
+        }
+
+        menuBtn.addEventListener('click', toggleMobileMenu);
+
         collectionToggleBtn.addEventListener('click', () => {
             collectionSubmenu.classList.toggle('hidden');
             collectionArrow.classList.toggle('rotate-180');
@@ -552,7 +561,7 @@
             document.getElementById('home-view').classList.remove('hidden');
             document.getElementById('ropa-view').classList.add('hidden');
             document.getElementById('zapatos-view').classList.add('hidden');
-            mobileMenu.classList.add('hidden');
+            toggleMobileMenu();
         }
 
         function showCategory(category, event) {
@@ -562,7 +571,7 @@
             document.getElementById('zapatos-view').classList.add('hidden');
             if (category === 'ropa') document.getElementById('ropa-view').classList.remove('hidden');
             if (category === 'zapatos') document.getElementById('zapatos-view').classList.remove('hidden');
-            mobileMenu.classList.add('hidden');
+            toggleMobileMenu();
         }
 
         function changeColor(productId, imageUrl, colorName, buttonElement) {
@@ -664,7 +673,7 @@
                 actionBtn.textContent = 'Siguiente: Pago';
                 actionBtn.style.display = 'block';
 
-                // Si hay sesión iniciada, autocompletar nombre y teléfono
+                // Autocompletar datos si la clienta tiene sesión iniciada
                 if (userData) {
                     document.getElementById('ship-name').value = `${userData.names} ${userData.surnames}`;
                     document.getElementById('ship-phone').value = userData.phone;
