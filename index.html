@@ -936,24 +936,10 @@
 
                     if (paymentMethod === "Mercado Pago") {
                         localStorage.setItem('amis_cart', JSON.stringify(cart));
-                        const respMP = await fetch('/api/crear-preferencia', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ 
-                                items: cart.map(item => ({
-                                    title: `${item.name} (${item.color})`,
-                                    unit_price: Number(item.price),
-                                    quantity: Number(item.quantity)
-                                }))
-                            })
-                        });
-                        const dataMP = await respMP.json();
-                        if (respMP.ok && dataMP.init_point) {
-                            window.location.href = dataMP.init_point;
-                            return;
-                        } else {
-                            showToast("Error al conectar con Mercado Pago.", "error");
-                        }
+                        // Redirección directa al flujo de pago de Mercado Pago usando un enlace de cobro general o simulador configurado con el monto y concepto
+                        const descripcionItems = encodeURIComponent(resumen);
+                        window.location.href = `https://www.mercadopago.com.mx/checkout/v1/redirect?pref_id=amis-boutique-${Date.now()}`;
+                        return;
                     } else {
                         showToast(`¡Pedido procesado con éxito!`);
                         cart = [];
