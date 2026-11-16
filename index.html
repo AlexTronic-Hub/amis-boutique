@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amis Boutique | Collection & Boutique</title>
+    <title>Amis Boutique | Colección Navideña y de Temporada</title>
     
     <!-- Favicon Personalizado con el Monograma A+B -->
     <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/9FDwKwCG/IMG-20261116-WA0002.jpg">
@@ -280,15 +280,18 @@
                             </button>
                         </div>
 
-                        <!-- 2. COLECCIÓN -->
+                        <!-- 2. CATEGORÍAS (VESTIDOS, CONJUNTOS, BLUSAS, ABRIGOS, DE TEMPORADA) -->
                         <div class="pt-2 border-t border-gray-100">
                             <button id="collection-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
-                                <span class="tracking-widest uppercase text-sm font-bold">Colección</span>
+                                <span class="tracking-widest uppercase text-sm font-bold">Categorías</span>
                                 <svg id="collection-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div id="collection-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
-                                <a href="#" onclick="showCategory('ropa', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Ropa</a>
-                                <a href="#" onclick="showCategory('zapatos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition">Zapatos</a>
+                                <a href="#" onclick="showCategory('vestidos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Vestidos</a>
+                                <a href="#" onclick="showCategory('conjuntos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Conjuntos</a>
+                                <a href="#" onclick="showCategory('blusas', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Blusas</a>
+                                <a href="#" onclick="showCategory('abrigos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Abrigos</a>
+                                <a href="#" onclick="showCategory('temporada', event)" class="block py-1.5 text-sm text-red-600 hover:text-red-700 transition font-bold">🎄 De Temporada (Navidad)</a>
                             </div>
                         </div>
 
@@ -462,20 +465,59 @@
     </div>
 
     <!-- CONTENIDO PRINCIPAL -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div id="home-view" class="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
-            <h1 class="text-3xl font-light tracking-wide mb-4">Bienvenida a Amis Boutique</h1>
-            <p class="text-gray-500 max-w-md mx-auto mb-8">Explora nuestra colección de ropa y zapatos.</p>
-            <button onclick="showCategory('ropa', event)" class="inline-block bg-black text-white px-8 py-3 rounded-full text-sm tracking-widest uppercase hover:bg-gray-800 transition">Ver Colección</button>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- BANNER DE INICIO / HERO NAVIDEÑO ELEGANTE -->
+        <div id="home-view" class="space-y-8">
+            <div class="relative bg-black text-white rounded-3xl p-8 sm:p-16 overflow-hidden shadow-xl text-center">
+                <!-- Efecto visual decorativo de temporada -->
+                <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#d4af37_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                
+                <div class="relative z-10 max-w-2xl mx-auto space-y-4">
+                    <span class="text-xs uppercase tracking-[0.3em] text-amber-300 font-semibold">✨ Especial Navidad &amp; Temporada ✨</span>
+                    <h1 class="text-3xl sm:text-5xl font-serif font-light tracking-wide">Elegancia que ilumina tus fiestas</h1>
+                    <p class="text-gray-300 text-sm sm:text-base leading-relaxed">Descubre nuestra exclusiva selección de vestidos, conjuntos y abrigos diseñados para destacar en cada celebración.</p>
+                    <div class="pt-4 flex flex-wrap justify-center gap-4">
+                        <button onclick="showCategory('temporada', event)" class="bg-amber-400 text-black px-8 py-3 rounded-full text-xs tracking-widest uppercase font-bold hover:bg-amber-300 transition shadow-lg">Ver Colección Navideña</button>
+                        <button onclick="showCategory('conjuntos', event)" class="border border-white text-white px-8 py-3 rounded-full text-xs tracking-widest uppercase hover:bg-white hover:text-black transition">Explorar Todo</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TARJETAS DE CATEGORÍAS RÁPIDAS EN EL INICIO -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div onclick="showCategory('vestidos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group">
+                    <span class="text-2xl mb-2 block">👗</span>
+                    <h3 class="font-serif font-medium text-sm group-hover:text-amber-600 transition">Vestidos</h3>
+                </div>
+                <div onclick="showCategory('conjuntos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group">
+                    <span class="text-2xl mb-2 block">✨</span>
+                    <h3 class="font-serif font-medium text-sm group-hover:text-amber-600 transition">Conjuntos</h3>
+                </div>
+                <div onclick="showCategory('abrigos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group">
+                    <span class="text-2xl mb-2 block">🧥</span>
+                    <h3 class="font-serif font-medium text-sm group-hover:text-amber-600 transition">Abrigos</h3>
+                </div>
+                <div onclick="showCategory('temporada', event)" class="bg-amber-50 p-6 rounded-2xl shadow-sm border border-amber-200 text-center cursor-pointer hover:shadow-md transition group">
+                    <span class="text-2xl mb-2 block">🎄</span>
+                    <h3 class="font-serif font-bold text-sm text-red-700 transition">Navidad</h3>
+                </div>
+            </div>
         </div>
 
-        <div id="ropa-view" class="hidden">
-            <h2 class="text-2xl font-serif mb-6 tracking-wider">Colección de Ropa</h2>
+        <!-- VISTAS DE CATEGORÍAS -->
+        <div id="vestidos-view" class="hidden">
+            <h2 class="text-2xl font-serif mb-6 tracking-wider">Vestidos Exclusivos</h2>
+            <p class="text-gray-500">Pronto agregaremos los nuevos modelos de vestidos.</p>
+        </div>
+
+        <div id="conjuntos-view" class="hidden">
+            <h2 class="text-2xl font-serif mb-6 tracking-wider">Conjuntos de Temporada</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
                     <div class="relative bg-gray-100 h-[450px]">
                         <img id="product-img-1" src="https://i.postimg.cc/YqXSG8fS/IMG-20261115-WA0058.jpg" alt="Conjunto Tejido Punto" class="w-full h-full object-cover transition-all duration-300">
-                        <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">Ropa</span>
+                        <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">Conjunto</span>
                     </div>
                     <div class="p-5 flex-1 flex flex-col justify-between">
                         <div>
@@ -499,9 +541,25 @@
             </div>
         </div>
 
-        <div id="zapatos-view" class="hidden text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
-            <h2 class="text-2xl font-serif mb-4 tracking-wider">Colección de Zapatos</h2>
-            <p class="text-gray-500">Pronto agregaremos los nuevos modelos de calzado.</p>
+        <div id="blusas-view" class="hidden">
+            <h2 class="text-2xl font-serif mb-6 tracking-wider">Blusas</h2>
+            <p class="text-gray-500">Pronto agregaremos los nuevos modelos de blusas.</p>
+        </div>
+
+        <div id="abrigos-view" class="hidden">
+            <h2 class="text-2xl font-serif mb-6 tracking-wider">Abrigos y Suéteres</h2>
+            <p class="text-gray-500">Pronto agregaremos los nuevos modelos de abrigos.</p>
+        </div>
+
+        <div id="temporada-view" class="hidden">
+            <div class="bg-red-900 text-white p-6 rounded-2xl mb-6 text-center space-y-2">
+                <span class="text-xs uppercase tracking-widest text-amber-300">Colección Especial</span>
+                <h2 class="text-2xl font-serif font-bold">🎄 Especial Navidad 🎄</h2>
+                <p class="text-xs text-red-100">Las mejores prendas para lucir deslumbrante en tus posadas y cenas navideñas.</p>
+            </div>
+            <div id="temporada-products">
+                <p class="text-gray-500 text-center py-8">Cargando prendas de temporada...</p>
+            </div>
         </div>
     </main>
 
@@ -804,21 +862,30 @@
         setupDropdown('data-toggle-btn', 'data-container-sub', 'data-arrow');
         setupDropdown('contact-toggle-btn', 'contact-submenu', 'contact-arrow');
 
+        function hideAllViews() {
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('vestidos-view').classList.add('hidden');
+            document.getElementById('conjuntos-view').classList.add('hidden');
+            document.getElementById('blusas-view').classList.add('hidden');
+            document.getElementById('abrigos-view').classList.add('hidden');
+            document.getElementById('temporada-view').classList.add('hidden');
+        }
+
         function showHome(event) {
             if (event) event.preventDefault();
+            hideAllViews();
             document.getElementById('home-view').classList.remove('hidden');
-            document.getElementById('ropa-view').classList.add('hidden');
-            document.getElementById('zapatos-view').classList.add('hidden');
             toggleMobileMenu();
         }
 
         function showCategory(category, event) {
             if (event) event.preventDefault();
-            document.getElementById('home-view').classList.add('hidden');
-            document.getElementById('ropa-view').classList.add('hidden');
-            document.getElementById('zapatos-view').classList.add('hidden');
-            if (category === 'ropa') document.getElementById('ropa-view').classList.remove('hidden');
-            if (category === 'zapatos') document.getElementById('zapatos-view').classList.remove('hidden');
+            hideAllViews();
+            const viewId = `${category}-view`;
+            const viewElement = document.getElementById(viewId);
+            if (viewElement) {
+                viewElement.classList.remove('hidden');
+            }
             toggleMobileMenu();
         }
 
@@ -1003,9 +1070,9 @@
                         });
 
                         let detalleProductos = cart.map(i => `- ${i.quantity}x ${i.name} (${i.color})`).join('%0A');
-                        let mensajeWA = `Hola Amis Boutique! 👋 Acabo de realizar un pedido.%0A%0A*Cliente:* ${clientName}%0A*Total:* $${total} MXN%0A*Método de Pago:* ${paymentMethod}%0A*Envío:* ${shippingMethod}%0A*Dirección:* ${clientAddress}%0A%0A*Productos:*%0A${detalleProductos}%0A%0AAdjunto mi comprobante de pago. ✨`;
+                        let mensajeWA = `Hola Amis Boutique! 👋 Acabo de realizar un pedido.%0A%0A*Cliente:* ${clientName}%0A*Total:* $${total} MXN%0A*Método de Pago:* ${paymentMethod}%0A*Envío:* ${shippingMethod}%0A*Dirección:* ${clientAddress}%0A*Productos:*%0A${detalleProductos}%0A%0AAdjunto mi comprobante de pago. ✨`;
                         
-                        document.getElementById('whatsapp-link').href = `https://wa.me/523312467018?text=${mensajeWA}`;
+                        document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${mensajeWA}`;
 
                         toggleCartModal();
                         document.getElementById('order-success-modal').classList.remove('hidden');
