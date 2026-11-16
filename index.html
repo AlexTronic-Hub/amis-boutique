@@ -288,6 +288,19 @@
                                 <a href="#" onclick="showCategory('zapatos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition">Zapatos</a>
                             </div>
                         </div>
+
+                        <!-- 3. CONTÁCTANOS (INSTAGRAM, FACEBOOK, WHATSAPP) -->
+                        <div class="pt-2 border-t border-gray-100">
+                            <button id="contact-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
+                                <span class="tracking-widest uppercase text-sm font-bold">Contáctanos</span>
+                                <svg id="contact-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                            <div id="contact-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100 text-sm">
+                                <a href="https://instagram.com" target="_blank" class="block py-1.5 text-gray-600 hover:text-black transition font-medium">📸 Instagram</a>
+                                <a href="https://facebook.com" target="_blank" class="block py-1.5 text-gray-600 hover:text-black transition font-medium">📘 Facebook</a>
+                                <a href="https://wa.me/523312467018?text=Hola%20Amis%20Boutique,%20me%20gustaría%20más%20información." target="_blank" class="block py-1.5 text-emerald-600 hover:text-emerald-700 transition font-medium">📲 WhatsApp</a>
+                            </div>
+                        </div>
                     </nav>
                 </div>
             </div>
@@ -388,7 +401,7 @@
                             </label>
                         </div>
 
-                        <!-- DATOS BANCARIOS (AHORA SÍ SE MUESTRAN AL SELECCIONAR TRANSFERENCIA) -->
+                        <!-- DATOS BANCARIOS -->
                         <div id="bank-details" class="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-700 hidden">
                             <p class="font-bold text-gray-900 mb-1">Datos para Transferencia:</p>
                             <p><strong>Institución:</strong> Mercado Pago Wallet</p>
@@ -483,7 +496,7 @@
     <!-- Script General -->
     <script>
         const CORREO_BOUTIQUE = "alexisorozcoortiz@gmail.com";
-        const WHATSAPP_TIENDA = "523312345678"; // Reemplaza con tu número de WhatsApp de ventas
+        const WHATSAPP_TIENDA = "523312467018";
         let cart = JSON.parse(localStorage.getItem('amis_cart') || '[]');
         let selectedColor = 'Rosa';
         let checkoutStep = 1;
@@ -551,9 +564,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const status = urlParams.get('status') || urlParams.get('collection_status');
             const mpResult = urlParams.get('pago');
-            const prefId = urlParams.get('preference_id');
 
-            const banner = document.getElementById('payment-status-banner');
             if (status === 'approved' || mpResult === 'exito') {
                 cart = [];
                 localStorage.removeItem('amis_cart');
@@ -779,6 +790,7 @@
         setupDropdown('addresses-toggle-btn', 'addresses-container-sub', 'addresses-arrow');
         setupDropdown('collection-toggle-btn', 'collection-submenu', 'collection-arrow');
         setupDropdown('data-toggle-btn', 'data-container-sub', 'data-arrow');
+        setupDropdown('contact-toggle-btn', 'contact-submenu', 'contact-arrow'); // Menú Contáctanos
 
         function showHome(event) {
             if (event) event.preventDefault();
@@ -965,7 +977,6 @@
                             throw new Error("No se pudo obtener el enlace de pago.");
                         }
                     } else {
-                        // Guardar pedido en Firestore
                         const { collection, addDoc, Timestamp } = window.FB_Methods;
                         await addDoc(collection(window.FB_Db, "orders"), {
                             userId: currentUser ? currentUser.uid : "guest",
@@ -979,13 +990,11 @@
                             createdAt: Timestamp.now()
                         });
 
-                        // Configurar enlace de WhatsApp
                         let detalleProductos = cart.map(i => `- ${i.quantity}x ${i.name} (${i.color})`).join('%0A');
                         let mensajeWA = `Hola Amis Boutique! 👋 Acabo de realizar un pedido.%0A%0A*Cliente:* ${clientName}%0A*Total:* $${total} MXN%0A*Método de Pago:* ${paymentMethod}%0A*Envío:* ${shippingMethod}%0A*Dirección:* ${clientAddress}%0A%0A*Productos:*%0A${detalleProductos}%0A%0AAdjunto mi comprobante de pago. ✨`;
                         
                         document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${mensajeWA}`;
 
-                        // Ocultar carrito y mostrar modal de éxito personalizado
                         toggleCartModal();
                         document.getElementById('order-success-modal').classList.remove('hidden');
                     }
