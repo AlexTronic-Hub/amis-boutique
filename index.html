@@ -14,32 +14,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Pinyon+Script&display=swap" rel="stylesheet">
 
     <style>
-      /* Estilos personalizados para el Logo en Código Puro */
-      .amis-logo-container {
-        display: inline-flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        cursor: pointer;
-        text-decoration: none;
-      }
-      .amis-logo-title {
-        font-family: 'Playfair Display', serif;
-        font-size: 2rem;
-        font-weight: 700;
-        letter-spacing: 0.15em;
-        color: #000000;
-        line-height: 1;
-        margin: 0;
-      }
-      .amis-logo-subtitle {
-        font-family: 'Pinyon Script', cursive;
-        font-size: 1.1rem;
-        color: #1a1a1a;
-        margin-top: -2px;
-        letter-spacing: 0.05em;
-      }
-    </style>
+  /* Contenedor general del logo */
+  .amis-logo-container {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start; /* Alinea los elementos hacia la izquierda para respetar la simetría del diseño */
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  /* Título principal AMIS */
+  .amis-logo-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: #000000;
+    line-height: 1;
+    margin: 0;
+  }
+
+  /* Subtítulo desplazado exactamente como en la imagen */
+  .amis-logo-subtitle {
+    font-family: 'Pinyon Script', cursive;
+    font-size: 1.1rem;
+    color: #1a1a1a;
+    margin-top: -2px;
+    margin-left: 2.2rem; /* Mueve el subtítulo hacia la derecha para que empiece debajo de la M */
+    letter-spacing: 0.05em;
+  }
+</style>
+
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans">
 
