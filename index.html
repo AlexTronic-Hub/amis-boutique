@@ -190,47 +190,62 @@
                     </div>
 
                     <nav class="mt-6 space-y-4">
-                        <!-- 1. MI CUENTA -->
-                        <div>
-                            <button onclick="handleAccountClick()" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
+                        <!-- 1. MI CUENTA (Desplegable principal con Pedidos y Direcciones dentro) -->
+                        <div id="menu-account-wrapper" class="hidden">
+                            <button id="account-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Mi Cuenta</span>
-                                <span id="menu-account-status" class="text-xs text-gray-500 font-normal">Iniciar sesión</span>
+                                <svg id="account-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
-                        </div>
+                            <div id="account-submenu" class="hidden pl-4 mt-2 space-y-3 border-l-2 border-gray-100">
+                                
+                                <!-- Subsección: Mis Pedidos -->
+                                <div>
+                                    <button id="orders-toggle-btn" class="w-full flex items-center justify-between py-1.5 text-left font-medium text-gray-700 hover:text-black transition">
+                                        <span class="tracking-wider uppercase text-xs font-bold">Mis Pedidos</span>
+                                        <svg id="orders-arrow" class="w-3.5 h-3.5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </button>
+                                    <div id="orders-submenu" class="hidden pl-3 mt-1 space-y-1 border-l border-gray-100">
+                                        <div id="menu-user-orders" class="py-1 text-xs text-gray-600 space-y-2">
+                                            <p class="text-gray-400 italic">Cargando pedidos...</p>
+                                        </div>
+                                    </div>
+                                </div>
 
-                        <!-- 2. MIS PEDIDOS (Visible solo con sesión) -->
-                        <div id="menu-orders-container" class="hidden">
-                            <button id="orders-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
-                                <span class="tracking-widest uppercase text-sm font-bold">Mis Pedidos</span>
-                                <svg id="orders-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </button>
-                            <div id="orders-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
-                                <div id="menu-user-orders" class="py-2 text-xs text-gray-600 space-y-2">
-                                    <p class="text-gray-400 italic">Cargando pedidos...</p>
+                                <!-- Subsección: Direcciones Registradas -->
+                                <div>
+                                    <button id="addresses-toggle-btn" class="w-full flex items-center justify-between py-1.5 text-left font-medium text-gray-700 hover:text-black transition">
+                                        <span class="tracking-wider uppercase text-xs font-bold">Direcciones Registradas</span>
+                                        <svg id="addresses-arrow" class="w-3.5 h-3.5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </button>
+                                    <div id="addresses-submenu" class="hidden pl-3 mt-1 space-y-2 border-l border-gray-100">
+                                        <div id="menu-user-addresses" class="py-1 text-xs text-gray-600 space-y-1">
+                                            <p class="text-gray-400 italic">Cargando direcciones...</p>
+                                        </div>
+                                        <button onclick="toggleAddressModal()" class="w-full mt-1 bg-gray-100 text-black py-1.5 rounded-full text-[10px] tracking-wider uppercase hover:bg-gray-200 transition font-medium">
+                                            + Agregar dirección
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Botón Cerrar Sesión dentro del desplegable -->
+                                <div class="pt-2">
+                                    <button onclick="handleLogout()" class="w-full bg-gray-100 text-red-600 py-2 rounded-full text-[11px] tracking-widest uppercase hover:bg-red-50 transition font-medium">Cerrar Sesión</button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 3. DIRECCIONES REGISTRADAS (Visible solo con sesión) -->
-                        <div id="menu-addresses-container" class="hidden">
-                            <button id="addresses-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
-                                <span class="tracking-widest uppercase text-sm font-bold">Direcciones Registradas</span>
-                                <svg id="addresses-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        <!-- Botón simple para Iniciar Sesión cuando NO hay sesión -->
+                        <div id="menu-login-wrapper">
+                            <button onclick="toggleAuthModal(); toggleMobileMenu();" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
+                                <span class="tracking-widest uppercase text-sm font-bold">Mi Cuenta</span>
+                                <span class="text-xs text-gray-400 font-normal">Iniciar sesión</span>
                             </button>
-                            <div id="addresses-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
-                                <div id="menu-user-addresses" class="py-2 text-xs text-gray-600 space-y-2">
-                                    <p class="text-gray-400 italic">Cargando direcciones...</p>
-                                </div>
-                                <button onclick="toggleAddressModal()" class="w-full mt-1 bg-gray-100 text-black py-2 rounded-full text-[11px] tracking-wider uppercase hover:bg-gray-200 transition font-medium">
-                                    + Agregar dirección
-                                </button>
-                            </div>
                         </div>
 
-                        <!-- 4. COLECCIÓN -->
+                        <!-- 2. COLECCIÓN -->
                         <div class="pt-2 border-t border-gray-100">
                             <button id="collection-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
-                                <span class="tracking-widest uppercase text-sm">Colección</span>
+                                <span class="tracking-widest uppercase text-sm font-bold">Colección</span>
                                 <svg id="collection-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div id="collection-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
@@ -239,11 +254,6 @@
                             </div>
                         </div>
                     </nav>
-                </div>
-
-                <!-- Botón Salir al fondo del menú si hay sesión -->
-                <div id="menu-logout-container" class="pt-6 border-t border-gray-100 mt-6 hidden">
-                    <button onclick="handleLogout()" class="w-full bg-gray-100 text-red-600 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-red-50 transition font-medium">Cerrar Sesión</button>
                 </div>
             </div>
         </div>
@@ -452,14 +462,12 @@
                     clearInterval(checkFB);
                     window.FB_Methods.onAuthStateChanged(window.FB_Auth, async (user) => {
                         currentUser = user;
-                        const ordersContainer = document.getElementById('menu-orders-container');
-                        const addressesContainer = document.getElementById('menu-addresses-container');
-                        const logoutContainer = document.getElementById('menu-logout-container');
+                        const accountWrapper = document.getElementById('menu-account-wrapper');
+                        const loginWrapper = document.getElementById('menu-login-wrapper');
 
                         if (user) {
-                            ordersContainer.classList.remove('hidden');
-                            addressesContainer.classList.remove('hidden');
-                            logoutContainer.classList.remove('hidden');
+                            accountWrapper.classList.remove('hidden');
+                            loginWrapper.classList.add('hidden');
                             const { doc, getDoc } = window.FB_Methods;
                             try {
                                 const userDoc = await getDoc(doc(window.FB_Db, "users", user.uid));
@@ -472,10 +480,8 @@
                             loadUserDataAndOrders(user.uid);
                         } else {
                             userData = null;
-                            ordersContainer.classList.add('hidden');
-                            addressesContainer.classList.add('hidden');
-                            logoutContainer.classList.add('hidden');
-                            updateMenuAccountUI();
+                            accountWrapper.classList.add('hidden');
+                            loginWrapper.classList.remove('hidden');
                         }
                     });
                 }
@@ -514,26 +520,7 @@
             }
         });
 
-        function updateMenuAccountUI() {
-            const statusEl = document.getElementById('menu-account-status');
-            if (currentUser) {
-                statusEl.textContent = userData ? `${userData.names} (${currentUser.email})` : currentUser.email;
-            } else {
-                statusEl.textContent = "Iniciar sesión";
-            }
-        }
-
-        function handleAccountClick() {
-            if (!currentUser) {
-                toggleMobileMenu();
-                toggleAuthModal();
-            } else {
-                showToast(`Sesión activa: ${currentUser.email}`);
-            }
-        }
-
         async function loadUserDataAndOrders(uid) {
-            updateMenuAccountUI();
             const ordersContent = document.getElementById('menu-user-orders');
             const addressesContent = document.getElementById('menu-user-addresses');
 
@@ -736,6 +723,7 @@
             }
         }
 
+        setupDropdown('account-toggle-btn', 'account-submenu', 'account-arrow');
         setupDropdown('orders-toggle-btn', 'orders-submenu', 'orders-arrow');
         setupDropdown('addresses-toggle-btn', 'addresses-submenu', 'addresses-arrow');
         setupDropdown('collection-toggle-btn', 'collection-submenu', 'collection-arrow');
