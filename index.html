@@ -53,7 +53,7 @@
             </button>
 
             <!-- LOGO OFICIAL EN CÓDIGO -->
-            <a href="/" class="amis-logo-container">
+            <a href="#" onclick="showHome(event)" class="amis-logo-container">
                 <span class="amis-logo-title">AMIS</span>
                 <span class="amis-logo-subtitle">collection &amp; boutique</span>
             </a>
@@ -92,9 +92,10 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
+                            <!-- Subcategorías: Al hacer clic en Ropa, se muestra la sección de ropa -->
                             <div id="collection-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
-                                <a href="#ropa" class="block py-1.5 text-sm text-gray-600 hover:text-black transition">Ropa</a>
-                                <a href="#zapatos" class="block py-1.5 text-sm text-gray-600 hover:text-black transition">Zapatos</a>
+                                <a href="#" onclick="showCategory('ropa', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Ropa</a>
+                                <a href="#" onclick="showCategory('zapatos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition">Zapatos</a>
                             </div>
                         </div>
 
@@ -133,55 +134,67 @@
         </div>
     </div>
 
-    <!-- CONTENIDO PRINCIPAL CON EL PRODUCTO -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <h2 class="text-2xl font-serif mb-6 text-center tracking-wider">Novedades</h2>
+    <!-- CONTENIDO PRINCIPAL (INICIO) -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <!-- VISTA INICIAL (BIENVENIDA) -->
+        <div id="home-view" class="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
+            <h1 class="text-3xl font-light tracking-wide mb-4">Bienvenida a Amis Boutique</h1>
+            <p class="text-gray-500 max-w-md mx-auto mb-8">Explora nuestro menú para descubrir la colección de ropa y zapatos.</p>
+            <button onclick="showCategory('ropa', event)" class="inline-block bg-black text-white px-8 py-3 rounded-full text-sm tracking-widest uppercase hover:bg-gray-800 transition">Ver Ropa</button>
+        </div>
 
-        <!-- CATÁLOGO DE PRODUCTOS -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            
-            <!-- TARJETA DE PRODUCTO -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
-                <!-- Imagen del producto cambiante (Usando enlaces directos compatibles con imgbb) -->
-                <div class="relative bg-gray-100 h-96">
-                    <img id="product-img-1" src="https://i.ibb.co/Tqr89BYZ/foto-rosa.jpg" alt="Conjunto Tejido Punto" class="w-full h-full object-cover transition-all duration-300">
-                    <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">Ropa</span>
-                </div>
+        <!-- VISTA DE ROPA (OCULTA INICIALMENTE) -->
+        <div id="ropa-view" class="hidden">
+            <h2 class="text-2xl font-serif mb-6 tracking-wider">Colección de Ropa</h2>
 
-                <!-- Detalles del producto -->
-                <div class="p-5 flex-1 flex flex-col justify-between">
-                    <div>
-                        <h3 class="font-serif text-lg font-medium text-gray-900">Conjunto Tejido Punto con Gorro</h3>
-                        <p class="text-xs text-gray-500 mt-1">Tejido Super Strech | Unitalla (Abarca 3 a 13)</p>
-                        
-                        <div class="mt-4 flex items-center justify-between">
-                            <span class="text-xl font-semibold text-gray-900">$370 <span class="text-xs text-gray-500 font-normal">MXN</span></span>
-                            
-                            <!-- Selectores de Colores (Círculos) -->
-                            <div class="flex items-center space-x-2">
-                                <!-- Rosa -->
-                                <button onclick="changeColor(1, 'https://i.ibb.co/Tqr89BYZ/foto-rosa.jpg', this)" class="w-6 h-6 rounded-full bg-rose-300 border-2 border-black focus:outline-none transition transform hover:scale-110 color-btn-1" title="Rosa"></button>
-                                <!-- Gris -->
-                                <button onclick="changeColor(1, 'https://i.ibb.co/VpzbLPtm/foto-gris.jpg', this)" class="w-6 h-6 rounded-full bg-gray-400 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Gris"></button>
-                                <!-- Beige -->
-                                <button onclick="changeColor(1, 'https://i.ibb.co/k2kQp22t/foto-beige.jpg', this)" class="w-6 h-6 rounded-full bg-amber-200 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Beige"></button>
-                                <!-- Verde -->
-                                <button onclick="changeColor(1, 'https://i.ibb.co/Xxj3gmHX/foto-verde.jpg', this)" class="w-6 h-6 rounded-full bg-stone-600 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Verde"></button>
-                            </div>
-                        </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- TARJETA DEL CONJUNTO EN ALTA CALIDAD -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                    <div class="relative bg-gray-100 h-[450px]">
+                        <img id="product-img-1" src="https://i.ibb.co/30b3J65/236831.jpg" alt="Conjunto Tejido Punto" class="w-full h-full object-cover transition-all duration-300">
+                        <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">Ropa</span>
                     </div>
 
-                    <!-- Botón Agregar al Carrito -->
-                    <button class="mt-6 w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
-                        Añadir al Carrito
-                    </button>
+                    <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-serif text-lg font-medium text-gray-900">Conjunto Tejido Punto con Gorro</h3>
+                            <p class="text-xs text-gray-500 mt-1">Tejido Super Strech | Unitalla (Abarca 3 a 13)</p>
+                            
+                            <div class="mt-4 flex items-center justify-between">
+                                <span class="text-xl font-semibold text-gray-900">$370 <span class="text-xs text-gray-500 font-normal">MXN</span></span>
+                                
+                                <!-- Selectores de Colores en Alta Resolución -->
+                                <div class="flex items-center space-x-2">
+                                    <!-- Rosa -->
+                                    <button onclick="changeColor(1, 'https://i.ibb.co/30b3J65/236831.jpg', this)" class="w-6 h-6 rounded-full bg-rose-300 border-2 border-black focus:outline-none transition transform hover:scale-110 color-btn-1" title="Rosa"></button>
+                                    <!-- Gris -->
+                                    <button onclick="changeColor(1, 'https://i.ibb.co/6y4M24Z/236830.jpg', this)" class="w-6 h-6 rounded-full bg-gray-400 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Gris"></button>
+                                    <!-- Beige -->
+                                    <button onclick="changeColor(1, 'https://i.ibb.co/7t5Q02H/236829.jpg', this)" class="w-6 h-6 rounded-full bg-amber-200 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Beige"></button>
+                                    <!-- Verde -->
+                                    <button onclick="changeColor(1, 'https://i.ibb.co/8m1K20X/236828.jpg', this)" class="w-6 h-6 rounded-full bg-stone-600 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Verde"></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="mt-6 w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
+                            Añadir al Carrito
+                        </button>
+                    </div>
                 </div>
             </div>
-
         </div>
+
+        <!-- VISTA DE ZAPATOS (OCULTA INICIALMENTE) -->
+        <div id="zapatos-view" class="hidden text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-2xl font-serif mb-4 tracking-wider">Colección de Zapatos</h2>
+            <p class="text-gray-500">Pronto agregaremos los nuevos modelos de calzado.</p>
+        </div>
+
     </main>
 
-    <!-- Scripts de interactividad -->
+    <!-- Scripts de interactividad y navegación por categorías -->
     <script>
         const menuBtn = document.getElementById('menu-btn');
         const closeMenuBtn = document.getElementById('close-menu-btn');
@@ -191,6 +204,10 @@
         const collectionToggleBtn = document.getElementById('collection-toggle-btn');
         const collectionSubmenu = document.getElementById('collection-submenu');
         const collectionArrow = document.getElementById('collection-arrow');
+
+        const homeView = document.getElementById('home-view');
+        const ropaView = document.getElementById('ropa-view');
+        const zapatosView = document.getElementById('zapatos-view');
 
         function toggleMenu() {
             mobileMenu.classList.toggle('hidden');
@@ -204,6 +221,30 @@
             collectionSubmenu.classList.toggle('hidden');
             collectionArrow.classList.toggle('rotate-180');
         });
+
+        // Funciones para alternar entre vistas desde el menú
+        function showHome(event) {
+            event.preventDefault();
+            homeView.classList.remove('hidden');
+            ropaView.classList.add('hidden');
+            zapatosView.classList.add('hidden');
+            mobileMenu.classList.add('hidden');
+        }
+
+        function showCategory(category, event) {
+            event.preventDefault();
+            homeView.classList.add('hidden');
+            ropaView.classList.add('hidden');
+            zapatosView.classList.add('hidden');
+
+            if (category === 'ropa') {
+                ropaView.classList.remove('hidden');
+            } else if (category === 'zapatos') {
+                zapatosView.classList.remove('hidden');
+            }
+
+            mobileMenu.classList.add('hidden');
+        }
 
         function changeColor(productId, imageUrl, buttonElement) {
             document.getElementById(`product-img-${productId}`).src = imageUrl;
