@@ -224,16 +224,21 @@
                     </div>
                 </div>
 
-                <!-- Footer del Carrito con Botones de Navegación -->
-                <div class="pt-4 border-t border-gray-100 mt-4">
-                    <div class="flex justify-between text-base font-semibold text-gray-900 mb-4">
+                <!-- Footer del Carrito con Botones de Navegación y Retroceso -->
+                <div class="pt-4 border-t border-gray-100 mt-4 space-y-2">
+                    <div class="flex justify-between text-base font-semibold text-gray-900 mb-2">
                         <span>Total:</span>
                         <span id="cart-total">$0 MXN</span>
                     </div>
                     
-                    <!-- Botón dinámico según el paso -->
+                    <!-- Botón Principal (Siguiente / Finalizar) -->
                     <button id="cart-action-btn" onclick="handleCartNext()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
                         Ir a Pagar
+                    </button>
+
+                    <!-- Botón de Regresar (Aparece en los pasos 2 y 3) -->
+                    <button id="cart-back-btn" onclick="handleCartBack()" class="w-full bg-gray-100 text-gray-800 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-gray-200 transition hidden">
+                        Regresar
                     </button>
                 </div>
             </div>
@@ -418,6 +423,7 @@
             const cartTotal = document.getElementById('cart-total');
             const modalTitle = document.getElementById('cart-modal-title');
             const actionBtn = document.getElementById('cart-action-btn');
+            const backBtn = document.getElementById('cart-back-btn');
 
             const stepCart = document.getElementById('step-cart');
             const stepShipping = document.getElementById('step-shipping');
@@ -433,6 +439,7 @@
                 modalTitle.textContent = 'Tu Carrito';
                 stepCart.classList.remove('hidden');
                 actionBtn.textContent = 'Ir a Pagar';
+                backBtn.classList.add('hidden'); // Ocultar botón regresar en el paso 1
 
                 if (cart.length === 0) {
                     cartItems.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>';
@@ -467,15 +474,24 @@
                 modalTitle.textContent = 'Método de Envío';
                 stepShipping.classList.remove('hidden');
                 actionBtn.textContent = 'Siguiente';
+                backBtn.classList.remove('hidden'); // Mostrar botón regresar en paso 2
                 actionBtn.style.display = 'block';
 
             } else if (checkoutStep === 3) {
                 modalTitle.textContent = 'Método de Pago';
                 stepPayment.classList.remove('hidden');
                 actionBtn.textContent = 'Finalizar Pedido';
+                backBtn.classList.remove('hidden'); // Mostrar botón regresar en paso 3
                 actionBtn.style.display = 'block';
                 
                 applyShippingRules();
+            }
+        }
+
+        function handleCartBack() {
+            if (checkoutStep > 1) {
+                checkoutStep--;
+                updateCartUI();
             }
         }
 
