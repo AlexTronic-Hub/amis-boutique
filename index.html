@@ -545,55 +545,65 @@
         const userDocRef = doc(window.FB_Db, "users", uid);
         const userSnap = await getDoc(userDocRef);
 
+        let names = '';
+        let surnames = '';
+        let phone = '';
+        let email = currentUser ? currentUser.email : '';
+        let hasData = false;
+
         if (userSnap.exists()) {
             userData = userSnap.data();
-            const hasData = userData.names && userData.names.trim() !== "";
-            const primerNombre = hasData ? userData.names.split(' ')[0] : 'Cliente';
-            
-            // Actualizar saludo en el menú principal
-            if (accountToggleBtn) {
-                const span = accountToggleBtn.querySelector('span');
-                if (span) span.textContent = `Hola, ${primerNombre}`;
-            }
+            names = userData.names || '';
+            surnames = userData.surnames || '';
+            phone = userData.phone || '';
+            hasData = names.trim() !== "";
+        }
 
-            if (profileContent) {
-                if (!hasData) {
-                    // SI NO HA AGREGADO DATOS: Muestra el formulario para crearlos
-                    profileContent.innerHTML = `
-                        <div class="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-2 text-gray-700">
-                            <p class="text-xs text-gray-500 font-medium">Aún no has registrado tus datos personales.</p>
-                            <input type="text" id="input-names" placeholder="Nombre(s)" value="${userData.names || ''}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
-                            <input type="text" id="input-surnames" placeholder="Apellidos" value="${userData.surnames || ''}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
-                            <input type="text" id="input-phone" placeholder="Teléfono" value="${userData.phone || ''}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
-                            <button onclick="guardarMisDatos('${uid}')" class="w-full bg-black text-white py-2 rounded-md text-xs tracking-wider uppercase hover:bg-gray-800 transition">Guardar Mis Datos</button>
+        const primerNombre = hasData ? names.split(' ')[0] : 'Cliente';
+        
+        // Actualizar saludo en el menú principal
+        if (accountToggleBtn) {
+            const span = accountToggleBtn.querySelector('span');
+            if (span) span.textContent = `Hola, ${primerNombre}`;
+        }
+
+        if (profileContent) {
+            if (!hasData) {
+                // SI NO HAY DATOS: Muestra el formulario para agregarlos
+                profileContent.innerHTML = `
+                    <div class="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-2 text-gray-700">
+                        <p class="text-xs text-gray-500 font-medium">Agrega tus datos personales:</p>
+                        <input type="text" id="input-names" placeholder="Nombre(s)" value="${names}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
+                        <input type="text" id="input-surnames" placeholder="Apellidos" value="${surnames}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
+                        <input type="text" id="input-phone" placeholder="Teléfono" value="${phone}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
+                        <button onclick="guardarMisDatos('${uid}')" class="w-full bg-black text-white py-2 rounded-md text-xs tracking-wider uppercase hover:bg-gray-800 transition">Guardar Mis Datos</button>
+                    </div>
+                `;
+            } else {
+                // SI YA LOS TIENE: Muestra la vista y opción de modificar
+                profileContent.innerHTML = `
+                    <div id="view-data-box" class="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-1 text-gray-700 text-xs">
+                        <p><strong>Nombre(s):</strong> ${names}</p>
+                        <p><strong>Apellidos:</strong> ${surnames || '-'}</p>
+                        <p><strong>Teléfono:</strong> ${phone || '-'}</p>
+                        <p><strong>Correo:</strong> ${email || '-'}</p>
+                        <button onclick="habilitarEdicionDatos()" class="mt-2 w-full bg-gray-200 text-gray-800 py-1.5 rounded-md text-[11px] tracking-wider uppercase hover:bg-gray-300 transition">Modificar Datos</button>
+                    </div>
+                    <div id="edit-data-box" class="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-2 text-gray-700 hidden">
+                        <p class="text-xs text-gray-500 font-medium">Modifica tus datos:</p>
+                        <input type="text" id="input-names" placeholder="Nombre(s)" value="${names}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
+                        <input type="text" id="input-surnames" placeholder="Apellidos" value="${surnames}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
+                        <input type="text" id="input-phone" placeholder="Teléfono" value="${phone}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
+                        <div class="flex gap-2">
+                            <button onclick="guardarMisDatos('${uid}')" class="flex-1 bg-black text-white py-2 rounded-md text-xs tracking-wider uppercase hover:bg-gray-800 transition">Actualizar</button>
+                            <button onclick="cancelarEdicionDatos()" class="flex-1 bg-gray-200 text-gray-800 py-2 rounded-md text-xs tracking-wider uppercase hover:bg-gray-300 transition">Cancelar</button>
                         </div>
-                    `;
-                } else {
-                    // SI YA LOS CREÓ: Muestra sus datos y opción para modificarlos
-                    profileContent.innerHTML = `
-                        <div id="view-data-box" class="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-1 text-gray-700 text-xs">
-                            <p><strong>Nombre(s):</strong> ${userData.names}</p>
-                            <p><strong>Apellidos:</strong> ${userData.surnames || '-'}</p>
-                            <p><strong>Teléfono:</strong> ${userData.phone || '-'}</p>
-                            <p><strong>Correo:</strong> ${userData.email || '-'}</p>
-                            <button onclick="habilitarEdicionDatos()" class="mt-2 w-full bg-gray-200 text-gray-800 py-1.5 rounded-md text-[11px] tracking-wider uppercase hover:bg-gray-300 transition">Modificar Datos</button>
-                        </div>
-                        <div id="edit-data-box" class="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-2 text-gray-700 hidden">
-                            <p class="text-xs text-gray-500 font-medium">Modifica tus datos:</p>
-                            <input type="text" id="input-names" placeholder="Nombre(s)" value="${userData.names || ''}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
-                            <input type="text" id="input-surnames" placeholder="Apellidos" value="${userData.surnames || ''}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
-                            <input type="text" id="input-phone" placeholder="Teléfono" value="${userData.phone || ''}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
-                            <div class="flex gap-2">
-                                <button onclick="guardarMisDatos('${uid}')" class="flex-1 bg-black text-white py-2 rounded-md text-xs tracking-wider uppercase hover:bg-gray-800 transition">Actualizar</button>
-                                <button onclick="cancelarEdicionDatos()" class="flex-1 bg-gray-200 text-gray-800 py-2 rounded-md text-xs tracking-wider uppercase hover:bg-gray-300 transition">Cancelar</button>
-                            </div>
-                        </div>
-                    `;
-                }
+                    </div>
+                `;
             }
         }
 
-        // Cargar pedidos y direcciones con normalidad...
+        // Cargar pedidos
         const q = query(collection(window.FB_Db, "orders"), where("userId", "==", uid));
         const querySnapshot = await getDocs(q);
         
