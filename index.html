@@ -8,21 +8,18 @@
     <!-- Importación de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Importación de las tipografías exactas: Playfair Display para AMIS y Pinyon Script para el subtítulo cursivo -->
+    <!-- Importación de tipografías oficiales para el logo -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Pinyon+Script&display=swap" rel="stylesheet">
 
     <style>
-      /* Contenedor general del logo alineado a la izquierda para replicar la simetría */
       .amis-logo-container {
         display: inline-flex;
         flex-direction: column;
         align-items: flex-start;
         text-decoration: none;
       }
-
-      /* Título principal AMIS con la fuente serif elegante */
       .amis-logo-title {
         font-family: 'Playfair Display', serif;
         font-size: 1.8rem;
@@ -32,14 +29,12 @@
         line-height: 1;
         margin: 0;
       }
-
-      /* Subtítulo idéntico a la imagen: cursiva, desplazado a la derecha debajo de la M y con su toque inclinado */
       .amis-logo-subtitle {
         font-family: 'Pinyon Script', cursive;
         font-size: 1.25rem;
         color: #1a1a1a;
         margin-top: -4px;
-        margin-left: 1.8rem; /* Desplazamiento exacto para que comience a la mitad de la M */
+        margin-left: 1.8rem;
         letter-spacing: 0.02em;
       }
     </style>
@@ -50,21 +45,21 @@
     <header class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             
-            <!-- Botón Menú Hamburguesa (Móvil) -->
-            <button id="menu-btn" class="p-2 rounded-md focus:outline-none hover:bg-gray-100">
+            <!-- Botón Menú Hamburguesa -->
+            <button id="menu-btn" class="p-2 rounded-md focus:outline-none hover:bg-gray-100 transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
             </button>
 
-            <!-- LOGO OFICIAL EN CÓDIGO (IDÉNTICO A TU IMAGEN) -->
+            <!-- LOGO OFICIAL EN CÓDIGO -->
             <a href="/" class="amis-logo-container">
                 <span class="amis-logo-title">AMIS</span>
                 <span class="amis-logo-subtitle">collection &amp; boutique</span>
             </a>
 
             <!-- Icono del Carrito de Compras -->
-            <button id="cart-btn" class="p-2 relative rounded-md focus:outline-none hover:bg-gray-100">
+            <button id="cart-btn" class="p-2 relative rounded-md focus:outline-none hover:bg-gray-100 transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
                 </svg>
@@ -73,17 +68,111 @@
         </div>
     </header>
 
+    <!-- MENÚ LATERAL DESLIZANTE (DRAWER) -->
+    <div id="mobile-menu" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div id="menu-backdrop" class="absolute inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+        
+        <div class="absolute inset-y-0 left-0 max-w-full flex">
+            <div class="w-80 bg-white shadow-xl p-6 flex flex-col justify-between">
+                <div>
+                    <!-- Encabezado del menú -->
+                    <div class="flex items-center justify-between pb-6 border-b border-gray-100">
+                        <span class="font-serif text-xl tracking-wider font-bold">Menú</span>
+                        <button id="close-menu-btn" class="p-2 rounded-md hover:bg-gray-100">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Opciones de Navegación -->
+                    <nav class="mt-6 space-y-4">
+                        <!-- Sección Colección -->
+                        <div>
+                            <button id="collection-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
+                                <span class="tracking-widest uppercase text-sm">Colección</span>
+                                <svg id="collection-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                            <!-- Subcategorías -->
+                            <div id="collection-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
+                                <a href="#ropa" class="block py-1.5 text-sm text-gray-600 hover:text-black transition">Ropa</a>
+                                <a href="#zapatos" class="block py-1.5 text-sm text-gray-600 hover:text-black transition">Zapatos</a>
+                            </div>
+                        </div>
+
+                        <!-- Sección Contáctanos y Redes Sociales con Iconos -->
+                        <div class="pt-4 border-t border-gray-100">
+                            <span class="block py-2 text-sm font-medium text-gray-800 tracking-widest uppercase">Contáctanos</span>
+                            <div class="pl-2 mt-2 space-y-3">
+                                <!-- Instagram -->
+                                <a href="https://www.instagram.com/amisboutique.official?xtok=Y3V1a3oyMGhweHNy" target="_blank" class="flex items-center gap-3 text-sm text-gray-600 hover:text-black transition">
+                                    <svg class="w-5 h-5 text-pink-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
+                                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                        <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
+                                    </svg>
+                                    <span>Instagram</span>
+                                </a>
+                                <!-- Facebook -->
+                                <a href="https://www.facebook.com/share/1CMqeKz5Su/" target="_blank" class="flex items-center gap-3 text-sm text-gray-600 hover:text-black transition">
+                                    <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"></path>
+                                    </svg>
+                                    <span>Facebook</span>
+                                </a>
+                                <!-- WhatsApp -->
+                                <a href="https://wa.me/523312467018" target="_blank" class="flex items-center gap-3 text-sm text-gray-600 hover:text-black transition">
+                                    <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"></path>
+                                    </svg>
+                                    <span>WhatsApp</span>
+                                </a>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+
+                <div class="text-xs text-center text-gray-400 pb-4">
+                    Amis Boutique &copy; 2026
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- CONTENIDO PRINCIPAL -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
             <h1 class="text-3xl font-light tracking-wide mb-4">Bienvenida a Amis Boutique</h1>
-            <p class="text-gray-500 max-w-md mx-auto mb-8">A L E X I S   S T U D I O S   Presenta.</p>
+            <p class="text-gray-500 max-w-md mx-auto mb-8">Explora nuestro menú para ver la colección de ropa y zapatos o ponerte en contacto por nuestras redes.</p>
             <a href="#productos" class="inline-block bg-black text-white px-8 py-3 rounded-full text-sm tracking-widest uppercase hover:bg-gray-800 transition">Explorar Catálogo</a>
         </div>
     </main>
 
+    <!-- Script del menú -->
     <script>
-        console.log("Amis Boutique inicializada correctamente.");
+        const menuBtn = document.getElementById('menu-btn');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuBackdrop = document.getElementById('menu-backdrop');
+        
+        const collectionToggleBtn = document.getElementById('collection-toggle-btn');
+        const collectionSubmenu = document.getElementById('collection-submenu');
+        const collectionArrow = document.getElementById('collection-arrow');
+
+        function toggleMenu() {
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        menuBtn.addEventListener('click', toggleMenu);
+        closeMenuBtn.addEventListener('click', toggleMenu);
+        menuBackdrop.addEventListener('click', toggleMenu);
+
+        collectionToggleBtn.addEventListener('click', () => {
+            collectionSubmenu.classList.toggle('hidden');
+            collectionArrow.classList.toggle('rotate-180');
+        });
     </script>
 </body>
 </html>
