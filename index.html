@@ -133,84 +133,103 @@
         </div>
     </div>
 
-    <!-- MODAL DEL CARRITO Y CHECKOUT -->
+    <!-- MODAL DEL CARRITO Y CHECKOUT POR PASOS -->
     <div id="cart-modal" class="fixed inset-0 z-50 overflow-hidden hidden">
         <div class="absolute inset-0 bg-black bg-opacity-50" onclick="toggleCartModal()"></div>
         <div class="absolute inset-y-0 right-0 max-w-full flex pl-10">
             <div class="w-screen max-w-md bg-white shadow-xl p-6 flex flex-col justify-between overflow-y-auto">
                 <div>
                     <div class="flex items-center justify-between pb-4 border-b border-gray-100">
-                        <h2 class="font-serif text-xl font-bold">Tu Carrito</h2>
+                        <h2 id="cart-modal-title" class="font-serif text-xl font-bold">Tu Carrito</h2>
                         <button onclick="toggleCartModal()" class="p-2 rounded-md hover:bg-gray-100">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                         </button>
                     </div>
 
-                    <!-- Lista de productos en el carrito -->
-                    <div id="cart-items" class="py-4 space-y-4 max-h-40 overflow-y-auto border-b border-gray-100">
-                        <p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>
+                    <!-- PASO 1: VISTA DE PRODUCTOS EN EL CARRITO -->
+                    <div id="step-cart" class="py-4">
+                        <div id="cart-items" class="space-y-4 max-h-60 overflow-y-auto border-b border-gray-100 pb-4">
+                            <p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>
+                        </div>
                     </div>
 
-                    <!-- Selección de Método de Envío -->
-                    <div class="mt-4">
-                        <h3 class="text-sm font-medium text-gray-900 tracking-wide uppercase mb-2">Método de Envío</h3>
+                    <!-- PASO 2: MÉTODO DE ENVÍO -->
+                    <div id="step-shipping" class="py-4 hidden">
+                        <div class="flex items-center gap-2 mb-3 text-gray-900 font-medium text-sm">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                            <span class="tracking-wide uppercase text-xs font-bold">Selecciona tu Método de Envío</span>
+                        </div>
                         <div class="space-y-2 text-sm">
-                            <label class="flex items-center space-x-3 p-2 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="shipping-method" value="local" checked onchange="handleShippingChange()" class="text-black focus:ring-black">
-                                <span>Envío local en Guadalajara</span>
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="shipping-method" value="local" checked class="text-black focus:ring-black">
+                                <div>
+                                    <span class="font-medium block">Envío local en Guadalajara</span>
+                                    <span class="text-xs text-gray-500">Disponible pago contra entrega</span>
+                                </div>
                             </label>
-                            <label class="flex items-center space-x-3 p-2 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="shipping-method" value="nacional" onchange="handleShippingChange()" class="text-black focus:ring-black">
-                                <span>Envío Nacional</span>
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="shipping-method" value="nacional" class="text-black focus:ring-black">
+                                <div>
+                                    <span class="font-medium block">Envío Nacional</span>
+                                    <span class="text-xs text-gray-500">Pago por transferencia o Mercado Pago</span>
+                                </div>
                             </label>
                         </div>
                     </div>
 
-                    <!-- Selección de Métodos de Pago -->
-                    <div class="mt-4">
-                        <h3 class="text-sm font-medium text-gray-900 tracking-wide uppercase mb-2">Método de Pago</h3>
+                    <!-- PASO 3: MÉTODO DE PAGO -->
+                    <div id="step-payment" class="py-4 hidden">
+                        <h3 class="text-xs font-bold uppercase tracking-wide text-gray-900 mb-3">Selecciona tu Método de Pago</h3>
                         <div id="payment-options" class="space-y-2 text-sm">
-                            <label class="flex items-center space-x-3 p-2 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
                                 <input type="radio" name="payment-method" value="Mercado Pago" checked onchange="handlePaymentChange()" class="text-black focus:ring-black">
-                                <span>Mercado Pago (Checkout Pro)</span>
+                                <div>
+                                    <span class="font-medium block">Mercado Pago (Checkout Pro)</span>
+                                    <span class="text-xs text-gray-500">Acceso seguro con Access Key</span>
+                                </div>
                             </label>
-                            <label class="flex items-center space-x-3 p-2 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
                                 <input type="radio" name="payment-method" value="Transferencia Bancaria" onchange="handlePaymentChange()" class="text-black focus:ring-black">
-                                <span>Transferencia Bancaria</span>
+                                <div>
+                                    <span class="font-medium block">Transferencia Bancaria</span>
+                                    <span class="text-xs text-gray-500">CLABE de Mercado Pago Wallet</span>
+                                </div>
                             </label>
-                            <label id="pay-cash" class="flex items-center space-x-3 p-2 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
+                            <label id="pay-cash" class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
                                 <input type="radio" name="payment-method" value="Pago contra entrega en efectivo" onchange="handlePaymentChange()" class="text-black focus:ring-black">
-                                <span>Pago contra entrega en efectivo</span>
+                                <span class="font-medium">Pago contra entrega en efectivo (Solo GDL)</span>
                             </label>
-                            <label id="pay-terminal" class="flex items-center space-x-3 p-2 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
+                            <label id="pay-terminal" class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
                                 <input type="radio" name="payment-method" value="Pago contra entrega en terminal" onchange="handlePaymentChange()" class="text-black focus:ring-black">
-                                <span>Pago contra entrega en terminal</span>
+                                <span class="font-medium">Pago contra entrega en terminal (Solo GDL)</span>
                             </label>
                         </div>
-                    </div>
 
-                    <!-- Datos Bancarios (Se muestran si eligen transferencia) -->
-                    <div id="bank-details" class="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-700 hidden">
-                        <p class="font-bold text-gray-900 mb-1">Datos para Transferencia:</p>
-                        <p><strong>Banco/Instalación:</strong> Mercado Pago W[span_0](start_span)[span_0](end_span)</p>
-                        <p><strong>CLABE:</strong> <span class="select-all font-mono">722969020435527654</span>[span_1](start_span)[span_1](end_span)</p>
-                        <p><strong>Beneficiario:</strong> Alexis Daniel Orozco Ortiz[span_2](start_span)[span_2](end_span)</p>
-                    </div>
+                        <!-- Datos Bancarios -->
+                        <div id="bank-details" class="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-700 hidden">
+                            <p class="font-bold text-gray-900 mb-1">Datos para Transferencia:</p>
+                            <p><strong>Banco/Instalación:</strong> Mercado Pago W</p>
+                            <p><strong>CLABE:</strong> <span class="select-all font-mono">722969020435527654</span></p>
+                            <p><strong>Beneficiario:</strong> Alexis Daniel Orozco Ortiz</p>
+                        </div>
 
-                    <!-- Aviso Importante -->
-                    <div class="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
-                        <strong>Nota importante:</strong> Primero se debe confirmar el pago (o enviar comprobante en transferencias) para procesar y enviar el pedido.
+                        <!-- Aviso Importante -->
+                        <div class="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
+                            <strong>Nota importante:</strong> Primero se debe confirmar el pago (o enviar comprobante en transferencias) para procesar y enviar el pedido.
+                        </div>
                     </div>
                 </div>
 
-                <!-- Total y botón de proceder -->
+                <!-- Footer del Carrito con Botones de Navegación -->
                 <div class="pt-4 border-t border-gray-100 mt-4">
                     <div class="flex justify-between text-base font-semibold text-gray-900 mb-4">
                         <span>Total:</span>
                         <span id="cart-total">$0 MXN</span>
                     </div>
-                    <button onclick="proceedToCheckout()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
-                        Proceder con el Pago
+                    
+                    <!-- Botón dinámico según el paso -->
+                    <button id="cart-action-btn" onclick="handleCartNext()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
+                        Ir a Pagar
                     </button>
                 </div>
             </div>
@@ -271,7 +290,7 @@
 
     </main>
 
-    <!-- Scripts de interactividad, regla de envío y carrito -->
+    <!-- Scripts de navegación por pasos, lógica de envío y carrito -->
     <script>
         const menuBtn = document.getElementById('menu-btn');
         const closeMenuBtn = document.getElementById('close-menu-btn');
@@ -288,6 +307,7 @@
 
         let cart = [];
         let selectedColor = 'Rosa';
+        let checkoutStep = 1; // 1: Carrito, 2: Envío, 3: Pago
 
         function toggleMenu() {
             mobileMenu.classList.toggle('hidden');
@@ -319,7 +339,7 @@
             if (category === 'ropa') {
                 ropaView.classList.remove('hidden');
             } else if (category === 'zapatos') {
-                zapatosView.classList.add('hidden'); // Ajustar cuando haya zapatos
+                zapatosView.classList.remove('hidden');
             }
 
             mobileMenu.classList.add('hidden');
@@ -340,36 +360,9 @@
         function toggleCartModal() {
             const modal = document.getElementById('cart-modal');
             modal.classList.toggle('hidden');
-        }
-
-        // REGLA LÓGICA (IF): Si el envío es nacional, se ocultan los pagos contra entrega
-        function handleShippingChange() {
-            const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
-            const payCash = document.getElementById('pay-cash');
-            const payTerminal = document.getElementById('pay-terminal');
-            const mpRadio = document.querySelector('input[name="payment-method"][value="Mercado Pago"]');
-
-            if (shippingMethod === 'nacional') {
-                payCash.classList.add('hidden');
-                payTerminal.classList.add('hidden');
-                // Si estaba seleccionado uno de los ocultos, regresamos a Mercado Pago
-                const currentPayment = document.querySelector('input[name="payment-method"]:checked');
-                if(currentPayment && (currentPayment.value.includes('efectivo') || currentPayment.value.includes('terminal'))) {
-                    mpRadio.checked = true;
-                }
-            } else {
-                payCash.classList.remove('hidden');
-                payTerminal.classList.remove('hidden');
-            }
-        }
-
-        function handlePaymentChange() {
-            const selectedMethod = document.querySelector('input[name="payment-method"]:checked').value;
-            const bankDetails = document.getElementById('bank-details');
-            if (selectedMethod === 'Transferencia Bancaria') {
-                bankDetails.classList.remove('hidden');
-            } else {
-                bankDetails.classList.add('hidden');
+            if(!modal.classList.contains('hidden')) {
+                checkoutStep = 1;
+                updateCartUI();
             }
         }
 
@@ -384,53 +377,123 @@
             const cartCount = document.getElementById('cart-count');
             const cartItems = document.getElementById('cart-items');
             const cartTotal = document.getElementById('cart-total');
+            const modalTitle = document.getElementById('cart-modal-title');
+            const actionBtn = document.getElementById('cart-action-btn');
+
+            const stepCart = document.getElementById('step-cart');
+            const stepShipping = document.getElementById('step-shipping');
+            const stepPayment = document.getElementById('step-payment');
 
             cartCount.textContent = cart.length;
 
-            if (cart.length === 0) {
-                cartItems.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>';
-                cartTotal.textContent = '$0 MXN';
-                return;
+            // Ocultar todos los pasos primero
+            stepCart.classList.add('hidden');
+            stepShipping.classList.add('hidden');
+            stepPayment.classList.add('hidden');
+
+            if (checkoutStep === 1) {
+                modalTitle.textContent = 'Tu Carrito';
+                stepCart.classList.remove('hidden');
+                actionBtn.textContent = 'Ir a Pagar';
+
+                if (cart.length === 0) {
+                    cartItems.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>';
+                    cartTotal.textContent = '$0 MXN';
+                    actionBtn.style.display = 'none';
+                    return;
+                } else {
+                    actionBtn.style.display = 'block';
+                }
+
+                let html = '';
+                let total = 0;
+                cart.forEach((item, index) => {
+                    total += item.price;
+                    html += `
+                        <div class="flex justify-between items-center text-sm border-b pb-2">
+                            <div>
+                                <p class="font-medium">${item.name}</p>
+                                <p class="text-xs text-gray-500">Color: ${item.color}</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="font-semibold">$${item.price}</span>
+                                <button onclick="removeFromCart(${index})" class="text-red-500 text-xs hover:underline">Eliminar</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                cartItems.innerHTML = html;
+                cartTotal.textContent = `$${total} MXN`;
+
+            } else if (checkoutStep === 2) {
+                modalTitle.textContent = 'Método de Envío';
+                stepShipping.classList.remove('hidden');
+                actionBtn.textContent = 'Siguiente';
+                actionBtn.style.display = 'block';
+
+            } else if (checkoutStep === 3) {
+                modalTitle.textContent = 'Método de Pago';
+                stepPayment.classList.remove('hidden');
+                actionBtn.textContent = 'Finalizar Pedido';
+                actionBtn.style.display = 'block';
+                
+                // Aplicar regla lógica de envíos al entrar al paso de pago
+                applyShippingRules();
             }
+        }
 
-            let html = '';
-            let total = 0;
-            cart.forEach((item, index) => {
-                total += item.price;
-                html += `
-                    <div class="flex justify-between items-center text-sm border-b pb-2">
-                        <div>
-                            <p class="font-medium">${item.name}</p>
-                            <p class="text-xs text-gray-500">Color: ${item.color}</p>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="font-semibold">$${item.price}</span>
-                            <button onclick="removeFromCart(${index})" class="text-red-500 text-xs hover:underline">Eliminar</button>
-                        </div>
-                    </div>
-                `;
-            });
+        function handleCartNext() {
+            if (checkoutStep === 1) {
+                if (cart.length === 0) return;
+                checkoutStep = 2;
+                updateCartUI();
+            } else if (checkoutStep === 2) {
+                checkoutStep = 3;
+                updateCartUI();
+            } else if (checkoutStep === 3) {
+                const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value === 'local' ? 'Envío local en GDL' : 'Envío Nacional';
+                const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
 
-            cartItems.innerHTML = html;
-            cartTotal.textContent = `$${total} MXN`;
+                alert(`¡Pedido procesado con éxito!\n\nEnvío: ${shippingMethod}\nPago: ${paymentMethod}\n\nRecuerda que tu pedido se procesará al confirmar el pago.`);
+                cart = [];
+                toggleCartModal();
+                showHome(event);
+            }
+        }
+
+        // REGLA LÓGICA (IF): Si el envío es nacional, se ocultan los pagos contra entrega
+        function applyShippingRules() {
+            const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
+            const payCash = document.getElementById('pay-cash');
+            const payTerminal = document.getElementById('pay-terminal');
+            const mpRadio = document.querySelector('input[name="payment-method"][value="Mercado Pago"]');
+
+            if (shippingMethod === 'nacional') {
+                payCash.style.display = 'none';
+                payTerminal.style.display = 'none';
+                const currentPayment = document.querySelector('input[name="payment-method"]:checked');
+                if(currentPayment && (currentPayment.value.includes('efectivo') || currentPayment.value.includes('terminal'))) {
+                    mpRadio.checked = true;
+                }
+            } else {
+                payCash.style.display = 'flex';
+                payTerminal.style.display = 'flex';
+            }
+        }
+
+        function handlePaymentChange() {
+            const selectedMethod = document.querySelector('input[name="payment-method"]:checked').value;
+            const bankDetails = document.getElementById('bank-details');
+            if (selectedMethod === 'Transferencia Bancaria') {
+                bankDetails.classList.remove('hidden');
+            } else {
+                bankDetails.classList.add('hidden');
+            }
         }
 
         function removeFromCart(index) {
             cart.splice(index, 1);
             updateCartUI();
-        }
-
-        function proceedToCheckout() {
-            if (cart.length === 0) {
-                alert('Tu carrito está vacío');
-                return;
-            }
-
-            const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value === 'local' ? 'Envío local en GDL' : 'Envío Nacional';
-            const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
-
-            alert(`Pedido registrado con éxito.\nEnvío: ${shippingMethod}\nMétodo de pago: ${paymentMethod}\n\nRecuerda que el pedido se procesará al confirmar el pago.`);
-            toggleCartModal();
         }
     </script>
 </body>
