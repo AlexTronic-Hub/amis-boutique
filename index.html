@@ -69,7 +69,7 @@
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans">
 
-    <!-- NOTIFICACIÓN FLOTANTE ELEGANTE (En lugar de alert feos) -->
+    <!-- NOTIFICACIÓN FLOTANTE -->
     <div id="toast-notification" class="fixed top-5 right-5 z-50 transform translate-y-[-200%] transition-transform duration-300">
         <div id="toast-card" class="bg-black text-white px-5 py-3 rounded-2xl shadow-xl text-xs flex items-center gap-3">
             <span id="toast-icon">✨</span>
@@ -91,7 +91,6 @@
             </a>
 
             <div class="flex items-center gap-2">
-                <!-- Icono del Carrito -->
                 <button onclick="toggleCartModal()" class="p-2 relative rounded-md focus:outline-none hover:bg-gray-100 transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     <span id="cart-count" class="absolute top-0 right-0 bg-black text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
@@ -123,6 +122,9 @@
                     <h3 id="auth-modal-title" class="font-serif text-xl font-bold">Iniciar Sesión</h3>
                     <button onclick="toggleAuthModal()" class="text-gray-400 hover:text-black">✕</button>
                 </div>
+
+                <!-- Contenedor para mostrar errores en rojo dentro del modal -->
+                <div id="auth-error-box" class="hidden mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl"></div>
 
                 <div id="auth-form-container" class="space-y-3 text-sm">
                     <div id="register-fields" class="hidden space-y-3">
@@ -365,7 +367,6 @@
         let userData = null;
         let isRegistering = false;
 
-        // Función para mostrar notificaciones elegantes en lugar de alert()
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast-notification');
             const card = document.getElementById('toast-card');
@@ -480,6 +481,9 @@
 
         function toggleAuthModal() {
             const modal = document.getElementById('auth-modal');
+            const errorBox = document.getElementById('auth-error-box');
+            errorBox.classList.add('hidden');
+            errorBox.textContent = '';
             modal.classList.toggle('hidden');
             toggleMobileMenu();
         }
@@ -487,6 +491,9 @@
         function switchAuthMode() {
             isRegistering = !isRegistering;
             const regFields = document.getElementById('register-fields');
+            const errorBox = document.getElementById('auth-error-box');
+            errorBox.classList.add('hidden');
+            
             if (isRegistering) {
                 regFields.classList.remove('hidden');
                 document.getElementById('auth-modal-title').textContent = 'Crear Cuenta';
@@ -503,6 +510,10 @@
         async function handleAuthSubmit() {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
+            const errorBox = document.getElementById('auth-error-box');
+            errorBox.classList.add('hidden');
+            errorBox.textContent = '';
+
             const { signInWithEmailAndPassword, createUserWithEmailAndPassword, doc, setDoc } = window.FB_Methods;
 
             try {
@@ -512,7 +523,8 @@
                     const phone = document.getElementById('reg-phone').value;
 
                     if (!names || !surnames || !phone) {
-                        showToast("Por favor completa todos los campos de registro.", "error");
+                        errorBox.textContent = "Por favor completa todos los campos de registro.";
+                        errorBox.classList.remove('hidden');
                         return;
                     }
 
@@ -527,7 +539,21 @@
                 }
                 toggleAuthModal();
             } catch (error) {
-                showToast("Error: " + error.message, "error");
+                console.error("Auth error:", error.code);
+                let mensajeError = "Ocurrió un error. Inténtalo de nuevo.";
+                
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+                    mensajeError = "Correo electrónico o contraseña incorrectos.";
+                } else if (error.code === 'auth/email-already-in-use') {
+                    mensajeError = "Este correo ya está registrado.";
+                } else if (error.code === 'auth/weak-password') {
+                    mensajeError = "La contraseña debe tener al menos 6 caracteres.";
+                } else if (error.code === 'auth/invalid-email') {
+                    mensajeError = "El formato del correo electrónico no es válido.";
+                }
+
+                errorBox.textContent = mensajeError;
+                errorBox.classList.remove('hidden');
             }
         }
 
