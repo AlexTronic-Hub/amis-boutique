@@ -147,14 +147,29 @@
                     </div>
 
                     <!-- Lista de productos en el carrito -->
-                    <div id="cart-items" class="py-4 space-y-4 max-h-48 overflow-y-auto border-b border-gray-100">
+                    <div id="cart-items" class="py-4 space-y-4 max-h-40 overflow-y-auto border-b border-gray-100">
                         <p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>
+                    </div>
+
+                    <!-- Selección de Método de Envío -->
+                    <div class="mt-4">
+                        <h3 class="text-sm font-medium text-gray-900 tracking-wide uppercase mb-2">Método de Envío</h3>
+                        <div class="space-y-2 text-sm">
+                            <label class="flex items-center space-x-3 p-2 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="shipping-method" value="local" checked onchange="handleShippingChange()" class="text-black focus:ring-black">
+                                <span>Envío local en Guadalajara</span>
+                            </label>
+                            <label class="flex items-center space-x-3 p-2 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="shipping-method" value="nacional" onchange="handleShippingChange()" class="text-black focus:ring-black">
+                                <span>Envío Nacional</span>
+                            </label>
+                        </div>
                     </div>
 
                     <!-- Selección de Métodos de Pago -->
                     <div class="mt-4">
-                        <h3 class="text-sm font-medium text-gray-900 tracking-wide uppercase mb-3">Método de Pago</h3>
-                        <div class="space-y-2 text-sm">
+                        <h3 class="text-sm font-medium text-gray-900 tracking-wide uppercase mb-2">Método de Pago</h3>
+                        <div id="payment-options" class="space-y-2 text-sm">
                             <label class="flex items-center space-x-3 p-2 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
                                 <input type="radio" name="payment-method" value="Mercado Pago" checked onchange="handlePaymentChange()" class="text-black focus:ring-black">
                                 <span>Mercado Pago (Checkout Pro)</span>
@@ -163,23 +178,23 @@
                                 <input type="radio" name="payment-method" value="Transferencia Bancaria" onchange="handlePaymentChange()" class="text-black focus:ring-black">
                                 <span>Transferencia Bancaria</span>
                             </label>
-                            <label class="flex items-center space-x-3 p-2 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
+                            <label id="pay-cash" class="flex items-center space-x-3 p-2 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
                                 <input type="radio" name="payment-method" value="Pago contra entrega en efectivo" onchange="handlePaymentChange()" class="text-black focus:ring-black">
                                 <span>Pago contra entrega en efectivo</span>
                             </label>
-                            <label class="flex items-center space-x-3 p-2 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
+                            <label id="pay-terminal" class="flex items-center space-x-3 p-2 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
                                 <input type="radio" name="payment-method" value="Pago contra entrega en terminal" onchange="handlePaymentChange()" class="text-black focus:ring-black">
                                 <span>Pago contra entrega en terminal</span>
                             </label>
                         </div>
                     </div>
 
-                    <!-- Datos Bancarios (Ocultos por defecto, se muestran si eligen transferencia) -->
+                    <!-- Datos Bancarios (Se muestran si eligen transferencia) -->
                     <div id="bank-details" class="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-700 hidden">
                         <p class="font-bold text-gray-900 mb-1">Datos para Transferencia:</p>
-                        <p><strong>Banco/Instalación:</strong> Mercado Pago W[span_3](start_span)[span_3](end_span)</p>
-                        <p><strong>CLABE:</strong> <span class="select-all font-mono">722969020435527654</span>[span_4](start_span)[span_4](end_span)</p>
-                        <p><strong>Beneficiario:</strong> Alexis Daniel Orozco Ortiz[span_5](start_span)[span_5](end_span)</p>
+                        <p><strong>Banco/Instalación:</strong> Mercado Pago W[span_0](start_span)[span_0](end_span)</p>
+                        <p><strong>CLABE:</strong> <span class="select-all font-mono">722969020435527654</span>[span_1](start_span)[span_1](end_span)</p>
+                        <p><strong>Beneficiario:</strong> Alexis Daniel Orozco Ortiz[span_2](start_span)[span_2](end_span)</p>
                     </div>
 
                     <!-- Aviso Importante -->
@@ -188,14 +203,14 @@
                     </div>
                 </div>
 
-                <!-- Total y botón de compra -->
+                <!-- Total y botón de proceder -->
                 <div class="pt-4 border-t border-gray-100 mt-4">
                     <div class="flex justify-between text-base font-semibold text-gray-900 mb-4">
                         <span>Total:</span>
                         <span id="cart-total">$0 MXN</span>
                     </div>
-                    <button onclick="checkoutWhatsApp()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
-                        Completar Pedido por WhatsApp
+                    <button onclick="proceedToCheckout()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
+                        Proceder con el Pago
                     </button>
                 </div>
             </div>
@@ -256,7 +271,7 @@
 
     </main>
 
-    <!-- Scripts de interactividad y Carrito -->
+    <!-- Scripts de interactividad, regla de envío y carrito -->
     <script>
         const menuBtn = document.getElementById('menu-btn');
         const closeMenuBtn = document.getElementById('close-menu-btn');
@@ -266,6 +281,10 @@
         const collectionToggleBtn = document.getElementById('collection-toggle-btn');
         const collectionSubmenu = document.getElementById('collection-submenu');
         const collectionArrow = document.getElementById('collection-arrow');
+
+        const homeView = document.getElementById('home-view');
+        const ropaView = document.getElementById('ropa-view');
+        const zapatosView = document.getElementById('zapatos-view');
 
         let cart = [];
         let selectedColor = 'Rosa';
@@ -300,7 +319,7 @@
             if (category === 'ropa') {
                 ropaView.classList.remove('hidden');
             } else if (category === 'zapatos') {
-                zapatosView.classList.remove('hidden');
+                zapatosView.classList.add('hidden'); // Ajustar cuando haya zapatos
             }
 
             mobileMenu.classList.add('hidden');
@@ -321,6 +340,27 @@
         function toggleCartModal() {
             const modal = document.getElementById('cart-modal');
             modal.classList.toggle('hidden');
+        }
+
+        // REGLA LÓGICA (IF): Si el envío es nacional, se ocultan los pagos contra entrega
+        function handleShippingChange() {
+            const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
+            const payCash = document.getElementById('pay-cash');
+            const payTerminal = document.getElementById('pay-terminal');
+            const mpRadio = document.querySelector('input[name="payment-method"][value="Mercado Pago"]');
+
+            if (shippingMethod === 'nacional') {
+                payCash.classList.add('hidden');
+                payTerminal.classList.add('hidden');
+                // Si estaba seleccionado uno de los ocultos, regresamos a Mercado Pago
+                const currentPayment = document.querySelector('input[name="payment-method"]:checked');
+                if(currentPayment && (currentPayment.value.includes('efectivo') || currentPayment.value.includes('terminal'))) {
+                    mpRadio.checked = true;
+                }
+            } else {
+                payCash.classList.remove('hidden');
+                payTerminal.classList.remove('hidden');
+            }
         }
 
         function handlePaymentChange() {
@@ -380,23 +420,17 @@
             updateCartUI();
         }
 
-        function checkoutWhatsApp() {
+        function proceedToCheckout() {
             if (cart.length === 0) {
                 alert('Tu carrito está vacío');
                 return;
             }
 
+            const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value === 'local' ? 'Envío local en GDL' : 'Envío Nacional';
             const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
 
-            let message = "Hola Amis Boutique, quiero realizar el siguiente pedido:%0A";
-            let total = 0;
-            cart.forEach(item => {
-                message += `- ${item.name} (${item.color}) - $${item.price} MXN%0A`;
-                total += item.price;
-            });
-            message += `%0ATotal: $${total} MXN%0AMétodo de pago elegido: ${paymentMethod}%0A%0A¡Entiendo que primero se debe confirmar el pago/enviar comprobante para procesar el pedido!`;
-
-            window.open(`https://wa.me/523312467018?text=${message}`, '_blank');
+            alert(`Pedido registrado con éxito.\nEnvío: ${shippingMethod}\nMétodo de pago: ${paymentMethod}\n\nRecuerda que el pedido se procesará al confirmar el pago.`);
+            toggleCartModal();
         }
     </script>
 </body>
