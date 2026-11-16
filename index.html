@@ -37,7 +37,7 @@
         margin-left: 1.8rem;
         letter-spacing: 0.02em;
       }
-      /* Transición suave para deslizar el carrito */
+      /* Transición suave para deslizar el carrito hacia la derecha */
       #cart-drawer-panel {
         transition: transform 0.3s ease-in-out;
       }
@@ -165,14 +165,14 @@
                         </div>
                         <div class="space-y-2 text-sm">
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="shipping-method" value="local" checked class="text-black focus:ring-black">
+                                <input type="radio" name="shipping-method" value="local" checked onchange="applyShippingRules()" class="text-black focus:ring-black">
                                 <div>
                                     <span class="font-medium block">Envío local en Guadalajara</span>
                                     <span class="text-xs text-gray-500">Disponible pago contra entrega</span>
                                 </div>
                             </label>
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="shipping-method" value="nacional" class="text-black focus:ring-black">
+                                <input type="radio" name="shipping-method" value="nacional" onchange="applyShippingRules()" class="text-black focus:ring-black">
                                 <div>
                                     <span class="font-medium block">Envío Nacional</span>
                                     <span class="text-xs text-gray-500">Pago por transferencia o Mercado Pago</span>
@@ -201,11 +201,11 @@
                             </label>
                             <label id="pay-cash" class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
                                 <input type="radio" name="payment-method" value="Pago contra entrega en efectivo" onchange="handlePaymentChange()" class="text-black focus:ring-black">
-                                <span class="font-medium">Pago contra entrega en efectivo (Solo GDL)</span>
+                                <span class="font-medium">Pago contra entrega en efectivo</span>
                             </label>
                             <label id="pay-terminal" class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
                                 <input type="radio" name="payment-method" value="Pago contra entrega en terminal" onchange="handlePaymentChange()" class="text-black focus:ring-black">
-                                <span class="font-medium">Pago contra entrega en terminal (Solo GDL)</span>
+                                <span class="font-medium">Pago contra entrega en terminal</span>
                             </label>
                         </div>
 
@@ -393,7 +393,7 @@
             const modal = document.getElementById('cart-modal');
             const drawer = document.getElementById('cart-drawer-panel');
 
-            // Si es el primer producto añadido, se abre durante 1.5 segundos y se oculta solo deslizando/desvaneciendo
+            // Solo se abre automáticamente en el primer artículo, durante 1.5 segundos y se oculta deslizando a la derecha
             if (!hasAddedFirstItem) {
                 hasAddedFirstItem = true;
                 modal.classList.remove('hidden');
@@ -408,12 +408,8 @@
                         modal.classList.add('hidden');
                     }, 300);
                 }, 1500);
-            } else {
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    drawer.classList.remove('translate-x-full');
-                }, 10);
             }
+            // A partir del segundo artículo ya no se abre solo.
         }
 
         function updateCartUI() {
@@ -500,7 +496,7 @@
                 actionBtn.textContent = "Procesando pedido...";
 
                 try {
-                    // Estructura correcta que espera tu backend en Vercel para Mercado Pago
+                    // Si selecciona Mercado Pago, envía los datos al endpoint de Vercel asegurando el formato correcto
                     if (paymentMethod === "Mercado Pago") {
                         const respMP = await fetch('/api/crear-preferencia', {
                             method: 'POST',
@@ -513,17 +509,26 @@
                                 }))
                             })
                         });
-                        const dataMP = await respMP.json();
+                        
+                        const textResponse = await respMP.text();
+                        let dataMP;
+                        try {
+                            dataMP = JSON.parse(textResponse);
+                        } catch (err) {
+                            console.error("Respuesta no JSON del servidor:", textResponse);
+                            alert("Error en el servidor de Vercel. Revisa los logs de tu función /api/crear-preferencia.");
+                            return;
+                        }
 
-                        if (dataMP.id || dataMP.init_point) {
+                        if (respMP.ok && (dataMP.id || dataMP.init_point)) {
                             const redirectUrl = dataMP.init_point || `https://www.mercadopago.com.mx/checkout/v1/redirect?pref_id=${dataMP.id}`;
                             window.location.href = redirectUrl;
                             return;
                         } else {
-                            alert("Hubo un detalle al conectar con Mercado Pago. Verifica la configuración en Vercel.");
+                            alert(`Error de Mercado Pago: ${dataMP.error || dataMP.message || 'Verifica la configuración del Access Token en Vercel.'}`);
                         }
                     } else {
-                        // Envío por correo con FormSubmit para métodos alternativos
+                        // Envío por correo con FormSubmit para Transferencia o Contra Entrega
                         let resumen = "";
                         let total = 0;
                         cart.forEach(item => {
