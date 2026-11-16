@@ -623,19 +623,26 @@
             }
 
             try {
-                const { collection, query, where, getDocs } = window.FB_Methods;
-                const q = query(collection(window.FB_Db, "products"), where("category", "==", categoryKey));
-                const querySnapshot = await getDocs(q);
+                const { collection, getDocs } = window.FB_Methods;
+                // Traemos todos los productos y filtramos localmente para evitar errores de índices en Firebase
+                const querySnapshot = await getDocs(collection(window.FB_Db, "products"));
+                
+                let matchingProducts = [];
+                querySnapshot.forEach((docSnap) => {
+                    const p = docSnap.data();
+                    if(p.category === categoryKey) {
+                        matchingProducts.push({ id: docSnap.id, ...p });
+                    }
+                });
 
-                if (querySnapshot.empty) {
+                if (matchingProducts.length === 0) {
                     gridEl.innerHTML = `<p class="text-gray-500 italic py-8 text-center col-span-full">Pronto agregaremos nuevos modelos en esta categoría.</p>`;
                     return;
                 }
 
                 let html = '';
-                querySnapshot.forEach((docSnap) => {
-                    const p = docSnap.data();
-                    const prodId = docSnap.id;
+                matchingProducts.forEach((p) => {
+                    const prodId = p.id;
                     const defaultImg = p.images && p.images.length > 0 ? p.images[0] : '';
                     
                     let colorsHtml = '';
