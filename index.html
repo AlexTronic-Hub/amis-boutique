@@ -315,4 +315,44 @@
             Cliente: nombre,
             WhatsApp: whatsapp,
             Direccion: direccion,
-            Metodo_Pago: metodo
+            Metodo_Pago: metodo,
+            Productos: resumen,
+            Total: `$${total} MXN`
+          })
+        });
+
+        if (metodo === "Mercado Pago En Línea") {
+          const respMP = await fetch('/api/crear-preferencia', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: carrito })
+          });
+
+          const dataMP = await respMP.json();
+
+          // CORRECCIÓN AQUÍ: Se usa dataMP.id en lugar de dataMP.init_point
+          if (dataMP.id) {
+            window.location.href = `https://www.mercadopago.com.mx/checkout/v1/redirect?pref_id=${dataMP.id}`;
+            return;
+          } else {
+            alert("Pedido enviado por correo, pero hubo un detalle al abrir Mercado Pago.");
+          }
+        } else {
+          alert("¡Pedido enviado por correo con éxito! Nos pondremos en contacto por WhatsApp.");
+          carrito = [];
+          actualizarCarritoUI();
+          toggleCarrito();
+        }
+      } catch (error) {
+        alert("Ocurrió un error al procesar el pedido. Revisa tu conexión.");
+        console.error(error);
+      } finally {
+        btn.disabled5 = false;
+        btn.disabled = false;
+        btn.textContent = "💳 Enviar Pedido y Pagar";
+      }
+    }
+  </script>
+
+</body>
+</html>
