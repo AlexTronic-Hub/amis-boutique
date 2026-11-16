@@ -62,15 +62,20 @@
         margin-left: 1.8rem;
         letter-spacing: 0.02em;
       }
-      #cart-drawer-panel {
-        transition: transform 0.3s ease-in-out;
-      }
-      #mobile-menu-panel {
+      #cart-drawer-panel, #mobile-menu-panel {
         transition: transform 0.3s ease-in-out;
       }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans">
+
+    <!-- NOTIFICACIÓN FLOTANTE ELEGANTE (En lugar de alert feos) -->
+    <div id="toast-notification" class="fixed top-5 right-5 z-50 transform translate-y-[-200%] transition-transform duration-300">
+        <div id="toast-card" class="bg-black text-white px-5 py-3 rounded-2xl shadow-xl text-xs flex items-center gap-3">
+            <span id="toast-icon">✨</span>
+            <span id="toast-msg">Mensaje de notificación</span>
+        </div>
+    </div>
 
     <!-- HEADER / NAVEGACIÓN -->
     <header class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
@@ -360,6 +365,31 @@
         let userData = null;
         let isRegistering = false;
 
+        // Función para mostrar notificaciones elegantes en lugar de alert()
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast-notification');
+            const card = document.getElementById('toast-card');
+            const icon = document.getElementById('toast-icon');
+            const msg = document.getElementById('toast-msg');
+
+            msg.textContent = message;
+            if (type === 'success') {
+                card.className = "bg-black text-white px-5 py-3 rounded-2xl shadow-xl text-xs flex items-center gap-3";
+                icon.textContent = "✨";
+            } else {
+                card.className = "bg-red-600 text-white px-5 py-3 rounded-2xl shadow-xl text-xs flex items-center gap-3";
+                icon.textContent = "⚠️";
+            }
+
+            toast.classList.remove('translate-y-[-200%]');
+            toast.classList.add('translate-y-0');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0');
+                toast.classList.add('translate-y-[-200%]');
+            }, 3500);
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             const checkFB = setInterval(() => {
                 if (window.FB_Auth) {
@@ -368,9 +398,13 @@
                         currentUser = user;
                         if (user) {
                             const { doc, getDoc } = window.FB_Methods;
-                            const userDoc = await getDoc(doc(window.FB_Db, "users", user.uid));
-                            if (userDoc.exists()) {
-                                userData = userDoc.data();
+                            try {
+                                const userDoc = await getDoc(doc(window.FB_Db, "users", user.uid));
+                                if (userDoc.exists()) {
+                                    userData = userDoc.data();
+                                }
+                            } catch (e) {
+                                console.error("Error cargando perfil:", e);
                             }
                             loadUserOrders(user.uid);
                         } else {
@@ -382,7 +416,6 @@
             }, 200);
 
             updateCartUI();
-            updateMenuAuthUI();
 
             // Validación de pagos Mercado Pago
             const urlParams = new URLSearchParams(window.location.search);
@@ -421,24 +454,24 @@
             if (currentUser) {
                 authSection.innerHTML = `
                     <div class="space-y-3">
-                        <div class="bg-gray-50 p-3 rounded-xl text-xs space-y-1">
-                            <p class="font-bold text-gray-950">${userData ? `${userData.names} ${userData.surnames}` : 'Mi Cuenta'}</p>
+                        <div class="bg-gray-50 p-3 rounded-xl text-xs space-y-1 border border-gray-100">
+                            <p class="font-bold text-gray-950 text-sm">${userData ? `${userData.names} ${userData.surnames}` : 'Mi Cuenta'}</p>
                             <p class="text-gray-600">${currentUser.email}</p>
                             <p class="text-gray-600">${userData ? userData.phone : ''}</p>
                         </div>
                         <div>
                             <p class="font-serif font-bold text-xs uppercase tracking-wider mb-2 text-gray-800">Mis Pedidos</p>
                             <div id="menu-user-orders" class="space-y-2 max-h-36 overflow-y-auto text-xs text-gray-600">
-                                <p class="text-gray-400 italic">Cargando...</p>
+                                <p class="text-gray-400 italic">Cargando pedidos...</p>
                             </div>
                         </div>
-                        <button onclick="handleLogout()" class="w-full bg-gray-100 text-red-600 py-2 rounded-full text-xs tracking-widest uppercase hover:bg-red-50 transition font-medium">Salir</button>
+                        <button onclick="handleLogout()" class="w-full bg-gray-100 text-red-600 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-red-50 transition font-medium">Salir</button>
                     </div>
                 `;
                 if (currentUser.uid) loadUserOrders(currentUser.uid);
             } else {
                 authSection.innerHTML = `
-                    <button onclick="toggleAuthModal()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
+                    <button onclick="toggleAuthModal()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition shadow-sm">
                         Iniciar Sesión / Registrarse
                     </button>
                 `;
@@ -479,7 +512,7 @@
                     const phone = document.getElementById('reg-phone').value;
 
                     if (!names || !surnames || !phone) {
-                        alert("Por favor completa todos los campos de registro.");
+                        showToast("Por favor completa todos los campos de registro.", "error");
                         return;
                     }
 
@@ -487,20 +520,20 @@
                     await setDoc(doc(window.FB_Db, "users", res.user.uid), {
                         names, surnames, phone, email, createdAt: new Date()
                     });
-                    alert("¡Cuenta creada con éxito!");
+                    showToast("¡Cuenta creada con éxito!");
                 } else {
                     await signInWithEmailAndPassword(window.FB_Auth, email, password);
-                    alert("¡Bienvenida de nuevo!");
+                    showToast("¡Bienvenida de nuevo!");
                 }
                 toggleAuthModal();
             } catch (error) {
-                alert("Error: " + error.message);
+                showToast("Error: " + error.message, "error");
             }
         }
 
         async function handleLogout() {
             await window.FB_Methods.signOut(window.FB_Auth);
-            alert("Has salido de tu cuenta.");
+            showToast("Has salido de tu cuenta.");
             toggleMobileMenu();
         }
 
@@ -673,7 +706,6 @@
                 actionBtn.textContent = 'Siguiente: Pago';
                 actionBtn.style.display = 'block';
 
-                // Autocompletar datos si la clienta tiene sesión iniciada
                 if (userData) {
                     document.getElementById('ship-name').value = `${userData.names} ${userData.surnames}`;
                     document.getElementById('ship-phone').value = userData.phone;
@@ -706,7 +738,7 @@
                 const phone = document.getElementById('ship-phone').value;
                 const address = document.getElementById('ship-address').value;
                 if (!name || !phone || !address) {
-                    alert("Por favor completa los datos de envío y contacto.");
+                    showToast("Por favor completa los datos de envío y contacto.", "error");
                     return;
                 }
                 checkoutStep = 3;
@@ -781,10 +813,10 @@
                             window.location.href = dataMP.init_point;
                             return;
                         } else {
-                            alert("Error al conectar con Mercado Pago.");
+                            showToast("Error al conectar con Mercado Pago.", "error");
                         }
                     } else {
-                        alert(`¡Pedido procesado con éxito!\n\nEnvío: ${shippingMethod}\nPago: ${paymentMethod}`);
+                        showToast(`¡Pedido procesado con éxito!`);
                         cart = [];
                         localStorage.removeItem('amis_cart');
                         toggleCartModal();
@@ -792,7 +824,7 @@
                     }
                 } catch (error) {
                     console.error(error);
-                    alert("Ocurrió un error al procesar tu pedido. Intenta de nuevo.");
+                    showToast("Ocurrió un error al procesar tu pedido.", "error");
                 } finally {
                     actionBtn.disabled = false;
                     actionBtn.textContent = "Finalizar Pedido";
