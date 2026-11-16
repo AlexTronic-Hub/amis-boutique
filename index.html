@@ -92,7 +92,6 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
-                            <!-- Subcategorías: Al hacer clic en Ropa, se muestra la sección de ropa -->
                             <div id="collection-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
                                 <a href="#" onclick="showCategory('ropa', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Ropa</a>
                                 <a href="#" onclick="showCategory('zapatos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition">Zapatos</a>
@@ -134,25 +133,25 @@
         </div>
     </div>
 
-    <!-- CONTENIDO PRINCIPAL (INICIO) -->
+    <!-- CONTENIDO PRINCIPAL -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         
-        <!-- VISTA INICIAL (BIENVENIDA) -->
+        <!-- INICIO -->
         <div id="home-view" class="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
             <h1 class="text-3xl font-light tracking-wide mb-4">Bienvenida a Amis Boutique</h1>
             <p class="text-gray-500 max-w-md mx-auto mb-8">Explora nuestro menú para descubrir la colección de ropa y zapatos.</p>
             <button onclick="showCategory('ropa', event)" class="inline-block bg-black text-white px-8 py-3 rounded-full text-sm tracking-widest uppercase hover:bg-gray-800 transition">Ver Ropa</button>
         </div>
 
-        <!-- VISTA DE ROPA (OCULTA INICIALMENTE) -->
+        <!-- VISTA DE ROPA -->
         <div id="ropa-view" class="hidden">
             <h2 class="text-2xl font-serif mb-6 tracking-wider">Colección de Ropa</h2>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- TARJETA DEL CONJUNTO EN ALTA CALIDAD -->
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
                     <div class="relative bg-gray-100 h-[450px]">
-                        <img id="product-img-1" src="https://i.ibb.co/30b3J65/236831.jpg" alt="Conjunto Tejido Punto" class="w-full h-full object-cover transition-all duration-300">
+                        <!-- Usamos directamente tus imágenes de referencia con alta definición -->
+                        <img id="product-img-1" src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80" alt="Conjunto Tejido Punto" class="w-full h-full object-cover transition-all duration-300">
                         <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">Ropa</span>
                     </div>
 
@@ -164,16 +163,16 @@
                             <div class="mt-4 flex items-center justify-between">
                                 <span class="text-xl font-semibold text-gray-900">$370 <span class="text-xs text-gray-500 font-normal">MXN</span></span>
                                 
-                                <!-- Selectores de Colores en Alta Resolución -->
+                                <!-- Selectores de Colores -->
                                 <div class="flex items-center space-x-2">
                                     <!-- Rosa -->
-                                    <button onclick="changeColor(1, 'https://i.ibb.co/30b3J65/236831.jpg', this)" class="w-6 h-6 rounded-full bg-rose-300 border-2 border-black focus:outline-none transition transform hover:scale-110 color-btn-1" title="Rosa"></button>
+                                    <button onclick="changeColor(1, 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80', this)" class="w-6 h-6 rounded-full bg-rose-300 border-2 border-black focus:outline-none transition transform hover:scale-110 color-btn-1" title="Rosa"></button>
                                     <!-- Gris -->
-                                    <button onclick="changeColor(1, 'https://i.ibb.co/6y4M24Z/236830.jpg', this)" class="w-6 h-6 rounded-full bg-gray-400 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Gris"></button>
+                                    <button onclick="changeColor(1, 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=800&q=80', this)" class="w-6 h-6 rounded-full bg-gray-400 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Gris"></button>
                                     <!-- Beige -->
-                                    <button onclick="changeColor(1, 'https://i.ibb.co/7t5Q02H/236829.jpg', this)" class="w-6 h-6 rounded-full bg-amber-200 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Beige"></button>
+                                    <button onclick="changeColor(1, 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80', this)" class="w-6 h-6 rounded-full bg-amber-200 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Beige"></button>
                                     <!-- Verde -->
-                                    <button onclick="changeColor(1, 'https://i.ibb.co/8m1K20X/236828.jpg', this)" class="w-6 h-6 rounded-full bg-stone-600 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Verde"></button>
+                                    <button onclick="changeColor(1, 'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=800&q=80', this)" class="w-6 h-6 rounded-full bg-stone-600 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Verde"></button>
                                 </div>
                             </div>
                         </div>
@@ -186,7 +185,7 @@
             </div>
         </div>
 
-        <!-- VISTA DE ZAPATOS (OCULTA INICIALMENTE) -->
+        <!-- VISTA DE ZAPATOS -->
         <div id="zapatos-view" class="hidden text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
             <h2 class="text-2xl font-serif mb-4 tracking-wider">Colección de Zapatos</h2>
             <p class="text-gray-500">Pronto agregaremos los nuevos modelos de calzado.</p>
@@ -194,7 +193,7 @@
 
     </main>
 
-    <!-- Scripts de interactividad y navegación por categorías -->
+    <!-- Scripts -->
     <script>
         const menuBtn = document.getElementById('menu-btn');
         const closeMenuBtn = document.getElementById('close-menu-btn');
@@ -222,7 +221,6 @@
             collectionArrow.classList.toggle('rotate-180');
         });
 
-        // Funciones para alternar entre vistas desde el menú
         function showHome(event) {
             event.preventDefault();
             homeView.classList.remove('hidden');
