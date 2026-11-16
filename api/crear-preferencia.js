@@ -1,6 +1,5 @@
 import { MercadoPagoConfig, Preference } from 'mercadopago';
 
-// Aquí le indicamos que busque exactamente la variable MP_ACCESS_TOKEN que tienes en Vercel
 const client = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
 
 export default async function handler(req, res) {
@@ -15,9 +14,9 @@ export default async function handler(req, res) {
     const result = await preference.create({
       body: {
         items: items.map(item => ({
-          title: item.title,
-          unit_price: Number(item.unit_price),
-          quantity: Number(item.quantity),
+          title: String(item.title),
+          unit_price: Number(item.unit_price), // <--- Forzamos que sea número
+          quantity: Number(item.quantity || 1),
           currency_id: 'MXN'
         })),
         back_urls: {
@@ -31,7 +30,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ id: result.id, init_point: result.init_point });
   } catch (error) {
-    console.error("Error en Mercado Pago:", error);
-    return res.status(500).json({ error: error.message || 'Error al procesar el pago con Mercado Pago' });
+    console.error("Error de Mercado Pago:", error.response?.data || error.message);
+    return res.status(500).json({ error: error.message || 'Error al procesar el pago' });
   }
 }
