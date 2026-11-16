@@ -81,7 +81,7 @@
     <header class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             
-            <button id="menu-btn" class="p-2 rounded-md focus:outline-none hover:bg-gray-100 transition">
+            <button id="menu-btn" onclick="toggleMobileMenu()" class="p-2 rounded-md focus:outline-none hover:bg-gray-100 transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
 
@@ -190,11 +190,11 @@
                     </div>
 
                     <nav class="mt-6 space-y-4">
-                        <!-- 1. MI CUENTA (Clic directo abre login o muestra datos) -->
+                        <!-- 1. MI CUENTA -->
                         <div>
                             <button onclick="handleAccountClick()" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
-                                <span id="menu-account-title" class="tracking-widest uppercase text-sm font-bold">Mi Cuenta</span>
-                                <span id="menu-account-status" class="text-xs text-gray-400">Iniciar sesión</span>
+                                <span class="tracking-widest uppercase text-sm font-bold">Mi Cuenta</span>
+                                <span id="menu-account-status" class="text-xs text-gray-500 font-normal">Iniciar sesión</span>
                             </button>
                         </div>
 
@@ -540,7 +540,6 @@
             try {
                 const { collection, query, where, getDocs, doc, getDoc } = window.FB_Methods;
                 
-                // Cargar Pedidos
                 const q = query(collection(window.FB_Db, "orders"), where("userId", "==", uid));
                 const querySnapshot = await getDocs(q);
                 
@@ -558,7 +557,6 @@
                     ordersContent.innerHTML = html;
                 }
 
-                // Cargar Direcciones (del documento de usuario en Firestore o pedidos)
                 const userDocRef = doc(window.FB_Db, "users", uid);
                 const userSnap = await getDoc(userDocRef);
                 let addresses = [];
@@ -567,7 +565,6 @@
                     addresses = userSnap.data().addresses;
                 }
 
-                // Si no tiene guardadas explícitamente, extraer de pedidos anteriores
                 if (addresses.length === 0) {
                     querySnapshot.forEach((doc) => {
                         const data = doc.data();
@@ -716,7 +713,6 @@
         }
 
         // Navegación menú lateral y submenús desplegables
-        const menuBtn = document.getElementById('menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
         const mobileMenuPanel = document.getElementById('mobile-menu-panel');
 
@@ -729,8 +725,6 @@
                 setTimeout(() => mobileMenu.classList.add('hidden'), 300);
             }
         }
-
-        menuBtn.addEventListener('click', toggleMobileMenu);
 
         function setupDropdown(toggleId, submenuId, arrowId) {
             const btn = document.getElementById(toggleId);
@@ -956,7 +950,7 @@
                         localStorage.setItem('amis_cart', JSON.stringify(cart));
                         const respMP = await fetch('/api/crear-preferencia', {
                             method: 'POST',
-                            headers: { 'Content-Type": "application/json' },
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ 
                                 items: cart.map(item => ({
                                     title: `${item.name} (${item.color})`,
@@ -1009,7 +1003,6 @@
         }
 
         function handlePaymentChange() {
-            const selectedMethod = document.querySelector('input[name="payment-method"][value="Mercado Pago"]');
             // Mantener lógica simple
         }
     </script>
