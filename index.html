@@ -160,7 +160,7 @@
         </div>
     </div>
 
-    <!-- MODAL PARA AGREGAR DIRECCIÓN -->
+    <!-- MODAL PARA AGREGAR DIRECCIÓN (ESTILO AMAZON / MERCADO LIBRE) -->
     <div id="address-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
         <div class="flex items-center justify-center min-h-screen px-4">
             <div class="fixed inset-0 bg-black bg-opacity-50" onclick="toggleAddressModal()"></div>
@@ -169,11 +169,49 @@
                     <h3 class="font-serif text-xl font-bold">Agregar Nueva Dirección</h3>
                     <button onclick="toggleAddressModal()" class="text-gray-400 hover:text-black">✕</button>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Dirección completa o referencias *</label>
-                    <textarea id="new-address-input" rows="3" class="w-full p-3 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-black" placeholder="Calle, número, colonia, referencias..."></textarea>
+                
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <label class="block font-bold uppercase text-gray-700 mb-1">Código Postal *</label>
+                        <input type="text" id="dir-cp" maxlength="5" placeholder="Ej. 44100" oninput="buscarCodigoPostal(this.value)" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black font-mono">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-bold uppercase text-gray-700 mb-1">Calle *</label>
+                            <input type="text" id="dir-calle" placeholder="Nombre de la calle" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
+                        </div>
+                        <div>
+                            <label class="block font-bold uppercase text-gray-700 mb-1">Núm. Exterior *</label>
+                            <input type="text" id="dir-num-ext" placeholder="Ej. 123" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-bold uppercase text-gray-700 mb-1">Núm. Interior (Opc.)</label>
+                            <input type="text" id="dir-num-int" placeholder="Ej. Depto 4B" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
+                        </div>
+                        <div>
+                            <label class="block font-bold uppercase text-gray-700 mb-1">Ciudad / Municipio *</label>
+                            <input type="text" id="dir-ciudad" placeholder="Ej. Guadalajara" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold uppercase text-gray-700 mb-1">Colonia *</label>
+                        <select id="dir-colonia-select" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black bg-white">
+                            <option value="">Ingresa un Código Postal primero</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold uppercase text-gray-700 mb-1">Estado *</label>
+                        <input type="text" id="dir-estado" placeholder="Ej. Jalisco" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
+                    </div>
                 </div>
-                <button onclick="saveNewAddress()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">Guardar Dirección</button>
+
+                <button onclick="saveStructuredAddress()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition mt-2">Guardar Dirección</button>
             </div>
         </div>
     </div>
@@ -534,97 +572,113 @@
         });
 
        async function loadUserDataAndOrders(uid, userObj = null) {
-    const ordersContent = document.getElementById('menu-user-orders');
-    const addressesContent = document.getElementById('menu-user-addresses');
-    const profileContent = document.getElementById('menu-user-profile');
-    const accountToggleBtn = document.getElementById('account-toggle-btn');
+            const ordersContent = document.getElementById('menu-user-orders');
+            const addressesContent = document.getElementById('menu-user-addresses');
+            const profileContent = document.getElementById('menu-user-profile');
+            const accountToggleBtn = document.getElementById('account-toggle-btn');
 
-    try {
-        const { collection, query, where, getDocs, doc, getDoc } = window.FB_Methods;
-        
-        const userDocRef = doc(window.FB_Db, "users", uid);
-        const userSnap = await getDoc(userDocRef);
+            try {
+                const { collection, query, where, getDocs, doc, getDoc } = window.FB_Methods;
+                
+                const userDocRef = doc(window.FB_Db, "users", uid);
+                const userSnap = await getDoc(userDocRef);
 
-        let names = '';
-        let surnames = '';
-        let phone = '';
-        let email = currentUser ? currentUser.email : '';
-        let hasData = false;
+                let names = '';
+                let surnames = '';
+                let phone = '';
+                let email = currentUser ? currentUser.email : '';
+                let hasData = false;
+                let addresses = [];
 
-        if (userSnap.exists()) {
-            userData = userSnap.data();
-            names = userData.names || '';
-            surnames = userData.surnames || '';
-            phone = userData.phone || '';
-            hasData = names.trim() !== "";
-        }
+                if (userSnap.exists()) {
+                    userData = userSnap.data();
+                    names = userData.names || '';
+                    surnames = userData.surnames || '';
+                    phone = userData.phone || '';
+                    hasData = names.trim() !== "";
+                    addresses = userData.addresses || [];
+                }
 
-        const primerNombre = hasData ? names.split(' ')[0] : 'Cliente';
-        
-        // Actualizar saludo en el menú principal
-        if (accountToggleBtn) {
-            const span = accountToggleBtn.querySelector('span');
-            if (span) span.textContent = `Hola, ${primerNombre}`;
-        }
+                const primerNombre = hasData ? names.split(' ')[0] : 'Cliente';
+                
+                if (accountToggleBtn) {
+                    const span = accountToggleBtn.querySelector('span');
+                    if (span) span.textContent = `Hola, ${primerNombre}`;
+                }
 
-        if (profileContent) {
-            if (!hasData) {
-                // SI NO HAY DATOS: Muestra el formulario para agregarlos
-                profileContent.innerHTML = `
-                    <div class="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-2 text-gray-700">
-                        <p class="text-xs text-gray-500 font-medium">Agrega tus datos personales:</p>
-                        <input type="text" id="input-names" placeholder="Nombre(s)" value="${names}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
-                        <input type="text" id="input-surnames" placeholder="Apellidos" value="${surnames}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
-                        <input type="text" id="input-phone" placeholder="Teléfono" value="${phone}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
-                        <button onclick="guardarMisDatos('${uid}')" class="w-full bg-black text-white py-2 rounded-md text-xs tracking-wider uppercase hover:bg-gray-800 transition">Guardar Mis Datos</button>
-                    </div>
-                `;
-            } else {
-                // SI YA LOS TIENE: Muestra la vista y opción de modificar
-                profileContent.innerHTML = `
-                    <div id="view-data-box" class="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-1 text-gray-700 text-xs">
-                        <p><strong>Nombre(s):</strong> ${names}</p>
-                        <p><strong>Apellidos:</strong> ${surnames || '-'}</p>
-                        <p><strong>Teléfono:</strong> ${phone || '-'}</p>
-                        <p><strong>Correo:</strong> ${email || '-'}</p>
-                        <button onclick="habilitarEdicionDatos()" class="mt-2 w-full bg-gray-200 text-gray-800 py-1.5 rounded-md text-[11px] tracking-wider uppercase hover:bg-gray-300 transition">Modificar Datos</button>
-                    </div>
-                    <div id="edit-data-box" class="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-2 text-gray-700 hidden">
-                        <p class="text-xs text-gray-500 font-medium">Modifica tus datos:</p>
-                        <input type="text" id="input-names" placeholder="Nombre(s)" value="${names}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
-                        <input type="text" id="input-surnames" placeholder="Apellidos" value="${surnames}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
-                        <input type="text" id="input-phone" placeholder="Teléfono" value="${phone}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
-                        <div class="flex gap-2">
-                            <button onclick="guardarMisDatos('${uid}')" class="flex-1 bg-black text-white py-2 rounded-md text-xs tracking-wider uppercase hover:bg-gray-800 transition">Actualizar</button>
-                            <button onclick="cancelarEdicionDatos()" class="flex-1 bg-gray-200 text-gray-800 py-2 rounded-md text-xs tracking-wider uppercase hover:bg-gray-300 transition">Cancelar</button>
-                        </div>
-                    </div>
-                `;
+                if (profileContent) {
+                    if (!hasData) {
+                        profileContent.innerHTML = `
+                            <div class="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-2 text-gray-700">
+                                <p class="text-xs text-gray-500 font-medium">Agrega tus datos personales:</p>
+                                <input type="text" id="input-names" placeholder="Nombre(s)" value="${names}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
+                                <input type="text" id="input-surnames" placeholder="Apellidos" value="${surnames}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
+                                <input type="text" id="input-phone" placeholder="Teléfono" value="${phone}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
+                                <button onclick="guardarMisDatos('${uid}')" class="w-full bg-black text-white py-2 rounded-md text-xs tracking-wider uppercase hover:bg-gray-800 transition">Guardar Mis Datos</button>
+                            </div>
+                        `;
+                    } else {
+                        profileContent.innerHTML = `
+                            <div id="view-data-box" class="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-1 text-gray-700 text-xs">
+                                <p><strong>Nombre(s):</strong> ${names}</p>
+                                <p><strong>Apellidos:</strong> ${surnames || '-'}</p>
+                                <p><strong>Teléfono:</strong> ${phone || '-'}</p>
+                                <p><strong>Correo:</strong> ${email || '-'}</p>
+                                <button onclick="habilitarEdicionDatos()" class="mt-2 w-full bg-gray-200 text-gray-800 py-1.5 rounded-md text-[11px] tracking-wider uppercase hover:bg-gray-300 transition">Modificar Datos</button>
+                            </div>
+                            <div id="edit-data-box" class="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-2 text-gray-700 hidden">
+                                <p class="text-xs text-gray-500 font-medium">Modifica tus datos:</p>
+                                <input type="text" id="input-names" placeholder="Nombre(s)" value="${names}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
+                                <input type="text" id="input-surnames" placeholder="Apellidos" value="${surnames}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
+                                <input type="text" id="input-phone" placeholder="Teléfono" value="${phone}" class="w-full p-2 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-black">
+                                <div class="flex gap-2">
+                                    <button onclick="guardarMisDatos('${uid}')" class="flex-1 bg-black text-white py-2 rounded-md text-xs tracking-wider uppercase hover:bg-gray-800 transition">Actualizar</button>
+                                    <button onclick="cancelarEdicionDatos()" class="flex-1 bg-gray-200 text-gray-800 py-2 rounded-md text-xs tracking-wider uppercase hover:bg-gray-300 transition">Cancelar</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                // Cargar direcciones ordenadas
+                if (addressesContent) {
+                    if (addresses.length === 0) {
+                        addressesContent.innerHTML = '<p class="text-gray-400 italic">No hay direcciones guardadas aún.</p>';
+                    } else {
+                        let addrHtml = '';
+                        addresses.forEach(addr => {
+                            addrHtml += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 text-gray-700 mb-1">
+                                <p class="font-medium text-gray-900">📍 Dirección:</p>
+                                <p class="text-[11px] text-gray-600 mt-0.5">${addr}</p>
+                            </div>`;
+                        });
+                        addressesContent.innerHTML = addrHtml;
+                    }
+                }
+
+                // Cargar pedidos
+                const q = query(collection(window.FB_Db, "orders"), where("userId", "==", uid));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    if (ordersContent) ordersContent.innerHTML = '<p class="text-gray-400 italic">No tienes pedidos anteriores.</p>';
+                } else {
+                    let html = '';
+                    querySnapshot.forEach((docSnap) => {
+                        const data = docSnap.data();
+                        html += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 space-y-0.5 text-xs">
+                            <p class="font-medium text-gray-900">${data.total || ''} · ${data.shipping || ''}</p>
+                        </div>`;
+                    });
+                    if (ordersContent) ordersContent.innerHTML = html;
+                }
+
+            } catch (e) {
+                console.error("Error al cargar perfil:", e);
+                if (profileContent) profileContent.innerHTML = '<p class="text-red-400 text-xs">Error al cargar perfil.</p>';
             }
         }
 
-        // Cargar pedidos
-        const q = query(collection(window.FB_Db, "orders"), where("userId", "==", uid));
-        const querySnapshot = await getDocs(q);
-        
-        if (querySnapshot.empty) {
-            if (ordersContent) ordersContent.innerHTML = '<p class="text-gray-400 italic">No tienes pedidos anteriores.</p>';
-        } else {
-            let html = '';
-            querySnapshot.forEach((docSnap) => {
-                const data = docSnap.data();
-                html += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 space-y-0.5 text-xs">
-                    <p class="font-medium text-gray-900">${data.total || ''} · ${data.shipping || ''}</p>
-                </div>`;
-            });
-            if (ordersContent) ordersContent.innerHTML = html;
-        }
-
-    } catch (e) {
-        console.error("Error al cargar perfil:", e);
-        if (profileContent) profileContent.innerHTML = '<p class="text-red-400 text-xs">Error al cargar perfil.</p>';
-    }
-}
         function toggleAuthModal() {
             const modal = document.getElementById('auth-modal');
             const errorBox = document.getElementById('auth-error-box');
@@ -647,15 +701,13 @@
                 const data = await response.json();
 
                 if (!data.error) {
-                    const asentamientos = data.response.asentamiento; // Puede ser un texto o una lista de colonias
+                    const asentamientos = data.response.asentamiento;
                     const municipio = data.response.municipio;
                     const estado = data.response.estado;
 
-                    // Rellenar ciudad y estado automáticamente
                     document.getElementById('dir-ciudad').value = municipio || '';
                     document.getElementById('dir-estado').value = estado || '';
 
-                    // Poblar el selector de colonias de forma dinámica
                     const selectColonia = document.getElementById('dir-colonia-select');
                     selectColonia.innerHTML = '';
 
@@ -701,7 +753,6 @@
                 return;
             }
 
-            // Formatear dirección ordenada estilo Amazon / Mercado Libre
             const direccionCompleta = `${calle} #${numExt}${numInt ? ' Int. ' + numInt : ''}, Col. ${colonia}, C.P. ${cp}, ${ciudad}, ${estado}`;
 
             try {
@@ -712,7 +763,6 @@
                 
                 showToast("¡Dirección guardada con éxito!");
                 
-                // Limpiar formulario
                 document.getElementById('dir-cp').value = '';
                 document.getElementById('dir-calle').value = '';
                 document.getElementById('dir-num-ext').value = '';
@@ -1000,7 +1050,6 @@
                 actionBtn.textContent = "Procesando pedido...";
 
                 try {
-                    // Si selecciona Mercado Pago, hace la petición a tu API de Vercel
                     if (paymentMethod === "Mercado Pago") {
                         const respMP = await fetch('/api/crear-preferencia', {
                             method: 'POST',
@@ -1023,7 +1072,6 @@
                         }
 
                         if (dataMP && dataMP.init_point) {
-                            // Guarda el carrito en localStorage por si regresa de la pasarela
                             localStorage.setItem('amis_cart', JSON.stringify(cart));
                             window.location.href = dataMP.init_point;
                             return;
@@ -1031,7 +1079,6 @@
                             throw new Error(dataMP.error || "No se pudo obtener el enlace de pago de Mercado Pago.");
                         }
                     } else {
-                        // Para transferencia u otros métodos de pago locales
                         alert(`¡Pedido registrado con éxito! Método de pago: ${paymentMethod}`);
                         cart = [];
                         localStorage.removeItem('amis_cart');
@@ -1070,10 +1117,6 @@
             // Mantener lógica simple
         }
 
-        function handlePaymentChange() {
-            // Mantener lógica simple
-        }
-
         // --- FUNCIONES PARA GESTIONAR LOS DATOS PERSONALES ---
         async function guardarMisDatos(uid) {
             const names = document.getElementById('input-names').value.trim();
@@ -1089,7 +1132,6 @@
                 const { doc, setDoc } = window.FB_Methods;
                 const userDocRef = doc(window.FB_Db, "users", uid);
 
-                // Guardar o fusionar los datos en Firestore
                 await setDoc(userDocRef, {
                     names,
                     surnames,
@@ -1098,7 +1140,7 @@
                 }, { merge: true });
 
                 showToast("¡Datos guardados con éxito!");
-                loadUserDataAndOrders(uid); // Recargar la vista del menú
+                loadUserDataAndOrders(uid);
             } catch (error) {
                 console.error("Error al guardar datos:", error);
                 showToast("Hubo un error al guardar tus datos.", "error");
@@ -1114,7 +1156,6 @@
             document.getElementById('edit-data-box').classList.add('hidden');
             document.getElementById('view-data-box').classList.remove('hidden');
         }
-    
     </script>
 </body>
 </html>
