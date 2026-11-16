@@ -848,7 +848,6 @@
                 actionBtn.textContent = 'Siguiente: Pago';
                 actionBtn.style.display = 'block';
 
-                // Autocompletar datos si el usuario tiene sesión iniciada
                 if (userData && currentUser) {
                     document.getElementById('ship-name').value = `${userData.names || ''} ${userData.surnames || ''}`.trim();
                     document.getElementById('ship-phone').value = userData.phone || '';
@@ -875,10 +874,11 @@
         }
 
         async function handleCartNext() {
+            console.log("-> handleCartNext ejecutándose. Paso actual:", checkoutStep);
+
             if (checkoutStep === 1) {
                 if (cart.length === 0) return;
                 
-                // Si el usuario ya tiene sesión y sus datos registrados, autocompletamos y pasamos al paso 2 (Envío/Datos) o revisamos
                 if (userData && currentUser && userData.names && userData.phone) {
                     document.getElementById('ship-name').value = `${userData.names} ${userData.surnames || ''}`.trim();
                     document.getElementById('ship-phone').value = userData.phone;
@@ -900,6 +900,8 @@
                 checkoutStep = 3;
                 updateCartUI();
             } else if (checkoutStep === 3) {
+                console.log("-> Llegó al paso 3 (Pago). Procesando pedido...");
+
                 const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
                 const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
                 const name = document.getElementById('ship-name').value;
@@ -933,6 +935,7 @@
                             total: `$${total} MXN`,
                             date: Timestamp.now()
                         });
+                        console.log("-> Pedido guardado en Firestore con éxito.");
                     }
 
                     await fetch(`https://formsubmit.co/ajax/${CORREO_BOUTIQUE}`, {
@@ -950,39 +953,35 @@
                             Total: `$${total} MXN`
                         })
                     });
+                    console.log("-> Correo enviado por formsubmit con éxito.");
 
-                   if (paymentMethod === "Mercado Pago") {
+                    if (paymentMethod === "Mercado Pago") {
                         localStorage.setItem('amis_cart', JSON.stringify(cart));
-                        console.log("Iniciando petición a /api/crear-preferencia con los items:", cart);
+                        console.log("-> Solicitando preferencia a /api/crear-preferencia...");
+                        
+                        const response = await fetch('/api/crear-preferencia', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                items: cart.map(item => ({
+                                    title: `${item.name} (${item.color})`,
+                                    unit_price: Number(item.price),
+                                    quantity: Number(item.quantity || 1)
+                                }))
+                            })
+                        });
 
-                        try {
-                            const response = await fetch('/api/crear-preferencia', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    items: cart.map(item => ({
-                                        title: `${item.name} (${item.color})`,
-                                        unit_price: Number(item.price),
-                                        quantity: Number(item.quantity || 1)
-                                    }))
-                                })
-                            });
+                        console.log("-> Status HTTP recibido de /api/crear-preferencia:", response.status);
+                        const data = await response.json();
+                        console.log("-> JSON recibido de la API:", data);
 
-                            console.log("Respuesta HTTP recibida del servidor:", response.status);
-                            const data = await response.json();
-                            console.log("Datos de la respuesta JSON:", data);
-
-                            if (data && data.init_point) {
-                                window.location.href = data.init_point;
-                                return;
-                            } else {
-                                throw new Error(data.error || "No se pudo obtener el enlace de pago.");
-                            }
-                        } catch (err) {
-                            console.error("Error detallado en el bloque de pago:", err);
-                            showToast("Error: " + err.message, "error");
+                        if (data && data.init_point) {
+                            console.log("-> Redirigiendo a Mercado Pago:", data.init_point);
+                            window.location.href = data.init_point;
+                            return;
+                        } else {
+                            throw new Error(data.error || "No se pudo obtener el enlace de pago.");
                         }
-                    }
                     } else {
                         showToast(`¡Pedido procesado con éxito!`);
                         cart = [];
@@ -991,8 +990,8 @@
                         showHome();
                     }
                 } catch (error) {
-                    console.error(error);
-                    showToast("Ocurrió un error al procesar tu pago con Mercado Pago.", "error");
+                    console.error("-> ERROR ATRAPADO EN EL FLUJO:", error);
+                    showToast("Error: " + error.message, "error");
                 } finally {
                     actionBtn.disabled = false;
                     actionBtn.textContent = "Finalizar Pedido";
