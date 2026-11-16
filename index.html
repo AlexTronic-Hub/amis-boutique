@@ -172,7 +172,7 @@
                     </div>
 
                     <nav class="mt-6 space-y-4">
-                        <!-- 1. MI CUENTA (Desplegable estilo Colección) -->
+                        <!-- 1. MI CUENTA -->
                         <div>
                             <button id="account-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Mi Cuenta</span>
@@ -180,38 +180,38 @@
                             </button>
                             <div id="account-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
                                 <div id="menu-auth-content" class="py-2 text-xs text-gray-600">
-                                    <!-- Dinámico: login o datos de cuenta -->
+                                    <!-- Dinámico -->
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 2. MIS PEDIDOS (Desplegable) -->
-                        <div>
+                        <!-- 2. MIS PEDIDOS (Solo visible si hay sesión iniciada) -->
+                        <div id="menu-orders-container" class="hidden">
                             <button id="orders-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Mis Pedidos</span>
                                 <svg id="orders-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div id="orders-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
                                 <div id="menu-user-orders" class="py-2 text-xs text-gray-600 space-y-2">
-                                    <p class="text-gray-400 italic">Inicia sesión para ver tus pedidos.</p>
+                                    <p class="text-gray-400 italic">Cargando pedidos...</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 3. DIRECCIONES REGISTRADAS (Desplegable) -->
-                        <div>
+                        <!-- 3. DIRECCIONES REGISTRADAS (Solo visible si hay sesión iniciada) -->
+                        <div id="menu-addresses-container" class="hidden">
                             <button id="addresses-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Direcciones Registradas</span>
                                 <svg id="addresses-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div id="addresses-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
                                 <div id="menu-user-addresses" class="py-2 text-xs text-gray-600 space-y-1">
-                                    <p class="text-gray-400 italic">Sin direcciones guardadas.</p>
+                                    <p class="text-gray-400 italic">Cargando direcciones...</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 4. COLECCIÓN (Desplegable original) -->
+                        <!-- 4. COLECCIÓN -->
                         <div class="pt-2 border-t border-gray-100">
                             <button id="collection-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm">Colección</span>
@@ -431,7 +431,12 @@
                     clearInterval(checkFB);
                     window.FB_Methods.onAuthStateChanged(window.FB_Auth, async (user) => {
                         currentUser = user;
+                        const ordersContainer = document.getElementById('menu-orders-container');
+                        const addressesContainer = document.getElementById('menu-addresses-container');
+
                         if (user) {
+                            ordersContainer.classList.remove('hidden');
+                            addressesContainer.classList.remove('hidden');
                             const { doc, getDoc } = window.FB_Methods;
                             try {
                                 const userDoc = await getDoc(doc(window.FB_Db, "users", user.uid));
@@ -444,6 +449,8 @@
                             loadUserDataAndOrders(user.uid);
                         } else {
                             userData = null;
+                            ordersContainer.classList.add('hidden');
+                            addressesContainer.classList.add('hidden');
                             updateMenuAuthUI();
                         }
                     });
@@ -452,7 +459,6 @@
 
             updateCartUI();
 
-            // Validación de pagos Mercado Pago
             const urlParams = new URLSearchParams(window.location.search);
             const status = urlParams.get('status') || urlParams.get('collection_status');
             const mpResult = urlParams.get('pago');
@@ -486,9 +492,6 @@
 
         function updateMenuAuthUI() {
             const authContent = document.getElementById('menu-auth-content');
-            const ordersContent = document.getElementById('menu-user-orders');
-            const addressesContent = document.getElementById('menu-user-addresses');
-
             if (currentUser) {
                 authContent.innerHTML = `
                     <div class="space-y-2 bg-gray-50 p-2.5 rounded-xl border border-gray-100">
@@ -504,8 +507,6 @@
                         Iniciar Sesión / Registrarse
                     </button>
                 `;
-                ordersContent.innerHTML = '<p class="text-gray-400 italic">Inicia sesión para ver tus pedidos.</p>';
-                addressesContent.innerHTML = '<p class="text-gray-400 italic">Inicia sesión para ver tus direcciones.</p>';
             }
         }
 
@@ -516,8 +517,6 @@
 
             try {
                 const { collection, query, where, getDocs } = window.FB_Methods;
-                
-                // Cargar Pedidos
                 const q = query(collection(window.FB_Db, "orders"), where("userId", "==", uid));
                 const querySnapshot = await getDocs(q);
                 
@@ -535,7 +534,6 @@
                     ordersContent.innerHTML = html;
                 }
 
-                // Cargar Direcciones basadas en los pedidos anteriores del usuario
                 if (querySnapshot.empty) {
                     addressesContent.innerHTML = '<p class="text-gray-400 italic">No hay direcciones guardadas aún.</p>';
                 } else {
@@ -589,8 +587,8 @@
         }
 
         async function handleAuthSubmit() {
-            const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-password').value;
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value.trim();
             const errorBox = document.getElementById('auth-error-box');
             errorBox.classList.add('hidden');
             errorBox.textContent = '';
@@ -599,12 +597,18 @@
 
             try {
                 if (isRegistering) {
-                    const names = document.getElementById('reg-names').value;
-                    const surnames = document.getElementById('reg-surnames').value;
-                    const phone = document.getElementById('reg-phone').value;
+                    const names = document.getElementById('reg-names').value.trim();
+                    const surnames = document.getElementById('reg-surnames').value.trim();
+                    const phone = document.getElementById('reg-phone').value.trim();
 
                     if (!names || !surnames || !phone) {
                         errorBox.textContent = "Por favor completa todos los campos de registro.";
+                        errorBox.classList.remove('hidden');
+                        return;
+                    }
+
+                    if (!email.includes('@') || !email.includes('.')) {
+                        errorBox.textContent = "Por favor ingresa un correo electrónico válido.";
                         errorBox.classList.remove('hidden');
                         return;
                     }
@@ -625,7 +629,7 @@
                 if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
                     mensajeError = "Correo electrónico o contraseña incorrectos.";
                 } else if (error.code === 'auth/email-already-in-use') {
-                    mensajeError = "Este correo ya está registrado.";
+                    mensajeError = "Este correo ya está registrado. Inicia sesión.";
                 } else if (error.code === 'auth/weak-password') {
                     mensajeError = "La contraseña debe tener al menos 6 caracteres.";
                 } else if (error.code === 'auth/invalid-email') {
@@ -642,7 +646,7 @@
             toggleMobileMenu();
         }
 
-        // Navegación menú lateral y submenús desplegables múltiples
+        // Navegación menú lateral y submenús desplegables
         const menuBtn = document.getElementById('menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
         const mobileMenuPanel = document.getElementById('mobile-menu-panel');
@@ -659,12 +663,14 @@
 
         menuBtn.addEventListener('click', toggleMobileMenu);
 
-        // Configurar despliegues
         function setupDropdown(toggleId, submenuId, arrowId) {
-            document.getElementById(toggleId).addEventListener('click', () => {
-                document.getElementById(submenuId).classList.toggle('hidden');
-                document.getElementById(arrowId).classList.toggle('rotate-180');
-            });
+            const btn = document.getElementById(toggleId);
+            if(btn) {
+                btn.addEventListener('click', () => {
+                    document.getElementById(submenuId).classList.toggle('hidden');
+                    document.getElementById(arrowId).classList.toggle('rotate-180');
+                });
+            }
         }
 
         setupDropdown('account-toggle-btn', 'account-submenu', 'account-arrow');
