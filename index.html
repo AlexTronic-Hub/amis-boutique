@@ -211,6 +211,19 @@
                                     </div>
                                 </div>
 
+                                <!-- Subsección: Mis Datos -->
+                                <div>
+                                    <button id="data-toggle-btn" class="w-full flex items-center justify-between py-1.5 text-left font-medium text-gray-700 hover:text-black transition">
+                                        <span class="tracking-wider uppercase text-xs font-bold">Mis Datos</span>
+                                        <svg id="data-arrow" class="w-3.5 h-3.5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </button>
+                                    <div id="data-container-sub" class="hidden pl-3 mt-1 space-y-1 border-l border-gray-100">
+                                        <div id="menu-user-profile" class="py-1 text-xs text-gray-600 space-y-1">
+                                            <p class="text-gray-400 italic">Cargando datos...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
                                 <!-- Subsección: Direcciones Registradas -->
                                 <div>
                                     <button id="addresses-toggle-btn" class="w-full flex items-center justify-between py-1.5 text-left font-medium text-gray-700 hover:text-black transition">
@@ -523,10 +536,39 @@
         async function loadUserDataAndOrders(uid) {
             const ordersContent = document.getElementById('menu-user-orders');
             const addressesContent = document.getElementById('menu-user-addresses');
+            const profileContent = document.getElementById('menu-user-profile');
+            const accountToggleBtn = document.getElementById('account-toggle-btn');
 
             try {
                 const { collection, query, where, getDocs, doc, getDoc } = window.FB_Methods;
                 
+                // Cargar perfil del usuario desde Firestore
+                const userDocRef = doc(window.FB_Db, "users", uid);
+                const userSnap = await getDoc(userDocRef);
+
+                if (userSnap.exists()) {
+                    userData = userSnap.data();
+                    const primerNombre = userData.names ? userData.names.split(' ')[0] : 'Cliente';
+                    
+                    // Cambiar el texto del botón principal de "MI CUENTA" para saludar al usuario
+                    if (accountToggleBtn) {
+                        accountToggleBtn.querySelector('span').textContent = `Hola, ${primerNombre}`;
+                    }
+
+                    // Mostrar datos en la subsección "Mis Datos"
+                    if (profileContent) {
+                        profileContent.innerHTML = `
+                            <div class="p-2 bg-gray-50 rounded-lg border border-gray-100 space-y-1 text-gray-700">
+                                <p><strong>Nombre(s):</strong> ${userData.names || '-'}</p>
+                                <p><strong>Apellidos:</strong> ${userData.surnames || '-'}</p>
+                                <p><strong>Teléfono:</strong> ${userData.phone || '-'}</p>
+                                <p><strong>Correo:</strong> ${userData.email || '-'}</p>
+                            </div>
+                        `;
+                    }
+                }
+
+                // Cargar pedidos
                 const q = query(collection(window.FB_Db, "orders"), where("userId", "==", uid));
                 const querySnapshot = await getDocs(q);
                 
@@ -534,8 +576,8 @@
                     ordersContent.innerHTML = '<p class="text-gray-400 italic">No tienes pedidos anteriores.</p>';
                 } else {
                     let html = '';
-                    querySnapshot.forEach((doc) => {
-                        const data = doc.data();
+                    querySnapshot.forEach((docSnap) => {
+                        const data = docSnap.data();
                         html += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 space-y-0.5">
                             <p class="font-medium text-gray-900">${data.total} · ${data.shipping}</p>
                             <p class="text-gray-500 text-[10px]">${new Date(data.date?.toDate()).toLocaleString()}</p>
@@ -544,21 +586,10 @@
                     ordersContent.innerHTML = html;
                 }
 
-                const userDocRef = doc(window.FB_Db, "users", uid);
-                const userSnap = await getDoc(userDocRef);
+                // Cargar direcciones
                 let addresses = [];
-
                 if (userSnap.exists() && userSnap.data().addresses) {
                     addresses = userSnap.data().addresses;
-                }
-
-                if (addresses.length === 0) {
-                    querySnapshot.forEach((doc) => {
-                        const data = doc.data();
-                        if (data.address && !addresses.includes(data.address)) {
-                            addresses.push(data.address);
-                        }
-                    });
                 }
 
                 if (addresses.length === 0) {
@@ -576,7 +607,7 @@
 
             } catch (e) {
                 console.error(e);
-                ordersContent.innerHTML = '<p class="text-red-400">Error al cargar datos.</p>';
+                if (profileContent) profileContent.innerHTML = '<p class="text-red-400">Error al cargar perfil.</p>';
             }
         }
 
@@ -730,6 +761,7 @@
         setupDropdown('orders-toggle-btn', 'orders-container-sub', 'orders-arrow');
         setupDropdown('addresses-toggle-btn', 'addresses-container-sub', 'addresses-arrow');
         setupDropdown('collection-toggle-btn', 'collection-submenu', 'collection-arrow');
+        setupDropdown('data-toggle-btn', 'data-container-sub', 'data-arrow');
 
         function showHome(event) {
             if (event) event.preventDefault();
