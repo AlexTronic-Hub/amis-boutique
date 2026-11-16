@@ -137,7 +137,7 @@
     <div id="cart-modal" class="fixed inset-0 z-50 overflow-hidden hidden">
         <div class="absolute inset-0 bg-black bg-opacity-50" onclick="toggleCartModal()"></div>
         <div class="absolute inset-y-0 right-0 max-w-full flex pl-10">
-            <div class="w-screen max-w-md bg-white shadow-xl p-6 flex flex-col justify-between overflow-y-auto">
+            <div id="cart-drawer-content" class="w-screen max-w-md bg-white shadow-xl p-6 flex flex-col justify-between overflow-y-auto transition-transform duration-300">
                 <div>
                     <div class="flex items-center justify-between pb-4 border-b border-gray-100">
                         <h2 id="cart-modal-title" class="font-serif text-xl font-bold">Tu Carrito</h2>
@@ -156,7 +156,8 @@
                     <!-- PASO 2: MÉTODO DE ENVÍO -->
                     <div id="step-shipping" class="py-4 hidden">
                         <div class="flex items-center gap-2 mb-3 text-gray-900 font-medium text-sm">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                            <!-- Icono de carrito / envío -->
+                            <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                             <span class="tracking-wide uppercase text-xs font-bold">Selecciona tu Método de Envío</span>
                         </div>
                         <div class="space-y-2 text-sm">
@@ -185,7 +186,7 @@
                                 <input type="radio" name="payment-method" value="Mercado Pago" checked onchange="handlePaymentChange()" class="text-black focus:ring-black">
                                 <div>
                                     <span class="font-medium block">Mercado Pago (Checkout Pro)</span>
-                                    <span class="text-xs text-gray-500">Acceso seguro con Access Key</span>
+                                    <span class="text-xs text-gray-500">Pago seguro con tarjeta, efectivo o MSI</span>
                                 </div>
                             </label>
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
@@ -290,7 +291,7 @@
 
     </main>
 
-    <!-- Scripts de navegación por pasos, lógica de envío y carrito -->
+    <!-- Scripts de interactividad -->
     <script>
         const menuBtn = document.getElementById('menu-btn');
         const closeMenuBtn = document.getElementById('close-menu-btn');
@@ -308,6 +309,7 @@
         let cart = [];
         let selectedColor = 'Rosa';
         let checkoutStep = 1; // 1: Carrito, 2: Envío, 3: Pago
+        let hasAddedFirstItem = false; // Controla que solo abra automáticamente en la primera adición
 
         function toggleMenu() {
             mobileMenu.classList.toggle('hidden');
@@ -370,7 +372,20 @@
             const colorToAdd = selectedColor || defaultColor;
             cart.push({ name, price, color: colorToAdd });
             updateCartUI();
-            toggleCartModal();
+
+            const modal = document.getElementById('cart-modal');
+
+            // Si es el primer producto añadido, abrir por 1.5 segundos y cerrar automáticamente
+            if (!hasAddedFirstItem) {
+                hasAddedFirstItem = true;
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 1500);
+            } else {
+                // A partir del segundo producto ya no se abre solo
+                modal.classList.remove('hidden');
+            }
         }
 
         function updateCartUI() {
@@ -386,7 +401,6 @@
 
             cartCount.textContent = cart.length;
 
-            // Ocultar todos los pasos primero
             stepCart.classList.add('hidden');
             stepShipping.classList.add('hidden');
             stepPayment.classList.add('hidden');
@@ -437,7 +451,6 @@
                 actionBtn.textContent = 'Finalizar Pedido';
                 actionBtn.style.display = 'block';
                 
-                // Aplicar regla lógica de envíos al entrar al paso de pago
                 applyShippingRules();
             }
         }
