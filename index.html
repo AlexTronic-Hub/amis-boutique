@@ -207,7 +207,8 @@
   </div>
 
   <script>
-    const CORREO_BOUTIQUE = "tucorreo@gmail.com";
+    // Correo configurado para pruebas
+    const CORREO_BOUTIQUE = "alexisorozcoortiz@gmail.com";
 
     const inventario = [
       { id: 1, nombre: "Blusa Satinada", categoria: "Ropa", precio: 380 },
@@ -307,6 +308,7 @@
       });
 
       try {
+        // 1. Mandar el correo en segundo plano
         await fetch(`https://formsubmit.co/ajax/${CORREO_BOUTIQUE}`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "Accept": "application/json" },
@@ -321,6 +323,7 @@
           })
         });
 
+        // 2. Si eligió Mercado Pago, pedimos el link a nuestro servidor de Vercel
         if (metodo === "Mercado Pago En Línea") {
           const respMP = await fetch('/api/crear-preferencia', {
             method: 'POST',
@@ -330,7 +333,6 @@
 
           const dataMP = await respMP.json();
 
-          // CORRECCIÓN AQUÍ: Se usa dataMP.id en lugar de dataMP.init_point
           if (dataMP.id) {
             window.location.href = `https://www.mercadopago.com.mx/checkout/v1/redirect?pref_id=${dataMP.id}`;
             return;
@@ -347,7 +349,6 @@
         alert("Ocurrió un error al procesar el pedido. Revisa tu conexión.");
         console.error(error);
       } finally {
-        btn.disabled5 = false;
         btn.disabled = false;
         btn.textContent = "💳 Enviar Pedido y Pagar";
       }
