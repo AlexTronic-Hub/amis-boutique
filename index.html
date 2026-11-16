@@ -72,16 +72,24 @@
     }
     button.agregar:hover { background-color: var(--primario); }
 
-    /* Drawer Carrito */
+    /* Drawer Carrito con animación de desplazamiento */
     .overlay {
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.4);
-      display: none;
+      display: flex;
       justify-content: flex-end;
       z-index: 100;
+      transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+      transform: translateX(100%);
+      opacity: 0;
+      pointer-events: none;
     }
-    .overlay.abierto { display: flex; }
+    .overlay.abierto {
+      transform: translateX(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
     
     .drawer {
       background: white;
@@ -207,7 +215,6 @@
   </div>
 
   <script>
-    // Correo configurado para pruebas
     const CORREO_BOUTIQUE = "alexisorozcoortiz@gmail.com";
 
     const inventario = [
@@ -220,6 +227,7 @@
     ];
 
     let carrito = [];
+    let timerCierreAutomatico = null;
 
     const contenedor = document.getElementById("contenedor-productos");
     const contadorSpan = document.getElementById("contador");
@@ -244,8 +252,17 @@
       carrito.push(prod);
       actualizarCarritoUI();
 
+      const overlay = document.getElementById("overlay-carrito");
+
+      // Si es el primer producto, aparece un segundo y se oculta solo
       if (carrito.length === 1) {
-        toggleCarrito();
+        overlay.classList.add("abierto");
+
+        if (timerCierreAutomatico) clearTimeout(timerCierreAutomatico);
+
+        timerCierreAutomatico = setTimeout(() => {
+          overlay.classList.remove("abierto");
+        }, 1000);
       }
     }
 
@@ -280,6 +297,7 @@
     }
 
     function toggleCarrito() {
+      if (timerCierreAutomatico) clearTimeout(timerCierreAutomatico);
       document.getElementById("overlay-carrito").classList.toggle("abierto");
     }
 
@@ -308,7 +326,6 @@
       });
 
       try {
-        // 1. Mandar el correo en segundo plano
         await fetch(`https://formsubmit.co/ajax/${CORREO_BOUTIQUE}`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "Accept": "application/json" },
@@ -323,7 +340,6 @@
           })
         });
 
-        // 2. Si eligió Mercado Pago, pedimos el link a nuestro servidor de Vercel
         if (metodo === "Mercado Pago En Línea") {
           const respMP = await fetch('/api/crear-preferencia', {
             method: 'POST',
