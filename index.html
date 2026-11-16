@@ -280,18 +280,18 @@
                             </button>
                         </div>
 
-                        <!-- 2. CATEGORÍAS (VESTIDOS, CONJUNTOS, BLUSAS, ABRIGOS, DE TEMPORADA) -->
+                        <!-- 2. CATEGORÍAS -->
                         <div class="pt-2 border-t border-gray-100">
                             <button id="collection-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Categorías</span>
                                 <svg id="collection-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div id="collection-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
-                                <a href="#" onclick="showCategory('vestidos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Vestidos</a>
-                                <a href="#" onclick="showCategory('conjuntos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Conjuntos</a>
-                                <a href="#" onclick="showCategory('blusas', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Blusas</a>
-                                <a href="#" onclick="showCategory('abrigos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Abrigos</a>
-                                <a href="#" onclick="showCategory('temporada', event)" class="block py-1.5 text-sm text-red-600 hover:text-red-700 transition font-bold">🎄 De Temporada (Navidad)</a>
+                                <a href="#" onclick="loadCategoryProducts('vestidos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Vestidos</a>
+                                <a href="#" onclick="loadCategoryProducts('conjuntos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Conjuntos</a>
+                                <a href="#" onclick="loadCategoryProducts('blusas', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Blusas</a>
+                                <a href="#" onclick="loadCategoryProducts('abrigos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Abrigos</a>
+                                <a href="#" onclick="loadCategoryProducts('temporada', event)" class="block py-1.5 text-sm text-red-600 hover:text-red-700 transition font-bold">🎄 De Temporada (Navidad)</a>
                             </div>
                         </div>
 
@@ -467,10 +467,9 @@
     <!-- CONTENIDO PRINCIPAL -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        <!-- BANNER DE INICIO / HERO NAVIDEÑO ELEGANTE -->
+        <!-- BANNER DE INICIO / HERO NAVIDEÑO -->
         <div id="home-view" class="space-y-8">
             <div class="relative bg-black text-white rounded-3xl p-8 sm:p-16 overflow-hidden shadow-xl text-center">
-                <!-- Efecto visual decorativo de temporada -->
                 <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#d4af37_1px,transparent_1px)] [background-size:16px_16px]"></div>
                 
                 <div class="relative z-10 max-w-2xl mx-auto space-y-4">
@@ -478,87 +477,38 @@
                     <h1 class="text-3xl sm:text-5xl font-serif font-light tracking-wide">Elegancia que ilumina tus fiestas</h1>
                     <p class="text-gray-300 text-sm sm:text-base leading-relaxed">Descubre nuestra exclusiva selección de vestidos, conjuntos y abrigos diseñados para destacar en cada celebración.</p>
                     <div class="pt-4 flex flex-wrap justify-center gap-4">
-                        <button onclick="showCategory('temporada', event)" class="bg-amber-400 text-black px-8 py-3 rounded-full text-xs tracking-widest uppercase font-bold hover:bg-amber-300 transition shadow-lg">Ver Colección Navideña</button>
-                        <button onclick="showCategory('conjuntos', event)" class="border border-white text-white px-8 py-3 rounded-full text-xs tracking-widest uppercase hover:bg-white hover:text-black transition">Explorar Todo</button>
+                        <button onclick="loadCategoryProducts('temporada', event)" class="bg-amber-400 text-black px-8 py-3 rounded-full text-xs tracking-widest uppercase font-bold hover:bg-amber-300 transition shadow-lg">Ver Colección Navideña</button>
+                        <button onclick="loadCategoryProducts('conjuntos', event)" class="border border-white text-white px-8 py-3 rounded-full text-xs tracking-widest uppercase hover:bg-white hover:text-black transition">Explorar Todo</button>
                     </div>
                 </div>
             </div>
 
-            <!-- TARJETAS DE CATEGORÍAS RÁPIDAS EN EL INICIO -->
+            <!-- TARJETAS DE CATEGORÍAS RÁPIDAS -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div onclick="showCategory('vestidos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group">
+                <div onclick="loadCategoryProducts('vestidos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group">
                     <span class="text-2xl mb-2 block">👗</span>
                     <h3 class="font-serif font-medium text-sm group-hover:text-amber-600 transition">Vestidos</h3>
                 </div>
-                <div onclick="showCategory('conjuntos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group">
+                <div onclick="loadCategoryProducts('conjuntos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group">
                     <span class="text-2xl mb-2 block">✨</span>
                     <h3 class="font-serif font-medium text-sm group-hover:text-amber-600 transition">Conjuntos</h3>
                 </div>
-                <div onclick="showCategory('abrigos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group">
+                <div onclick="loadCategoryProducts('abrigos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group">
                     <span class="text-2xl mb-2 block">🧥</span>
                     <h3 class="font-serif font-medium text-sm group-hover:text-amber-600 transition">Abrigos</h3>
                 </div>
-                <div onclick="showCategory('temporada', event)" class="bg-amber-50 p-6 rounded-2xl shadow-sm border border-amber-200 text-center cursor-pointer hover:shadow-md transition group">
+                <div onclick="loadCategoryProducts('temporada', event)" class="bg-amber-50 p-6 rounded-2xl shadow-sm border border-amber-200 text-center cursor-pointer hover:shadow-md transition group">
                     <span class="text-2xl mb-2 block">🎄</span>
                     <h3 class="font-serif font-bold text-sm text-red-700 transition">Navidad</h3>
                 </div>
             </div>
         </div>
 
-        <!-- VISTAS DE CATEGORÍAS -->
-        <div id="vestidos-view" class="hidden">
-            <h2 class="text-2xl font-serif mb-6 tracking-wider">Vestidos Exclusivos</h2>
-            <p class="text-gray-500">Pronto agregaremos los nuevos modelos de vestidos.</p>
-        </div>
-
-        <div id="conjuntos-view" class="hidden">
-            <h2 class="text-2xl font-serif mb-6 tracking-wider">Conjuntos de Temporada</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
-                    <div class="relative bg-gray-100 h-[450px]">
-                        <img id="product-img-1" src="https://i.postimg.cc/YqXSG8fS/IMG-20261115-WA0058.jpg" alt="Conjunto Tejido Punto" class="w-full h-full object-cover transition-all duration-300">
-                        <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">Conjunto</span>
-                    </div>
-                    <div class="p-5 flex-1 flex flex-col justify-between">
-                        <div>
-                            <h3 class="font-serif text-lg font-medium text-gray-900">Conjunto Tejido Punto con Gorro</h3>
-                            <p class="text-xs text-gray-500 mt-1">Tejido Super Strech | Unitalla (Abarca 3 a 13)</p>
-                            <div class="mt-4 flex items-center justify-between">
-                                <span class="text-xl font-semibold text-gray-900">$370 <span class="text-xs text-gray-500 font-normal">MXN</span></span>
-                                <div class="flex items-center space-x-2">
-                                    <button onclick="changeColor(1, 'https://i.postimg.cc/YqXSG8fS/IMG-20261115-WA0058.jpg', 'Rosa', this)" class="w-6 h-6 rounded-full bg-rose-300 border-2 border-black focus:outline-none transition transform hover:scale-110 color-btn-1" title="Rosa"></button>
-                                    <button onclick="changeColor(1, 'https://i.postimg.cc/jdjxbP0V/IMG-20261115-WA0059.jpg', 'Gris', this)" class="w-6 h-6 rounded-full bg-gray-400 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Gris"></button>
-                                    <button onclick="changeColor(1, 'https://i.postimg.cc/Qd2h1zFw/IMG-20261115-WA0057.jpg', 'Beige', this)" class="w-6 h-6 rounded-full bg-amber-200 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Beige"></button>
-                                    <button onclick="changeColor(1, 'https://i.postimg.cc/3NxT35q2/IMG-20261115-WA0056.jpg', 'Verde', this)" class="w-6 h-6 rounded-full bg-stone-600 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Verde"></button>
-                                </div>
-                            </div>
-                        </div>
-                        <button onclick="addToCart('Conjunto Tejido Punto con Gorro', 370, 'Rosa')" class="mt-6 w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
-                            Añadir al Carrito
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="blusas-view" class="hidden">
-            <h2 class="text-2xl font-serif mb-6 tracking-wider">Blusas</h2>
-            <p class="text-gray-500">Pronto agregaremos los nuevos modelos de blusas.</p>
-        </div>
-
-        <div id="abrigos-view" class="hidden">
-            <h2 class="text-2xl font-serif mb-6 tracking-wider">Abrigos y Suéteres</h2>
-            <p class="text-gray-500">Pronto agregaremos los nuevos modelos de abrigos.</p>
-        </div>
-
-        <div id="temporada-view" class="hidden">
-            <div class="bg-red-900 text-white p-6 rounded-2xl mb-6 text-center space-y-2">
-                <span class="text-xs uppercase tracking-widest text-amber-300">Colección Especial</span>
-                <h2 class="text-2xl font-serif font-bold">🎄 Especial Navidad 🎄</h2>
-                <p class="text-xs text-red-100">Las mejores prendas para lucir deslumbrante en tus posadas y cenas navideñas.</p>
-            </div>
-            <div id="temporada-products">
-                <p class="text-gray-500 text-center py-8">Cargando prendas de temporada...</p>
+        <!-- CONTENEDOR DINÁMICO DE PRODUCTOS -->
+        <div id="dynamic-category-view" class="hidden space-y-6">
+            <div id="category-header"></div>
+            <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Se cargan automáticamente desde Firestore -->
             </div>
         </div>
     </main>
@@ -568,7 +518,6 @@
         const CORREO_BOUTIQUE = "alexisorozcoortiz@gmail.com";
         const WHATSAPP_TIENDA = "523312467018";
         let cart = JSON.parse(localStorage.getItem('amis_cart') || '[]');
-        let selectedColor = 'Rosa';
         let checkoutStep = 1;
         let currentUser = null;
         let userData = null;
@@ -642,6 +591,113 @@
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
         });
+
+        async function loadCategoryProducts(categoryKey, event) {
+            if (event) event.preventDefault();
+            document.getElementById('home-view').classList.add('hidden');
+            const dynView = document.getElementById('dynamic-category-view');
+            dynView.classList.remove('hidden');
+
+            const headerEl = document.getElementById('category-header');
+            const gridEl = document.getElementById('products-grid');
+
+            let bannerHtml = '';
+            if(categoryKey === 'temporada') {
+                bannerHtml = `
+                    <div class="bg-red-900 text-white p-6 rounded-2xl mb-6 text-center space-y-2 shadow-sm">
+                        <span class="text-xs uppercase tracking-widest text-amber-300">Colección Especial</span>
+                        <h2 class="text-2xl font-serif font-bold">🎄 Especial Navidad 🎄</h2>
+                        <p class="text-xs text-red-100">Las mejores prendas para lucir deslumbrante en tus posadas y cenas navideñas.</p>
+                    </div>
+                `;
+            } else {
+                let titleName = categoryKey.toUpperCase();
+                bannerHtml = `<h2 class="text-2xl font-serif tracking-wider font-bold mb-4">${titleName}</h2>`;
+            }
+
+            headerEl.innerHTML = bannerHtml;
+            gridEl.innerHTML = '<p class="text-gray-400 italic py-8 text-center">Cargando productos...</p>';
+
+            if(!mobileMenu.classList.contains('hidden')) {
+                toggleMobileMenu();
+            }
+
+            try {
+                const { collection, query, where, getDocs } = window.FB_Methods;
+                const q = query(collection(window.FB_Db, "products"), where("category", "==", categoryKey));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    gridEl.innerHTML = `<p class="text-gray-500 italic py-8 text-center col-span-full">Pronto agregaremos nuevos modelos en esta categoría.</p>`;
+                    return;
+                }
+
+                let html = '';
+                querySnapshot.forEach((docSnap) => {
+                    const p = docSnap.data();
+                    const prodId = docSnap.id;
+                    const defaultImg = p.images && p.images.length > 0 ? p.images[0] : '';
+                    
+                    let colorsHtml = '';
+                    if (p.colors && p.colors.length > 0) {
+                        colorsHtml = `<div class="flex items-center space-x-2">`;
+                        p.colors.forEach((c, idx) => {
+                            const borderClass = idx === 0 ? 'border-black' : 'border-transparent';
+                            colorsHtml += `<button onclick="changeDynamicColor('${prodId}', '${c.image}', '${c.name}', this)" class="w-6 h-6 rounded-full border-2 ${borderClass} focus:outline-none transition transform hover:scale-110 color-btn-${prodId}" style="background-color: ${c.hex};" title="${c.name}"></button>`;
+                        });
+                        colorsHtml += `</div>`;
+                    }
+
+                    html += `
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                        <div class="relative bg-gray-100 h-[450px]">
+                            <img id="product-img-${prodId}" src="${defaultImg}" alt="${p.name}" class="w-full h-full object-cover transition-all duration-300">
+                            <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">${p.category}</span>
+                        </div>
+                        <div class="p-5 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-serif text-lg font-medium text-gray-900">${p.name}</h3>
+                                <p class="text-xs text-gray-500 mt-1">${p.description || ''}</p>
+                                <div class="mt-4 flex items-center justify-between">
+                                    <span class="text-xl font-semibold text-gray-900">$${p.price} <span class="text-xs text-gray-500 font-normal">MXN</span></span>
+                                    ${colorsHtml}
+                                </div>
+                            </div>
+                            <button onclick="addDynamicToCart('${p.name}', ${p.price}, '${prodId}')" class="mt-6 w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
+                                Añadir al Carrito
+                            </button>
+                        </div>
+                    </div>`;
+                });
+
+                gridEl.innerHTML = html;
+            } catch (e) {
+                console.error("Error al cargar productos:", e);
+                gridEl.innerHTML = '<p class="text-red-500 text-xs text-center py-8 col-span-full">Error al cargar el catálogo de productos.</p>';
+            }
+        }
+
+        function changeDynamicColor(prodId, imageUrl, colorName, buttonElement) {
+            document.getElementById(`product-img-${prodId}`).src = imageUrl;
+            buttonElement.dataset.selectedColor = colorName;
+            const buttons = buttonElement.parentElement.querySelectorAll('.color-btn-' + prodId);
+            buttons.forEach(btn => { btn.classList.remove('border-black'); btn.classList.add('border-transparent'); });
+            buttonElement.classList.remove('border-transparent');
+            buttonElement.classList.add('border-black');
+        }
+
+        function addDynamicToCart(name, price, prodId) {
+            const container = document.getElementById(`product-img-${prodId}`).parentElement.parentElement;
+            const activeColorBtn = container.querySelector(`.color-btn-${prodId}.border-black`);
+            const colorToAdd = activeColorBtn ? (activeColorBtn.title || 'Único') : 'Único';
+
+            const existing = cart.find(item => item.name === name && item.color === colorToAdd);
+            if (existing) existing.quantity += 1;
+            else cart.push({ name, price, color: colorToAdd, quantity: 1 });
+            localStorage.setItem('amis_cart', JSON.stringify(cart));
+            updateCartUI();
+            showToast("¡Producto agregado al carrito!");
+        }
 
         async function loadUserDataAndOrders(uid) {
             const ordersContent = document.getElementById('menu-user-orders');
@@ -862,40 +918,11 @@
         setupDropdown('data-toggle-btn', 'data-container-sub', 'data-arrow');
         setupDropdown('contact-toggle-btn', 'contact-submenu', 'contact-arrow');
 
-        function hideAllViews() {
-            document.getElementById('home-view').classList.add('hidden');
-            document.getElementById('vestidos-view').classList.add('hidden');
-            document.getElementById('conjuntos-view').classList.add('hidden');
-            document.getElementById('blusas-view').classList.add('hidden');
-            document.getElementById('abrigos-view').classList.add('hidden');
-            document.getElementById('temporada-view').classList.add('hidden');
-        }
-
         function showHome(event) {
             if (event) event.preventDefault();
-            hideAllViews();
             document.getElementById('home-view').classList.remove('hidden');
+            document.getElementById('dynamic-category-view').classList.add('hidden');
             toggleMobileMenu();
-        }
-
-        function showCategory(category, event) {
-            if (event) event.preventDefault();
-            hideAllViews();
-            const viewId = `${category}-view`;
-            const viewElement = document.getElementById(viewId);
-            if (viewElement) {
-                viewElement.classList.remove('hidden');
-            }
-            toggleMobileMenu();
-        }
-
-        function changeColor(productId, imageUrl, colorName, buttonElement) {
-            document.getElementById(`product-img-${productId}`).src = imageUrl;
-            selectedColor = colorName;
-            const buttons = buttonElement.parentElement.querySelectorAll('.color-btn-' + productId);
-            buttons.forEach(btn => { btn.classList.remove('border-black'); btn.classList.add('border-transparent'); });
-            buttonElement.classList.remove('border-transparent');
-            buttonElement.classList.add('border-black');
         }
 
         function toggleCartModal() {
@@ -910,16 +937,6 @@
                 drawer.classList.add('translate-x-full');
                 setTimeout(() => modal.classList.add('hidden'), 300);
             }
-        }
-
-        function addToCart(name, price, defaultColor) {
-            const colorToAdd = selectedColor || defaultColor;
-            const existing = cart.find(item => item.name === name && item.color === colorToAdd);
-            if (existing) existing.quantity += 1;
-            else cart.push({ name, price, color: colorToAdd, quantity: 1 });
-            localStorage.setItem('amis_cart', JSON.stringify(cart));
-            updateCartUI();
-            showToast("¡Producto agregado al carrito!");
         }
 
         function changeItemQuantity(index, delta) {
