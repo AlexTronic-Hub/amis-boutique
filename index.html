@@ -17,7 +17,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, arrayUnion, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyDpdI-Qx97QFhpM_LfIBjzlxiK2RJlTziQ",
@@ -35,7 +35,7 @@
 
         window.FB_Auth = auth;
         window.FB_Db = db;
-        window.FB_Methods = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, collection, addDoc, getDocs, doc, getDoc, setDoc, query, where, Timestamp };
+        window.FB_Methods = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, arrayUnion, query, where, Timestamp };
     </script>
 
     <style>
@@ -160,6 +160,24 @@
         </div>
     </div>
 
+    <!-- MODAL PARA AGREGAR DIRECCIÓN -->
+    <div id="address-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-black bg-opacity-50" onclick="toggleAddressModal()"></div>
+            <div class="bg-white rounded-2xl max-w-md w-full p-6 relative z-10 shadow-xl space-y-3">
+                <div class="flex justify-between items-center pb-4 border-b border-gray-100">
+                    <h3 class="font-serif text-xl font-bold">Agregar Nueva Dirección</h3>
+                    <button onclick="toggleAddressModal()" class="text-gray-400 hover:text-black">✕</button>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Dirección completa o referencias *</label>
+                    <textarea id="new-address-input" rows="3" class="w-full p-3 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-black" placeholder="Calle, número, colonia, referencias..."></textarea>
+                </div>
+                <button onclick="saveNewAddress()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">Guardar Dirección</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MENÚ LATERAL (TRES BARRITAS) -->
     <div id="mobile-menu" class="fixed inset-0 z-50 overflow-hidden hidden">
         <div id="menu-backdrop" class="absolute inset-0 bg-black bg-opacity-50 transition-opacity" onclick="toggleMobileMenu()"></div>
@@ -172,20 +190,15 @@
                     </div>
 
                     <nav class="mt-6 space-y-4">
-                        <!-- 1. MI CUENTA -->
+                        <!-- 1. MI CUENTA (Clic directo abre login o muestra datos) -->
                         <div>
-                            <button id="account-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
-                                <span class="tracking-widest uppercase text-sm font-bold">Mi Cuenta</span>
-                                <svg id="account-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <button onclick="handleAccountClick()" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
+                                <span id="menu-account-title" class="tracking-widest uppercase text-sm font-bold">Mi Cuenta</span>
+                                <span id="menu-account-status" class="text-xs text-gray-400">Iniciar sesión</span>
                             </button>
-                            <div id="account-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
-                                <div id="menu-auth-content" class="py-2 text-xs text-gray-600">
-                                    <!-- Dinámico -->
-                                </div>
-                            </div>
                         </div>
 
-                        <!-- 2. MIS PEDIDOS (Solo visible si hay sesión iniciada) -->
+                        <!-- 2. MIS PEDIDOS (Visible solo con sesión) -->
                         <div id="menu-orders-container" class="hidden">
                             <button id="orders-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Mis Pedidos</span>
@@ -198,16 +211,19 @@
                             </div>
                         </div>
 
-                        <!-- 3. DIRECCIONES REGISTRADAS (Solo visible si hay sesión iniciada) -->
+                        <!-- 3. DIRECCIONES REGISTRADAS (Visible solo con sesión) -->
                         <div id="menu-addresses-container" class="hidden">
                             <button id="addresses-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Direcciones Registradas</span>
                                 <svg id="addresses-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div id="addresses-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
-                                <div id="menu-user-addresses" class="py-2 text-xs text-gray-600 space-y-1">
+                                <div id="menu-user-addresses" class="py-2 text-xs text-gray-600 space-y-2">
                                     <p class="text-gray-400 italic">Cargando direcciones...</p>
                                 </div>
+                                <button onclick="toggleAddressModal()" class="w-full mt-1 bg-gray-100 text-black py-2 rounded-full text-[11px] tracking-wider uppercase hover:bg-gray-200 transition font-medium">
+                                    + Agregar dirección
+                                </button>
                             </div>
                         </div>
 
@@ -223,6 +239,11 @@
                             </div>
                         </div>
                     </nav>
+                </div>
+
+                <!-- Botón Salir al fondo del menú si hay sesión -->
+                <div id="menu-logout-container" class="pt-6 border-t border-gray-100 mt-6 hidden">
+                    <button onclick="handleLogout()" class="w-full bg-gray-100 text-red-600 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-red-50 transition font-medium">Cerrar Sesión</button>
                 </div>
             </div>
         </div>
@@ -433,10 +454,12 @@
                         currentUser = user;
                         const ordersContainer = document.getElementById('menu-orders-container');
                         const addressesContainer = document.getElementById('menu-addresses-container');
+                        const logoutContainer = document.getElementById('menu-logout-container');
 
                         if (user) {
                             ordersContainer.classList.remove('hidden');
                             addressesContainer.classList.remove('hidden');
+                            logoutContainer.classList.remove('hidden');
                             const { doc, getDoc } = window.FB_Methods;
                             try {
                                 const userDoc = await getDoc(doc(window.FB_Db, "users", user.uid));
@@ -451,7 +474,8 @@
                             userData = null;
                             ordersContainer.classList.add('hidden');
                             addressesContainer.classList.add('hidden');
-                            updateMenuAuthUI();
+                            logoutContainer.classList.add('hidden');
+                            updateMenuAccountUI();
                         }
                     });
                 }
@@ -490,33 +514,33 @@
             }
         });
 
-        function updateMenuAuthUI() {
-            const authContent = document.getElementById('menu-auth-content');
+        function updateMenuAccountUI() {
+            const statusEl = document.getElementById('menu-account-status');
             if (currentUser) {
-                authContent.innerHTML = `
-                    <div class="space-y-2 bg-gray-50 p-2.5 rounded-xl border border-gray-100">
-                        <p class="font-bold text-gray-900">${userData ? `${userData.names} ${userData.surnames}` : 'Mi Cuenta'}</p>
-                        <p class="text-gray-600">${currentUser.email}</p>
-                        <p class="text-gray-600">${userData ? userData.phone : ''}</p>
-                    </div>
-                    <button onclick="handleLogout()" class="mt-2 w-full bg-gray-100 text-red-600 py-2 rounded-full text-[11px] tracking-widest uppercase hover:bg-red-50 transition font-medium">Salir</button>
-                `;
+                statusEl.textContent = userData ? `${userData.names} (${currentUser.email})` : currentUser.email;
             } else {
-                authContent.innerHTML = `
-                    <button onclick="toggleAuthModal()" class="w-full bg-black text-white py-2.5 rounded-full text-[11px] tracking-widest uppercase hover:bg-gray-800 transition">
-                        Iniciar Sesión / Registrarse
-                    </button>
-                `;
+                statusEl.textContent = "Iniciar sesión";
+            }
+        }
+
+        function handleAccountClick() {
+            if (!currentUser) {
+                toggleMobileMenu();
+                toggleAuthModal();
+            } else {
+                showToast(`Sesión activa: ${currentUser.email}`);
             }
         }
 
         async function loadUserDataAndOrders(uid) {
-            updateMenuAuthUI();
+            updateMenuAccountUI();
             const ordersContent = document.getElementById('menu-user-orders');
             const addressesContent = document.getElementById('menu-user-addresses');
 
             try {
-                const { collection, query, where, getDocs } = window.FB_Methods;
+                const { collection, query, where, getDocs, doc, getDoc } = window.FB_Methods;
+                
+                // Cargar Pedidos
                 const q = query(collection(window.FB_Db, "orders"), where("userId", "==", uid));
                 const querySnapshot = await getDocs(q);
                 
@@ -534,22 +558,36 @@
                     ordersContent.innerHTML = html;
                 }
 
-                if (querySnapshot.empty) {
+                // Cargar Direcciones (del documento de usuario en Firestore o pedidos)
+                const userDocRef = doc(window.FB_Db, "users", uid);
+                const userSnap = await getDoc(userDocRef);
+                let addresses = [];
+
+                if (userSnap.exists() && userSnap.data().addresses) {
+                    addresses = userSnap.data().addresses;
+                }
+
+                // Si no tiene guardadas explícitamente, extraer de pedidos anteriores
+                if (addresses.length === 0) {
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        if (data.address && !addresses.includes(data.address)) {
+                            addresses.push(data.address);
+                        }
+                    });
+                }
+
+                if (addresses.length === 0) {
                     addressesContent.innerHTML = '<p class="text-gray-400 italic">No hay direcciones guardadas aún.</p>';
                 } else {
                     let addrHtml = '';
-                    let addedAddresses = new Set();
-                    querySnapshot.forEach((doc) => {
-                        const data = doc.data();
-                        if (data.address && !addedAddresses.has(data.address)) {
-                            addedAddresses.add(data.address);
-                            addrHtml += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 text-gray-700">
-                                <p class="font-medium text-gray-900">📍 Dirección de envío:</p>
-                                <p class="text-[11px] text-gray-600 mt-0.5">${data.address}</p>
-                            </div>`;
-                        }
+                    addresses.forEach(addr => {
+                        addrHtml += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 text-gray-700">
+                            <p class="font-medium text-gray-900">📍 Dirección:</p>
+                            <p class="text-[11px] text-gray-600 mt-0.5">${addr}</p>
+                        </div>`;
                     });
-                    addressesContent.innerHTML = addrHtml || '<p class="text-gray-400 italic">Sin direcciones registradas.</p>';
+                    addressesContent.innerHTML = addrHtml;
                 }
 
             } catch (e) {
@@ -564,7 +602,38 @@
             errorBox.classList.add('hidden');
             errorBox.textContent = '';
             modal.classList.toggle('hidden');
-            toggleMobileMenu();
+        }
+
+        function toggleAddressModal() {
+            const modal = document.getElementById('address-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        async function saveNewAddress() {
+            const newAddress = document.getElementById('new-address-input').value.trim();
+            if (!newAddress) {
+                showToast("Por favor escribe una dirección válida.", "error");
+                return;
+            }
+
+            if (!currentUser) {
+                showToast("Debes iniciar sesión para guardar direcciones.", "error");
+                return;
+            }
+
+            try {
+                const { doc, updateDoc, arrayUnion } = window.FB_Methods;
+                await updateDoc(doc(window.FB_Db, "users", currentUser.uid), {
+                    addresses: arrayUnion(newAddress)
+                });
+                showToast("¡Dirección guardada con éxito!");
+                document.getElementById('new-address-input').value = '';
+                toggleAddressModal();
+                loadUserDataAndOrders(currentUser.uid);
+            } catch (e) {
+                console.error(e);
+                showToast("Error al guardar la dirección.", "error");
+            }
         }
 
         function switchAuthMode() {
@@ -615,7 +684,7 @@
 
                     const res = await createUserWithEmailAndPassword(window.FB_Auth, email, password);
                     await setDoc(doc(window.FB_Db, "users", res.user.uid), {
-                        names, surnames, phone, email, createdAt: new Date()
+                        names, surnames, phone, email, addresses: [], createdAt: new Date()
                     });
                     showToast("¡Cuenta creada con éxito!");
                 } else {
@@ -673,7 +742,6 @@
             }
         }
 
-        setupDropdown('account-toggle-btn', 'account-submenu', 'account-arrow');
         setupDropdown('orders-toggle-btn', 'orders-submenu', 'orders-arrow');
         setupDropdown('addresses-toggle-btn', 'addresses-submenu', 'addresses-arrow');
         setupDropdown('collection-toggle-btn', 'collection-submenu', 'collection-arrow');
@@ -888,7 +956,7 @@
                         localStorage.setItem('amis_cart', JSON.stringify(cart));
                         const respMP = await fetch('/api/crear-preferencia', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: { 'Content-Type": "application/json' },
                             body: JSON.stringify({ 
                                 items: cart.map(item => ({
                                     title: `${item.name} (${item.color})`,
@@ -941,13 +1009,8 @@
         }
 
         function handlePaymentChange() {
-            const selectedMethod = document.querySelector('input[name="payment-method"]:checked').value;
-            const bankDetails = document.getElementById('bank-details');
-            if (selectedMethod === 'Transferencia Bancaria') {
-                bankDetails.classList.remove('hidden');
-            } else {
-                bankDetails.classList.add('hidden');
-            }
+            const selectedMethod = document.querySelector('input[name="payment-method"][value="Mercado Pago"]');
+            // Mantener lógica simple
         }
     </script>
 </body>
