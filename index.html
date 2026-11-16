@@ -638,10 +638,61 @@
             modal.classList.toggle('hidden');
         }
 
-        async function saveNewAddress() {
-            const newAddress = document.getElementById('new-address-input').value.trim();
-            if (!newAddress) {
-                showToast("Por favor escribe una dirección válida.", "error");
+        // --- AUTOCOMPLETADO DE CÓDIGO POSTAL (API SEPOMEX) ---
+        async function buscarCodigoPostal(cp) {
+            if (cp.length !== 5) return;
+
+            try {
+                const response = await fetch(`https://api.copomex.com/query/info_cp/${cp}?token=libre`);
+                const data = await response.json();
+
+                if (!data.error) {
+                    const asentamientos = data.response.asentamiento; // Puede ser un texto o una lista de colonias
+                    const municipio = data.response.municipio;
+                    const estado = data.response.estado;
+
+                    // Rellenar ciudad y estado automáticamente
+                    document.getElementById('dir-ciudad').value = municipio || '';
+                    document.getElementById('dir-estado').value = estado || '';
+
+                    // Poblar el selector de colonias de forma dinámica
+                    const selectColonia = document.getElementById('dir-colonia-select');
+                    selectColonia.innerHTML = '';
+
+                    if (Array.isArray(asentamientos)) {
+                        asentamientos.forEach(colonia => {
+                            const option = document.createElement('option');
+                            option.value = colonia;
+                            option.textContent = colonia;
+                            selectColonia.appendChild(option);
+                        });
+                    } else {
+                        const option = document.createElement('option');
+                        option.value = asentamientos;
+                        option.textContent = asentamientos;
+                        selectColonia.appendChild(option);
+                    }
+                } else {
+                    showToast("Código postal no encontrado.", "error");
+                }
+            } catch (error) {
+                console.error("Error al consultar el código postal:", error);
+                showToast("No se pudo consultar el código postal.", "error");
+            }
+        }
+
+        // --- GUARDAR DIRECCIÓN ESTRUCTURADA EN FIRESTORE ---
+        async function saveStructuredAddress() {
+            const cp = document.getElementById('dir-cp').value.trim();
+            const calle = document.getElementById('dir-calle').value.trim();
+            const numExt = document.getElementById('dir-num-ext').value.trim();
+            const numInt = document.getElementById('dir-num-int').value.trim();
+            const ciudad = document.getElementById('dir-ciudad').value.trim();
+            const estado = document.getElementById('dir-estado').value.trim();
+            const colonia = document.getElementById('dir-colonia-select').value;
+
+            if (!cp || !calle || !numExt || !ciudad || !colonia) {
+                showToast("Por favor completa los campos obligatorios (*).", "error");
                 return;
             }
 
@@ -650,13 +701,26 @@
                 return;
             }
 
+            // Formatear dirección ordenada estilo Amazon / Mercado Libre
+            const direccionCompleta = `${calle} #${numExt}${numInt ? ' Int. ' + numInt : ''}, Col. ${colonia}, C.P. ${cp}, ${ciudad}, ${estado}`;
+
             try {
                 const { doc, updateDoc, arrayUnion } = window.FB_Methods;
                 await updateDoc(doc(window.FB_Db, "users", currentUser.uid), {
-                    addresses: arrayUnion(newAddress)
+                    addresses: arrayUnion(direccionCompleta)
                 });
+                
                 showToast("¡Dirección guardada con éxito!");
-                document.getElementById('new-address-input').value = '';
+                
+                // Limpiar formulario
+                document.getElementById('dir-cp').value = '';
+                document.getElementById('dir-calle').value = '';
+                document.getElementById('dir-num-ext').value = '';
+                document.getElementById('dir-num-int').value = '';
+                document.getElementById('dir-ciudad').value = '';
+                document.getElementById('dir-estado').value = '';
+                document.getElementById('dir-colonia-select').innerHTML = '<option value="">Ingresa un Código Postal primero</option>';
+
                 toggleAddressModal();
                 loadUserDataAndOrders(currentUser.uid);
             } catch (e) {
