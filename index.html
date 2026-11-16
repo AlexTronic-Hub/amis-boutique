@@ -123,7 +123,6 @@
                     <button onclick="toggleAuthModal()" class="text-gray-400 hover:text-black">✕</button>
                 </div>
 
-                <!-- Contenedor para mostrar errores en rojo dentro del modal -->
                 <div id="auth-error-box" class="hidden mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl"></div>
 
                 <div id="auth-form-container" class="space-y-3 text-sm">
@@ -165,7 +164,7 @@
     <div id="mobile-menu" class="fixed inset-0 z-50 overflow-hidden hidden">
         <div id="menu-backdrop" class="absolute inset-0 bg-black bg-opacity-50 transition-opacity" onclick="toggleMobileMenu()"></div>
         <div class="absolute inset-y-0 left-0 max-w-full flex">
-            <div id="mobile-menu-panel" class="w-80 bg-white shadow-xl p-6 flex flex-col justify-between transform -translate-x-full">
+            <div id="mobile-menu-panel" class="w-80 bg-white shadow-xl p-6 flex flex-col justify-between transform -translate-x-full overflow-y-auto">
                 <div>
                     <div class="flex items-center justify-between pb-6 border-b border-gray-100">
                         <span class="font-serif text-xl tracking-wider font-bold">Menú</span>
@@ -173,12 +172,47 @@
                     </div>
 
                     <nav class="mt-6 space-y-4">
-                        <!-- Sección de Cuenta en el Menú -->
-                        <div id="menu-auth-section" class="pb-4 border-b border-gray-100">
-                            <!-- Se llena dinámicamente -->
+                        <!-- 1. MI CUENTA (Desplegable estilo Colección) -->
+                        <div>
+                            <button id="account-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
+                                <span class="tracking-widest uppercase text-sm font-bold">Mi Cuenta</span>
+                                <svg id="account-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                            <div id="account-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
+                                <div id="menu-auth-content" class="py-2 text-xs text-gray-600">
+                                    <!-- Dinámico: login o datos de cuenta -->
+                                </div>
+                            </div>
                         </div>
 
+                        <!-- 2. MIS PEDIDOS (Desplegable) -->
                         <div>
+                            <button id="orders-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
+                                <span class="tracking-widest uppercase text-sm font-bold">Mis Pedidos</span>
+                                <svg id="orders-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                            <div id="orders-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
+                                <div id="menu-user-orders" class="py-2 text-xs text-gray-600 space-y-2">
+                                    <p class="text-gray-400 italic">Inicia sesión para ver tus pedidos.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. DIRECCIONES REGISTRADAS (Desplegable) -->
+                        <div>
+                            <button id="addresses-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
+                                <span class="tracking-widest uppercase text-sm font-bold">Direcciones Registradas</span>
+                                <svg id="addresses-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                            <div id="addresses-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
+                                <div id="menu-user-addresses" class="py-2 text-xs text-gray-600 space-y-1">
+                                    <p class="text-gray-400 italic">Sin direcciones guardadas.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. COLECCIÓN (Desplegable original) -->
+                        <div class="pt-2 border-t border-gray-100">
                             <button id="collection-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm">Colección</span>
                                 <svg id="collection-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -407,11 +441,11 @@
                             } catch (e) {
                                 console.error("Error cargando perfil:", e);
                             }
-                            loadUserOrders(user.uid);
+                            loadUserDataAndOrders(user.uid);
                         } else {
                             userData = null;
+                            updateMenuAuthUI();
                         }
-                        updateMenuAuthUI();
                     });
                 }
             }, 200);
@@ -451,31 +485,78 @@
         });
 
         function updateMenuAuthUI() {
-            const authSection = document.getElementById('menu-auth-section');
+            const authContent = document.getElementById('menu-auth-content');
+            const ordersContent = document.getElementById('menu-user-orders');
+            const addressesContent = document.getElementById('menu-user-addresses');
+
             if (currentUser) {
-                authSection.innerHTML = `
-                    <div class="space-y-3">
-                        <div class="bg-gray-50 p-3 rounded-xl text-xs space-y-1 border border-gray-100">
-                            <p class="font-bold text-gray-950 text-sm">${userData ? `${userData.names} ${userData.surnames}` : 'Mi Cuenta'}</p>
-                            <p class="text-gray-600">${currentUser.email}</p>
-                            <p class="text-gray-600">${userData ? userData.phone : ''}</p>
-                        </div>
-                        <div>
-                            <p class="font-serif font-bold text-xs uppercase tracking-wider mb-2 text-gray-800">Mis Pedidos</p>
-                            <div id="menu-user-orders" class="space-y-2 max-h-36 overflow-y-auto text-xs text-gray-600">
-                                <p class="text-gray-400 italic">Cargando pedidos...</p>
-                            </div>
-                        </div>
-                        <button onclick="handleLogout()" class="w-full bg-gray-100 text-red-600 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-red-50 transition font-medium">Salir</button>
+                authContent.innerHTML = `
+                    <div class="space-y-2 bg-gray-50 p-2.5 rounded-xl border border-gray-100">
+                        <p class="font-bold text-gray-900">${userData ? `${userData.names} ${userData.surnames}` : 'Mi Cuenta'}</p>
+                        <p class="text-gray-600">${currentUser.email}</p>
+                        <p class="text-gray-600">${userData ? userData.phone : ''}</p>
                     </div>
+                    <button onclick="handleLogout()" class="mt-2 w-full bg-gray-100 text-red-600 py-2 rounded-full text-[11px] tracking-widest uppercase hover:bg-red-50 transition font-medium">Salir</button>
                 `;
-                if (currentUser.uid) loadUserOrders(currentUser.uid);
             } else {
-                authSection.innerHTML = `
-                    <button onclick="toggleAuthModal()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition shadow-sm">
+                authContent.innerHTML = `
+                    <button onclick="toggleAuthModal()" class="w-full bg-black text-white py-2.5 rounded-full text-[11px] tracking-widest uppercase hover:bg-gray-800 transition">
                         Iniciar Sesión / Registrarse
                     </button>
                 `;
+                ordersContent.innerHTML = '<p class="text-gray-400 italic">Inicia sesión para ver tus pedidos.</p>';
+                addressesContent.innerHTML = '<p class="text-gray-400 italic">Inicia sesión para ver tus direcciones.</p>';
+            }
+        }
+
+        async function loadUserDataAndOrders(uid) {
+            updateMenuAuthUI();
+            const ordersContent = document.getElementById('menu-user-orders');
+            const addressesContent = document.getElementById('menu-user-addresses');
+
+            try {
+                const { collection, query, where, getDocs } = window.FB_Methods;
+                
+                // Cargar Pedidos
+                const q = query(collection(window.FB_Db, "orders"), where("userId", "==", uid));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    ordersContent.innerHTML = '<p class="text-gray-400 italic">No tienes pedidos anteriores.</p>';
+                } else {
+                    let html = '';
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        html += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 space-y-0.5">
+                            <p class="font-medium text-gray-900">${data.total} · ${data.shipping}</p>
+                            <p class="text-gray-500 text-[10px]">${new Date(data.date?.toDate()).toLocaleString()}</p>
+                        </div>`;
+                    });
+                    ordersContent.innerHTML = html;
+                }
+
+                // Cargar Direcciones basadas en los pedidos anteriores del usuario
+                if (querySnapshot.empty) {
+                    addressesContent.innerHTML = '<p class="text-gray-400 italic">No hay direcciones guardadas aún.</p>';
+                } else {
+                    let addrHtml = '';
+                    let addedAddresses = new Set();
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        if (data.address && !addedAddresses.has(data.address)) {
+                            addedAddresses.add(data.address);
+                            addrHtml += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 text-gray-700">
+                                <p class="font-medium text-gray-900">📍 Dirección de envío:</p>
+                                <p class="text-[11px] text-gray-600 mt-0.5">${data.address}</p>
+                            </div>`;
+                        }
+                    });
+                    addressesContent.innerHTML = addrHtml || '<p class="text-gray-400 italic">Sin direcciones registradas.</p>';
+                }
+
+            } catch (e) {
+                console.error(e);
+                ordersContent.innerHTML = '<p class="text-red-400">Error al cargar datos.</p>';
             }
         }
 
@@ -541,7 +622,6 @@
             } catch (error) {
                 console.error("Auth error:", error.code);
                 let mensajeError = "Ocurrió un error. Inténtalo de nuevo.";
-                
                 if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
                     mensajeError = "Correo electrónico o contraseña incorrectos.";
                 } else if (error.code === 'auth/email-already-in-use') {
@@ -551,7 +631,6 @@
                 } else if (error.code === 'auth/invalid-email') {
                     mensajeError = "El formato del correo electrónico no es válido.";
                 }
-
                 errorBox.textContent = mensajeError;
                 errorBox.classList.remove('hidden');
             }
@@ -563,40 +642,10 @@
             toggleMobileMenu();
         }
 
-        async function loadUserOrders(uid) {
-            const listEl = document.getElementById('menu-user-orders');
-            if (!listEl) return;
-            try {
-                const { collection, query, where, getDocs } = window.FB_Methods;
-                const q = query(collection(window.FB_Db, "orders"), where("userId", "==", uid));
-                const querySnapshot = await getDocs(q);
-                
-                if (querySnapshot.empty) {
-                    listEl.innerHTML = '<p class="text-gray-400 italic">No tienes pedidos anteriores.</p>';
-                    return;
-                }
-
-                let html = '';
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    html += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100">
-                        <p class="font-medium text-gray-900">${data.total} · ${data.shipping}</p>
-                        <p class="text-gray-500 text-[10px]">${new Date(data.date?.toDate()).toLocaleString()}</p>
-                    </div>`;
-                });
-                listEl.innerHTML = html;
-            } catch (e) {
-                listEl.innerHTML = '<p class="text-red-400">Error al cargar pedidos.</p>';
-            }
-        }
-
-        // Navegación menú lateral
+        // Navegación menú lateral y submenús desplegables múltiples
         const menuBtn = document.getElementById('menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
         const mobileMenuPanel = document.getElementById('mobile-menu-panel');
-        const collectionToggleBtn = document.getElementById('collection-toggle-btn');
-        const collectionSubmenu = document.getElementById('collection-submenu');
-        const collectionArrow = document.getElementById('collection-arrow');
 
         function toggleMobileMenu() {
             if (mobileMenu.classList.contains('hidden')) {
@@ -610,10 +659,18 @@
 
         menuBtn.addEventListener('click', toggleMobileMenu);
 
-        collectionToggleBtn.addEventListener('click', () => {
-            collectionSubmenu.classList.toggle('hidden');
-            collectionArrow.classList.toggle('rotate-180');
-        });
+        // Configurar despliegues
+        function setupDropdown(toggleId, submenuId, arrowId) {
+            document.getElementById(toggleId).addEventListener('click', () => {
+                document.getElementById(submenuId).classList.toggle('hidden');
+                document.getElementById(arrowId).classList.toggle('rotate-180');
+            });
+        }
+
+        setupDropdown('account-toggle-btn', 'account-submenu', 'account-arrow');
+        setupDropdown('orders-toggle-btn', 'orders-submenu', 'orders-arrow');
+        setupDropdown('addresses-toggle-btn', 'addresses-submenu', 'addresses-arrow');
+        setupDropdown('collection-toggle-btn', 'collection-submenu', 'collection-arrow');
 
         function showHome(event) {
             if (event) event.preventDefault();
