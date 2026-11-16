@@ -68,14 +68,13 @@
         </div>
     </header>
 
-    <!-- MENÚ LATERAL DESLIZANTE (DRAWER) -->
+    <!-- MENÚ LATERAL DESLIZANTE -->
     <div id="mobile-menu" class="fixed inset-0 z-50 overflow-hidden hidden">
         <div id="menu-backdrop" class="absolute inset-0 bg-black bg-opacity-50 transition-opacity"></div>
         
         <div class="absolute inset-y-0 left-0 max-w-full flex">
             <div class="w-80 bg-white shadow-xl p-6 flex flex-col justify-between">
                 <div>
-                    <!-- Encabezado del menú -->
                     <div class="flex items-center justify-between pb-6 border-b border-gray-100">
                         <span class="font-serif text-xl tracking-wider font-bold">Menú</span>
                         <button id="close-menu-btn" class="p-2 rounded-md hover:bg-gray-100">
@@ -85,9 +84,7 @@
                         </button>
                     </div>
 
-                    <!-- Opciones de Navegación -->
                     <nav class="mt-6 space-y-4">
-                        <!-- Sección Colección -->
                         <div>
                             <button id="collection-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm">Colección</span>
@@ -95,18 +92,15 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
-                            <!-- Subcategorías -->
                             <div id="collection-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
                                 <a href="#ropa" class="block py-1.5 text-sm text-gray-600 hover:text-black transition">Ropa</a>
                                 <a href="#zapatos" class="block py-1.5 text-sm text-gray-600 hover:text-black transition">Zapatos</a>
                             </div>
                         </div>
 
-                        <!-- Sección Contáctanos y Redes Sociales con Iconos -->
                         <div class="pt-4 border-t border-gray-100">
                             <span class="block py-2 text-sm font-medium text-gray-800 tracking-widest uppercase">Contáctanos</span>
                             <div class="pl-2 mt-2 space-y-3">
-                                <!-- Instagram -->
                                 <a href="https://www.instagram.com/amisboutique.official?xtok=Y3V1a3oyMGhweHNy" target="_blank" class="flex items-center gap-3 text-sm text-gray-600 hover:text-black transition">
                                     <svg class="w-5 h-5 text-pink-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
@@ -115,14 +109,12 @@
                                     </svg>
                                     <span>Instagram</span>
                                 </a>
-                                <!-- Facebook -->
                                 <a href="https://www.facebook.com/share/1CMqeKz5Su/" target="_blank" class="flex items-center gap-3 text-sm text-gray-600 hover:text-black transition">
                                     <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"></path>
                                     </svg>
                                     <span>Facebook</span>
                                 </a>
-                                <!-- WhatsApp -->
                                 <a href="https://wa.me/523312467018" target="_blank" class="flex items-center gap-3 text-sm text-gray-600 hover:text-black transition">
                                     <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"></path>
@@ -141,16 +133,55 @@
         </div>
     </div>
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
-            <h1 class="text-3xl font-light tracking-wide mb-4">Bienvenida a Amis Boutique</h1>
-            <p class="text-gray-500 max-w-md mx-auto mb-8">Explora nuestro menú para ver la colección de ropa y zapatos o ponerte en contacto por nuestras redes.</p>
-            <a href="#productos" class="inline-block bg-black text-white px-8 py-3 rounded-full text-sm tracking-widest uppercase hover:bg-gray-800 transition">Explorar Catálogo</a>
+    <!-- CONTENIDO PRINCIPAL CON EL PRODUCTO -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <h2 class="text-2xl font-serif mb-6 text-center tracking-wider">Novedades</h2>
+
+        <!-- CATÁLOGO DE PRODUCTOS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <!-- TARJETA DE PRODUCTO -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                <!-- Imagen del producto cambiante (Inicia con la rosa por defecto) -->
+                <div class="relative bg-gray-100 h-96">
+                    <img id="product-img-1" src="https://ibb.co/Tqr89BYZ" alt="Conjunto Tejido Punto" class="w-full h-full object-cover transition-all duration-300">
+                    <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">Ropa</span>
+                </div>
+
+                <!-- Detalles del producto -->
+                <div class="p-5 flex-1 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-serif text-lg font-medium text-gray-900">Conjunto Tejido Punto con Gorro</h3>
+                        <p class="text-xs text-gray-500 mt-1">Tejido Super Strech | Unitalla (Abarca 3 a 13)</p>
+                        
+                        <div class="mt-4 flex items-center justify-between">
+                            <span class="text-xl font-semibold text-gray-900">$370 <span class="text-xs text-gray-500 font-normal">MXN</span></span>
+                            
+                            <!-- Selectores de Colores (Círculos) -->
+                            <div class="flex items-center space-x-2">
+                                <!-- Rosa -->
+                                <button onclick="changeColor(1, 'https://ibb.co/Tqr89BYZ', this)" class="w-6 h-6 rounded-full bg-rose-300 border-2 border-black focus:outline-none transition transform hover:scale-110 color-btn-1" title="Rosa"></button>
+                                <!-- Gris -->
+                                <button onclick="changeColor(1, 'https://ibb.co/VpzbLPtm', this)" class="w-6 h-6 rounded-full bg-gray-400 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Gris"></button>
+                                <!-- Beige -->
+                                <button onclick="changeColor(1, 'https://ibb.co/k2kQp22t', this)" class="w-6 h-6 rounded-full bg-amber-200 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Beige"></button>
+                                <!-- Verde -->
+                                <button onclick="changeColor(1, 'https://ibb.co/Xxj3gmHX', this)" class="w-6 h-6 rounded-full bg-stone-600 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Verde"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botón Agregar al Carrito -->
+                    <button class="mt-6 w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
+                        Añadir al Carrito
+                    </button>
+                </div>
+            </div>
+
         </div>
     </main>
 
-    <!-- Script del menú -->
+    <!-- Scripts de interactividad -->
     <script>
         const menuBtn = document.getElementById('menu-btn');
         const closeMenuBtn = document.getElementById('close-menu-btn');
@@ -173,6 +204,18 @@
             collectionSubmenu.classList.toggle('hidden');
             collectionArrow.classList.toggle('rotate-180');
         });
+
+        // Función para cambiar la imagen del producto según el color seleccionado y marcar el círculo activo
+        function changeColor(productId, imageUrl, buttonElement) {
+            document.getElementById(`product-img-${productId}`).src = imageUrl;
+
+            const buttons = buttonElement.parentElement.querySelectorAll('.color-btn-' + productId);
+            buttons.forEach(btn => btn.classList.remove('border-black'));
+            buttons.forEach(btn => btn.classList.add('border-transparent'));
+            
+            buttonElement.classList.remove('border-transparent');
+            buttonElement.classList.add('border-black');
+        }
     </script>
 </body>
 </html>
