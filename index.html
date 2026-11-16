@@ -136,22 +136,23 @@
     <!-- CONTENIDO PRINCIPAL -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         
-        <!-- INICIO -->
+        <!-- INICIO (BIENVENIDA) -->
         <div id="home-view" class="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
             <h1 class="text-3xl font-light tracking-wide mb-4">Bienvenida a Amis Boutique</h1>
             <p class="text-gray-500 max-w-md mx-auto mb-8">Explora nuestro menú para descubrir la colección de ropa y zapatos.</p>
-            <button onclick="showCategory('ropa', event)" class="inline-block bg-black text-white px-8 py-3 rounded-full text-sm tracking-widest uppercase hover:bg-gray-800 transition">Ver Ropa</button>
+            <button onclick="showCategory('ropa', event)" class="inline-block bg-black text-white px-8 py-3 rounded-full text-sm tracking-widest uppercase hover:bg-gray-800 transition">Ver Colección</button>
         </div>
 
-        <!-- VISTA DE ROPA -->
+        <!-- VISTA DE ROPA (OCULTA HASTA SELECCIONAR EN EL MENÚ) -->
         <div id="ropa-view" class="hidden">
             <h2 class="text-2xl font-serif mb-6 tracking-wider">Colección de Ropa</h2>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- TARJETA DEL PRODUCTO -->
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                    <!-- Imagen en alta calidad usando los enlaces directos de Postimages -->
                     <div class="relative bg-gray-100 h-[450px]">
-                        <!-- Usamos directamente tus imágenes de referencia con alta definición -->
-                        <img id="product-img-1" src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80" alt="Conjunto Tejido Punto" class="w-full h-full object-cover transition-all duration-300">
+                        <img id="product-img-1" src="https://i.postimg.cc/YqXSG8fS/IMG-20261115-WA0058.jpg" alt="Conjunto Tejido Punto" class="w-full h-full object-cover transition-all duration-300">
                         <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">Ropa</span>
                     </div>
 
@@ -163,16 +164,16 @@
                             <div class="mt-4 flex items-center justify-between">
                                 <span class="text-xl font-semibold text-gray-900">$370 <span class="text-xs text-gray-500 font-normal">MXN</span></span>
                                 
-                                <!-- Selectores de Colores -->
+                                <!-- Selectores de Colores Interactivos con tus enlaces directos -->
                                 <div class="flex items-center space-x-2">
                                     <!-- Rosa -->
-                                    <button onclick="changeColor(1, 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80', this)" class="w-6 h-6 rounded-full bg-rose-300 border-2 border-black focus:outline-none transition transform hover:scale-110 color-btn-1" title="Rosa"></button>
+                                    <button onclick="changeColor(1, 'https://i.postimg.cc/YqXSG8fS/IMG-20261115-WA0058.jpg', this)" class="w-6 h-6 rounded-full bg-rose-300 border-2 border-black focus:outline-none transition transform hover:scale-110 color-btn-1" title="Rosa"></button>
                                     <!-- Gris -->
-                                    <button onclick="changeColor(1, 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=800&q=80', this)" class="w-6 h-6 rounded-full bg-gray-400 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Gris"></button>
+                                    <button onclick="changeColor(1, 'https://i.postimg.cc/jdjxbP0V/IMG-20261115-WA0059.jpg', this)" class="w-6 h-6 rounded-full bg-gray-400 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Gris"></button>
                                     <!-- Beige -->
-                                    <button onclick="changeColor(1, 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80', this)" class="w-6 h-6 rounded-full bg-amber-200 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Beige"></button>
+                                    <button onclick="changeColor(1, 'https://i.postimg.cc/Qd2h1zFw/IMG-20261115-WA0057.jpg', this)" class="w-6 h-6 rounded-full bg-amber-200 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Beige"></button>
                                     <!-- Verde -->
-                                    <button onclick="changeColor(1, 'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=800&q=80', this)" class="w-6 h-6 rounded-full bg-stone-600 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Verde"></button>
+                                    <button onclick="changeColor(1, 'https://i.postimg.cc/3NxT35q2/IMG-20261115-WA0056.jpg', this)" class="w-6 h-6 rounded-full bg-stone-600 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Verde"></button>
                                 </div>
                             </div>
                         </div>
@@ -193,7 +194,7 @@
 
     </main>
 
-    <!-- Scripts -->
+    <!-- Scripts de interactividad -->
     <script>
         const menuBtn = document.getElementById('menu-btn');
         const closeMenuBtn = document.getElementById('close-menu-btn');
