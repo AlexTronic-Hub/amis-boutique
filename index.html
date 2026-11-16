@@ -59,7 +59,7 @@
             </a>
 
             <!-- Icono del Carrito de Compras -->
-            <button id="cart-btn" class="p-2 relative rounded-md focus:outline-none hover:bg-gray-100 transition">
+            <button onclick="toggleCartModal()" class="p-2 relative rounded-md focus:outline-none hover:bg-gray-100 transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
                 </svg>
@@ -133,24 +133,91 @@
         </div>
     </div>
 
+    <!-- MODAL DEL CARRITO Y CHECKOUT -->
+    <div id="cart-modal" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="toggleCartModal()"></div>
+        <div class="absolute inset-y-0 right-0 max-w-full flex pl-10">
+            <div class="w-screen max-w-md bg-white shadow-xl p-6 flex flex-col justify-between overflow-y-auto">
+                <div>
+                    <div class="flex items-center justify-between pb-4 border-b border-gray-100">
+                        <h2 class="font-serif text-xl font-bold">Tu Carrito</h2>
+                        <button onclick="toggleCartModal()" class="p-2 rounded-md hover:bg-gray-100">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+
+                    <!-- Lista de productos en el carrito -->
+                    <div id="cart-items" class="py-4 space-y-4 max-h-48 overflow-y-auto border-b border-gray-100">
+                        <p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>
+                    </div>
+
+                    <!-- Selección de Métodos de Pago -->
+                    <div class="mt-4">
+                        <h3 class="text-sm font-medium text-gray-900 tracking-wide uppercase mb-3">Método de Pago</h3>
+                        <div class="space-y-2 text-sm">
+                            <label class="flex items-center space-x-3 p-2 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="payment-method" value="Mercado Pago" checked onchange="handlePaymentChange()" class="text-black focus:ring-black">
+                                <span>Mercado Pago (Checkout Pro)</span>
+                            </label>
+                            <label class="flex items-center space-x-3 p-2 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="payment-method" value="Transferencia Bancaria" onchange="handlePaymentChange()" class="text-black focus:ring-black">
+                                <span>Transferencia Bancaria</span>
+                            </label>
+                            <label class="flex items-center space-x-3 p-2 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="payment-method" value="Pago contra entrega en efectivo" onchange="handlePaymentChange()" class="text-black focus:ring-black">
+                                <span>Pago contra entrega en efectivo</span>
+                            </label>
+                            <label class="flex items-center space-x-3 p-2 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="payment-method" value="Pago contra entrega en terminal" onchange="handlePaymentChange()" class="text-black focus:ring-black">
+                                <span>Pago contra entrega en terminal</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Datos Bancarios (Ocultos por defecto, se muestran si eligen transferencia) -->
+                    <div id="bank-details" class="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-700 hidden">
+                        <p class="font-bold text-gray-900 mb-1">Datos para Transferencia:</p>
+                        <p><strong>Banco/Instalación:</strong> Mercado Pago W[span_3](start_span)[span_3](end_span)</p>
+                        <p><strong>CLABE:</strong> <span class="select-all font-mono">722969020435527654</span>[span_4](start_span)[span_4](end_span)</p>
+                        <p><strong>Beneficiario:</strong> Alexis Daniel Orozco Ortiz[span_5](start_span)[span_5](end_span)</p>
+                    </div>
+
+                    <!-- Aviso Importante -->
+                    <div class="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
+                        <strong>Nota importante:</strong> Primero se debe confirmar el pago (o enviar comprobante en transferencias) para procesar y enviar el pedido.
+                    </div>
+                </div>
+
+                <!-- Total y botón de compra -->
+                <div class="pt-4 border-t border-gray-100 mt-4">
+                    <div class="flex justify-between text-base font-semibold text-gray-900 mb-4">
+                        <span>Total:</span>
+                        <span id="cart-total">$0 MXN</span>
+                    </div>
+                    <button onclick="checkoutWhatsApp()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
+                        Completar Pedido por WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- CONTENIDO PRINCIPAL -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         
-        <!-- INICIO (BIENVENIDA) -->
+        <!-- INICIO -->
         <div id="home-view" class="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
             <h1 class="text-3xl font-light tracking-wide mb-4">Bienvenida a Amis Boutique</h1>
             <p class="text-gray-500 max-w-md mx-auto mb-8">Explora nuestro menú para descubrir la colección de ropa y zapatos.</p>
             <button onclick="showCategory('ropa', event)" class="inline-block bg-black text-white px-8 py-3 rounded-full text-sm tracking-widest uppercase hover:bg-gray-800 transition">Ver Colección</button>
         </div>
 
-        <!-- VISTA DE ROPA (OCULTA HASTA SELECCIONAR EN EL MENÚ) -->
+        <!-- VISTA DE ROPA -->
         <div id="ropa-view" class="hidden">
             <h2 class="text-2xl font-serif mb-6 tracking-wider">Colección de Ropa</h2>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- TARJETA DEL PRODUCTO -->
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
-                    <!-- Imagen en alta calidad usando los enlaces directos de Postimages -->
                     <div class="relative bg-gray-100 h-[450px]">
                         <img id="product-img-1" src="https://i.postimg.cc/YqXSG8fS/IMG-20261115-WA0058.jpg" alt="Conjunto Tejido Punto" class="w-full h-full object-cover transition-all duration-300">
                         <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">Ropa</span>
@@ -158,27 +225,22 @@
 
                     <div class="p-5 flex-1 flex flex-col justify-between">
                         <div>
-                            <h3 class="font-serif text-lg font-medium text-gray-900">Conjunto Tejido Punto con Gorro</h3>
+                            <h3 id="product-name-1" class="font-serif text-lg font-medium text-gray-900">Conjunto Tejido Punto con Gorro</h3>
                             <p class="text-xs text-gray-500 mt-1">Tejido Super Strech | Unitalla (Abarca 3 a 13)</p>
                             
                             <div class="mt-4 flex items-center justify-between">
                                 <span class="text-xl font-semibold text-gray-900">$370 <span class="text-xs text-gray-500 font-normal">MXN</span></span>
                                 
-                                <!-- Selectores de Colores Interactivos con tus enlaces directos -->
                                 <div class="flex items-center space-x-2">
-                                    <!-- Rosa -->
-                                    <button onclick="changeColor(1, 'https://i.postimg.cc/YqXSG8fS/IMG-20261115-WA0058.jpg', this)" class="w-6 h-6 rounded-full bg-rose-300 border-2 border-black focus:outline-none transition transform hover:scale-110 color-btn-1" title="Rosa"></button>
-                                    <!-- Gris -->
-                                    <button onclick="changeColor(1, 'https://i.postimg.cc/jdjxbP0V/IMG-20261115-WA0059.jpg', this)" class="w-6 h-6 rounded-full bg-gray-400 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Gris"></button>
-                                    <!-- Beige -->
-                                    <button onclick="changeColor(1, 'https://i.postimg.cc/Qd2h1zFw/IMG-20261115-WA0057.jpg', this)" class="w-6 h-6 rounded-full bg-amber-200 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Beige"></button>
-                                    <!-- Verde -->
-                                    <button onclick="changeColor(1, 'https://i.postimg.cc/3NxT35q2/IMG-20261115-WA0056.jpg', this)" class="w-6 h-6 rounded-full bg-stone-600 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Verde"></button>
+                                    <button onclick="changeColor(1, 'https://i.postimg.cc/YqXSG8fS/IMG-20261115-WA0058.jpg', 'Rosa', this)" class="w-6 h-6 rounded-full bg-rose-300 border-2 border-black focus:outline-none transition transform hover:scale-110 color-btn-1" title="Rosa"></button>
+                                    <button onclick="changeColor(1, 'https://i.postimg.cc/jdjxbP0V/IMG-20261115-WA0059.jpg', 'Gris', this)" class="w-6 h-6 rounded-full bg-gray-400 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Gris"></button>
+                                    <button onclick="changeColor(1, 'https://i.postimg.cc/Qd2h1zFw/IMG-20261115-WA0057.jpg', 'Beige', this)" class="w-6 h-6 rounded-full bg-amber-200 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Beige"></button>
+                                    <button onclick="changeColor(1, 'https://i.postimg.cc/3NxT35q2/IMG-20261115-WA0056.jpg', 'Verde', this)" class="w-6 h-6 rounded-full bg-stone-600 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Verde"></button>
                                 </div>
                             </div>
                         </div>
 
-                        <button class="mt-6 w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
+                        <button onclick="addToCart('Conjunto Tejido Punto con Gorro', 370, 'Rosa')" class="mt-6 w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
                             Añadir al Carrito
                         </button>
                     </div>
@@ -194,7 +256,7 @@
 
     </main>
 
-    <!-- Scripts de interactividad -->
+    <!-- Scripts de interactividad y Carrito -->
     <script>
         const menuBtn = document.getElementById('menu-btn');
         const closeMenuBtn = document.getElementById('close-menu-btn');
@@ -205,9 +267,8 @@
         const collectionSubmenu = document.getElementById('collection-submenu');
         const collectionArrow = document.getElementById('collection-arrow');
 
-        const homeView = document.getElementById('home-view');
-        const ropaView = document.getElementById('ropa-view');
-        const zapatosView = document.getElementById('zapatos-view');
+        let cart = [];
+        let selectedColor = 'Rosa';
 
         function toggleMenu() {
             mobileMenu.classList.toggle('hidden');
@@ -245,8 +306,9 @@
             mobileMenu.classList.add('hidden');
         }
 
-        function changeColor(productId, imageUrl, buttonElement) {
+        function changeColor(productId, imageUrl, colorName, buttonElement) {
             document.getElementById(`product-img-${productId}`).src = imageUrl;
+            selectedColor = colorName;
 
             const buttons = buttonElement.parentElement.querySelectorAll('.color-btn-' + productId);
             buttons.forEach(btn => btn.classList.remove('border-black'));
@@ -254,6 +316,87 @@
             
             buttonElement.classList.remove('border-transparent');
             buttonElement.classList.add('border-black');
+        }
+
+        function toggleCartModal() {
+            const modal = document.getElementById('cart-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        function handlePaymentChange() {
+            const selectedMethod = document.querySelector('input[name="payment-method"]:checked').value;
+            const bankDetails = document.getElementById('bank-details');
+            if (selectedMethod === 'Transferencia Bancaria') {
+                bankDetails.classList.remove('hidden');
+            } else {
+                bankDetails.classList.add('hidden');
+            }
+        }
+
+        function addToCart(name, price, defaultColor) {
+            const colorToAdd = selectedColor || defaultColor;
+            cart.push({ name, price, color: colorToAdd });
+            updateCartUI();
+            toggleCartModal();
+        }
+
+        function updateCartUI() {
+            const cartCount = document.getElementById('cart-count');
+            const cartItems = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
+
+            cartCount.textContent = cart.length;
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>';
+                cartTotal.textContent = '$0 MXN';
+                return;
+            }
+
+            let html = '';
+            let total = 0;
+            cart.forEach((item, index) => {
+                total += item.price;
+                html += `
+                    <div class="flex justify-between items-center text-sm border-b pb-2">
+                        <div>
+                            <p class="font-medium">${item.name}</p>
+                            <p class="text-xs text-gray-500">Color: ${item.color}</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-semibold">$${item.price}</span>
+                            <button onclick="removeFromCart(${index})" class="text-red-500 text-xs hover:underline">Eliminar</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            cartItems.innerHTML = html;
+            cartTotal.textContent = `$${total} MXN`;
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function checkoutWhatsApp() {
+            if (cart.length === 0) {
+                alert('Tu carrito está vacío');
+                return;
+            }
+
+            const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+
+            let message = "Hola Amis Boutique, quiero realizar el siguiente pedido:%0A";
+            let total = 0;
+            cart.forEach(item => {
+                message += `- ${item.name} (${item.color}) - $${item.price} MXN%0A`;
+                total += item.price;
+            });
+            message += `%0ATotal: $${total} MXN%0AMétodo de pago elegido: ${paymentMethod}%0A%0A¡Entiendo que primero se debe confirmar el pago/enviar comprobante para procesar el pedido!`;
+
+            window.open(`https://wa.me/523312467018?text=${message}`, '_blank');
         }
     </script>
 </body>
