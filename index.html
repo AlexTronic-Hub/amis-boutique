@@ -142,9 +142,9 @@
             
             <!-- TARJETA DE PRODUCTO -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
-                <!-- Imagen del producto cambiante (Inicia con la rosa por defecto) -->
+                <!-- Imagen del producto cambiante (Usando enlaces directos compatibles con imgbb) -->
                 <div class="relative bg-gray-100 h-96">
-                    <img id="product-img-1" src="https://ibb.co/Tqr89BYZ" alt="Conjunto Tejido Punto" class="w-full h-full object-cover transition-all duration-300">
+                    <img id="product-img-1" src="https://i.ibb.co/Tqr89BYZ/foto-rosa.jpg" alt="Conjunto Tejido Punto" class="w-full h-full object-cover transition-all duration-300">
                     <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">Ropa</span>
                 </div>
 
@@ -160,13 +160,13 @@
                             <!-- Selectores de Colores (Círculos) -->
                             <div class="flex items-center space-x-2">
                                 <!-- Rosa -->
-                                <button onclick="changeColor(1, 'https://ibb.co/Tqr89BYZ', this)" class="w-6 h-6 rounded-full bg-rose-300 border-2 border-black focus:outline-none transition transform hover:scale-110 color-btn-1" title="Rosa"></button>
+                                <button onclick="changeColor(1, 'https://i.ibb.co/Tqr89BYZ/foto-rosa.jpg', this)" class="w-6 h-6 rounded-full bg-rose-300 border-2 border-black focus:outline-none transition transform hover:scale-110 color-btn-1" title="Rosa"></button>
                                 <!-- Gris -->
-                                <button onclick="changeColor(1, 'https://ibb.co/VpzbLPtm', this)" class="w-6 h-6 rounded-full bg-gray-400 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Gris"></button>
+                                <button onclick="changeColor(1, 'https://i.ibb.co/VpzbLPtm/foto-gris.jpg', this)" class="w-6 h-6 rounded-full bg-gray-400 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Gris"></button>
                                 <!-- Beige -->
-                                <button onclick="changeColor(1, 'https://ibb.co/k2kQp22t', this)" class="w-6 h-6 rounded-full bg-amber-200 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Beige"></button>
+                                <button onclick="changeColor(1, 'https://i.ibb.co/k2kQp22t/foto-beige.jpg', this)" class="w-6 h-6 rounded-full bg-amber-200 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Beige"></button>
                                 <!-- Verde -->
-                                <button onclick="changeColor(1, 'https://ibb.co/Xxj3gmHX', this)" class="w-6 h-6 rounded-full bg-stone-600 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Verde"></button>
+                                <button onclick="changeColor(1, 'https://i.ibb.co/Xxj3gmHX/foto-verde.jpg', this)" class="w-6 h-6 rounded-full bg-stone-600 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Verde"></button>
                             </div>
                         </div>
                     </div>
@@ -205,7 +205,6 @@
             collectionArrow.classList.toggle('rotate-180');
         });
 
-        // Función para cambiar la imagen del producto según el color seleccionado y marcar el círculo activo
         function changeColor(productId, imageUrl, buttonElement) {
             document.getElementById(`product-img-${productId}`).src = imageUrl;
 
