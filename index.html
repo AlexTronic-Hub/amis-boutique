@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amis Boutique | Ropa y Maquillaje</title>
+  <style>
+    :root {
+      --primario: #c85a7c;
+      --primario-oscuro: #a64161;
+      --fondo: #fdf9fa;
+      --texto: #2b2b2b;
+      --borde: #eadde1;
+      --mp-azul: #009ee3;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    body { background-color: var(--fondo); color: var(--texto); padding-bottom: 50px; }
+
+    header {
+      background: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--borde);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .logo { font-size: 1.3rem; font-weight: bold; color: var(--primario); }
+    .btn-carrito {
+      background-color: var(--primario);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-carrito:hover { background-color: var(--primario-oscuro); }
+
+    .catalogo-container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+    .catalogo {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .tarjeta {
+      background: white;
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .categoria { font-size: 11px; text-transform: uppercase; color: var(--primario); font-weight: bold; }
+    .tarjeta h3 { font-size: 1.05rem; margin: 8px 0; }
+    .precio { font-size: 18px; font-weight: bold; margin-bottom: 12px; }
+    
+    button.agregar {
+      background-color: var(--texto);
+      color: white;
+      border: none;
+      padding: 10px;
+      width: 100%;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button.agregar:hover { background-color: var(--primario); }
+
+    /* Drawer Carrito */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      justify-content: flex-end;
+      z-index: 100;
+    }
+    .overlay.abierto { display: flex; }
+    
+    .drawer {
+      background: white;
+      width: 100%;
+      max-width: 400px;
+      height: 100%;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      overflow-y: auto;
+    }
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--borde);
+      padding-bottom: 10px;
+    }
+    .cerrar-drawer { background: none; border: none; font-size: 1.4rem; cursor: pointer; }
+
+    .item-carrito {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f2ecee;
+      padding: 8px 0;
+      font-size: 0.9rem;
+    }
+    .btn-quitar {
+      background: #ffe5ec;
+      color: #c9184a;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+
+    .total-box {
+      background: #fdf2f5;
+      padding: 12px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
+    form { display: flex; flex-direction: column; gap: 8px; }
+    label { font-size: 0.8rem; font-weight: bold; color: #555; }
+    input, textarea, select {
+      width: 100%;
+      padding: 9px;
+      border: 1px solid var(--borde);
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    .btn-enviar {
+      background-color: var(--mp-azul);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+    .btn-enviar:hover { background-color: #0082bc; }
+    .btn-enviar:disabled { background-color: #999; cursor: not-allowed; }
+    .nota { font-size: 0.75rem; color: #777; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">✨ Amis Boutique</div>
+    <button class="btn-carrito" onclick="toggleCarrito()">
+      🛍️ Carrito (<span id="contador">0</span>)
+    </button>
+  </header>
+
+  <div class="catalogo-container">
+    <h2 style="margin-bottom: 20px; color: var(--primario);">Catálogo Disponible</h2>
+    <div id="contenedor-productos" class="catalogo"></div>
+  </div>
+
+  <!-- Carrito Lateral -->
+  <div class="overlay" id="overlay-carrito">
+    <div class="drawer">
+      <div class="drawer-header">
+        <h3>Tu Carrito de Compras</h3>
+        <button class="cerrar-drawer" onclick="toggleCarrito()">✕</button>
+      </div>
+
+      <div id="lista-carrito"></div>
+
+      <div class="total-box">
+        <span>Total:</span>
+        <span id="total-precio">$0 MXN</span>
+      </div>
+
+      <!-- CAMBIA TU_CORREO@gmail.com POR TU CORREO REAL -->
+      <form id="form-pedido" onsubmit="procesarCheckout(event)">
+        <label>Nombre completo *</label>
+        <input type="text" id="cliente-nombre" required placeholder="Tu nombre">
+
+        <label>WhatsApp / Teléfono *</label>
+        <input type="tel" id="cliente-whatsapp" required placeholder="33 1234 5678">
+
+        <label>Dirección de entrega *</label>
+        <textarea id="cliente-direccion" rows="2" required placeholder="Calle, número, colonia y CP"></textarea>
+
+        <label>Método de pago *</label>
+        <select id="metodo-pago">
+          <option value="Mercado Pago En Línea">Tarjeta / Mercado Pago en línea</option>
+          <option value="Transferencia SPEI">Transferencia Bancaria</option>
+        </select>
+
+        <button type="submit" id="btn-pagar" class="btn-enviar">💳 Enviar Pedido y Pagar</button>
+        <p class="nota">Se enviará tu orden por correo y pasarás a pagar el monto exacto.</p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // CAMBIA ESTE CORREO POR EL TUYO:
+    const CORREO_BOUTIQUE = "TU_CORREO@gmail.com";
+
+    const inventario = [
+      { id: 1, nombre: "Blusa Satinada", categoria: "Ropa", precio: 380 },
+      { id: 2, nombre: "Vestido Midi", categoria: "Ropa", precio: 520 },
+      { id: 3, nombre: "Labial Matte", categoria: "Maquillaje", precio: 165 },
+      { id: 4, nombre: "Paleta Nude", categoria: "Maquillaje", precio: 290 },
+      { id: 5, nombre: "Vestido Fucsia", categoria: "Ropa", precio: 350 },
+      { id: 6, nombre: "Conjunto Navideño", categoria: "Ropa", precio: 550 }
+    ];
+
+    let carrito = [];
+
+    const contenedor = document.getElementById("contenedor-productos");
+    const contadorSpan = document.getElementById("contador");
+    const listaCarrito = document.getElementById("lista-carrito");
+    const totalPrecio = document.getElementById("total-precio");
+
+    inventario.forEach(producto => {
+      contenedor.innerHTML += `
+        <div class="tarjeta">
+          <div>
+            <span class="categoria">${producto.categoria}</span>
+            <h3>${producto.nombre}</h3>
+            <div class="precio">$${producto.precio} MXN</div>
+          </div>
+          <button class="agregar" onclick="agregarAlCarrito(${producto.id})">Agregar</button>
+        </div>
+      `;
+    });
+
+    function agregarAlCarrito(id) {
+      const prod = inventario.find(p => p.id === id);
+      carrito.push(prod);
+      actualizarCarritoUI();
+
+      if (carrito.length === 1) {
+        toggleCarrito();
+      }
+    }
+
+    function quitarDelCarrito(index) {
+      carrito.splice(index, 1);
+      actualizarCarritoUI();
+    }
+
+    function actualizarCarritoUI() {
+      contadorSpan.textContent = carrito.length;
+      listaCarrito.innerHTML = "";
+      let total = 0;
+
+      if (carrito.length === 0) {
+        listaCarrito.innerHTML = "<p style='color:#777; text-align:center; padding:15px;'>Tu carrito está vacío.</p>";
+      } else {
+        carrito.forEach((item, index) => {
+          total += item.precio;
+          listaCarrito.innerHTML += `
+            <div class="item-carrito">
+              <div>
+                <strong>${item.nombre}</strong><br>
+                <small>$${item.precio} MXN</small>
+              </div>
+              <button class="btn-quitar" onclick="quitarDelCarrito(${index})">Quitar</button>
+            </div>
+          `;
+        });
+      }
+
+      totalPrecio.textContent = `$${total} MXN`;
+    }
+
+    function toggleCarrito() {
+      document.getElementById("overlay-carrito").classList.toggle("abierto");
+    }
+
+    async function procesarCheckout(e) {
+      e.preventDefault();
+
+      if (carrito.length === 0) {
+        alert("Agrega productos antes de hacer el pedido.");
+        return;
+      }
+
+      const btn = document.getElementById("btn-pagar");
+      btn.disabled = true;
+      btn.textContent = "Procesando pedido...";
+
+      const nombre = document.getElementById("cliente-nombre").value;
+      const whatsapp = document.getElementById("cliente-whatsapp").value;
+      const direccion = document.getElementById("cliente-direccion").value;
+      const metodo = document.getElementById("metodo-pago").value;
+
+      let resumen = "";
+      let total = 0;
+      carrito.forEach(item => {
+        resumen += `${item.nombre} ($${item.precio}) | `;
+        total += item.precio;
+      });
+
+      try {
+        // 1. Mandar el correo en segundo plano con FormSubmit
+        await fetch(`https://formsubmit.co/ajax/${CORREO_BOUTIQUE}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          body: JSON.stringify({
+            _subject: "Nuevo Pedido - Amis Boutique",
+            Cliente: nombre,
+            WhatsApp: whatsapp,
+            Direccion: direccion,
+            Metodo_Pago: metodo,
+            Productos: resumen,
+            Total: `$${total} MXN`
+          })
+        });
+
+        // 2. Si eligió Mercado Pago, pedimos el link con el monto exacto a nuestro servidor
+        if (metodo === "Mercado Pago En Línea") {
+          const respMP = await fetch('/api/crear-preferencia', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: carrito })
+          });
+
+          const dataMP = await respMP.json();
+
+          if (dataMP.init_point) {
+            window.location.href = dataMP.init_point;
+            return;
+          } else {
+            alert("Pedido enviado por correo, pero hubo un detalle al abrir Mercado Pago.");
+          }
+        } else {
+          alert("¡Pedido enviado por correo con éxito! Nos pondremos en contacto por WhatsApp.");
+          carrito = [];
+          actualizarCarritoUI();
+          toggleCarrito();
+        }
+      } catch (error) {
+        alert("Ocurrió un error al procesar el pedido. Revisa tu conexión.");
+        console.error(error);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "💳 Enviar Pedido y Pagar";
+      }
+    }
+  </script>
+
+</body>
+</html>
