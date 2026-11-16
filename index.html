@@ -13,6 +13,32 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Pinyon+Script&display=swap" rel="stylesheet">
 
+    <!-- Firebase SDKs (Compat / Versión Modular Web) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyDpdI-Qx97QFhpM_LfIBjzlxiK2RJlTziQ",
+          authDomain: "amis-boutique.firebaseapp.com",
+          projectId: "amis-boutique",
+          storageBucket: "amis-boutique.firebasestorage.app",
+          messagingSenderId: "529917647004",
+          appId: "1:529917647004:web:7aca9bfdc403cd5ab03559",
+          measurementId: "G-L9SRJ4SYT8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Exponer funciones globales para usarlas en el HTML
+        window.FB_Auth = auth;
+        window.FB_Db = db;
+        window.FB_Methods = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, collection, addDoc, getDocs, query, where, Timestamp };
+    </script>
+
     <style>
       .amis-logo-container {
         display: inline-flex;
@@ -37,7 +63,6 @@
         margin-left: 1.8rem;
         letter-spacing: 0.02em;
       }
-      /* Transición suave para deslizar el carrito hacia la derecha */
       #cart-drawer-panel {
         transition: transform 0.3s ease-in-out;
       }
@@ -49,30 +74,36 @@
     <header class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             
-            <!-- Botón Menú Hamburguesa -->
             <button id="menu-btn" class="p-2 rounded-md focus:outline-none hover:bg-gray-100 transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
             </button>
 
-            <!-- LOGO OFICIAL EN CÓDIGO -->
             <a href="#" onclick="showHome(event)" class="amis-logo-container">
                 <span class="amis-logo-title">AMIS</span>
                 <span class="amis-logo-subtitle">collection &amp; boutique</span>
             </a>
 
-            <!-- Icono del Carrito de Compras -->
-            <button onclick="toggleCartModal()" class="p-2 relative rounded-md focus:outline-none hover:bg-gray-100 transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-                <span id="cart-count" class="absolute top-0 right-0 bg-black text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
-            </button>
+            <div class="flex items-center gap-2">
+                <!-- Botón de Cuenta / Login -->
+                <button onclick="toggleAuthModal()" id="user-account-btn" class="text-xs uppercase tracking-wider font-medium px-3 py-2 rounded-full border border-gray-200 hover:bg-gray-100 transition flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    <span id="user-btn-text">Mi Cuenta</span>
+                </button>
+
+                <!-- Icono del Carrito -->
+                <button onclick="toggleCartModal()" class="p-2 relative rounded-md focus:outline-none hover:bg-gray-100 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    <span id="cart-count" class="absolute top-0 right-0 bg-black text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- BANNER / ALERTA DE ESTADO DE PAGO (MERCADO PAGO) -->
+    <!-- BANNER DE ESTADO DE PAGO -->
     <div id="payment-status-banner" class="hidden max-w-3xl mx-auto mt-6 px-4">
         <div id="payment-status-card" class="rounded-2xl p-5 shadow-md border flex items-start justify-between gap-4">
             <div class="flex items-start gap-3">
@@ -86,66 +117,70 @@
         </div>
     </div>
 
-    <!-- MENÚ LATERAL DESLIZANTE -->
+    <!-- MODAL DE INICIO DE SESIÓN / REGISTRO -->
+    <div id="auth-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-black bg-opacity-50" onclick="toggleAuthModal()"></div>
+            <div class="bg-white rounded-2xl max-w-md w-full p-6 relative z-10 shadow-xl">
+                <div class="flex justify-between items-center pb-4 border-b border-gray-100 mb-4">
+                    <h3 id="auth-modal-title" class="font-serif text-xl font-bold">Iniciar Sesión</h3>
+                    <button onclick="toggleAuthModal()" class="text-gray-400 hover:text-black">✕</button>
+                </div>
+
+                <div id="auth-form-container" class="space-y-4 text-sm">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Correo electrónico</label>
+                        <input type="email" id="auth-email" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black" placeholder="tucorreo@email.com">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Contraseña</label>
+                        <input type="password" id="auth-password" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black" placeholder="••••••••">
+                    </div>
+                    <button onclick="handleAuthSubmit()" id="auth-submit-btn" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">Entrar</button>
+                    
+                    <div class="text-center pt-2">
+                        <button onclick="switchAuthMode()" id="auth-switch-btn" class="text-xs text-gray-600 hover:underline">¿No tienes cuenta? Regístrate aquí</button>
+                    </div>
+                </div>
+
+                <!-- VISTA DE CUENTA ACTIVA (Pedidos e info) -->
+                <div id="auth-account-view" class="hidden space-y-4">
+                    <div class="bg-gray-50 p-4 rounded-xl text-xs space-y-1">
+                        <p class="font-bold text-gray-900">Sesión activa:</p>
+                        <p id="user-display-email" class="text-gray-600"></p>
+                    </div>
+                    <h4 class="font-serif font-bold text-sm">Mis Pedidos Anteriores</h4>
+                    <div id="user-orders-list" class="space-y-2 max-h-48 overflow-y-auto text-xs text-gray-600">
+                        <p class="text-gray-400 italic">Cargando tus pedidos...</p>
+                    </div>
+                    <button onclick="handleLogout()" class="w-full bg-gray-100 text-red-600 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-red-50 transition font-medium">Cerrar Sesión</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MENÚ LATERAL -->
     <div id="mobile-menu" class="fixed inset-0 z-50 overflow-hidden hidden">
         <div id="menu-backdrop" class="absolute inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-        
         <div class="absolute inset-y-0 left-0 max-w-full flex">
             <div class="w-80 bg-white shadow-xl p-6 flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between pb-6 border-b border-gray-100">
                         <span class="font-serif text-xl tracking-wider font-bold">Menú</span>
-                        <button id="close-menu-btn" class="p-2 rounded-md hover:bg-gray-100">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
+                        <button id="close-menu-btn" class="p-2 rounded-md hover:bg-gray-100">✕</button>
                     </div>
-
                     <nav class="mt-6 space-y-4">
                         <div>
                             <button id="collection-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm">Colección</span>
-                                <svg id="collection-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                </svg>
+                                <svg id="collection-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div id="collection-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
                                 <a href="#" onclick="showCategory('ropa', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Ropa</a>
                                 <a href="#" onclick="showCategory('zapatos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition">Zapatos</a>
                             </div>
                         </div>
-
-                        <div class="pt-4 border-t border-gray-100">
-                            <span class="block py-2 text-sm font-medium text-gray-800 tracking-widest uppercase">Contáctanos</span>
-                            <div class="pl-2 mt-2 space-y-3">
-                                <a href="https://www.instagram.com/amisboutique.official?xtok=Y3V1a3oyMGhweHNy" target="_blank" class="flex items-center gap-3 text-sm text-gray-600 hover:text-black transition">
-                                    <svg class="w-5 h-5 text-pink-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
-                                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                                        <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
-                                    </svg>
-                                    <span>Instagram</span>
-                                </a>
-                                <a href="https://www.facebook.com/share/1CMqeKz5Su/" target="_blank" class="flex items-center gap-3 text-sm text-gray-600 hover:text-black transition">
-                                    <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"></path>
-                                    </svg>
-                                    <span>Facebook</span>
-                                </a>
-                                <a href="https://wa.me/523312467018" target="_blank" class="flex items-center gap-3 text-sm text-gray-600 hover:text-black transition">
-                                    <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"></path>
-                                    </svg>
-                                    <span>WhatsApp</span>
-                                </a>
-                            </div>
-                        </div>
                     </nav>
-                </div>
-
-                <div class="text-xs text-center text-gray-400 pb-4">
-                    Amis Boutique &copy; 2026
                 </div>
             </div>
         </div>
@@ -159,51 +194,74 @@
                 <div>
                     <div class="flex items-center justify-between pb-4 border-b border-gray-100">
                         <h2 id="cart-modal-title" class="font-serif text-xl font-bold">Tu Carrito</h2>
-                        <button onclick="toggleCartModal()" class="p-2 rounded-md hover:bg-gray-100">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                        </button>
+                        <button onclick="toggleCartModal()" class="p-2 rounded-md hover:bg-gray-100">✕</button>
                     </div>
 
-                    <!-- PASO 1: VISTA DE PRODUCTOS EN EL CARRITO -->
+                    <!-- PASO 1: CARRITO -->
                     <div id="step-cart" class="py-4">
                         <div id="cart-items" class="space-y-4 max-h-80 overflow-y-auto border-b border-gray-100 pb-4">
                             <p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>
                         </div>
                     </div>
 
-                    <!-- PASO 2: MÉTODO DE ENVÍO -->
-                    <div id="step-shipping" class="py-4 hidden">
-                        <div class="flex items-center gap-2 mb-3 text-gray-900 font-medium text-sm">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
-                            <span class="tracking-wide uppercase text-xs font-bold">Selecciona tu Método de Envío</span>
-                        </div>
+                    <!-- PASO 2: MÉTODO DE ENVÍO Y DATOS DE ENTREGA -->
+                    <div id="step-shipping" class="py-4 hidden space-y-4">
+                        <h3 class="tracking-wide uppercase text-xs font-bold text-gray-900">Selecciona tu Método de Envío</h3>
                         <div class="space-y-2 text-sm">
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="shipping-method" value="local" checked onchange="applyShippingRules()" class="text-black focus:ring-black">
+                                <input type="radio" name="shipping-method" value="Envío local en GDL" checked onchange="applyShippingRules()" class="text-black focus:ring-black">
                                 <div>
                                     <span class="font-medium block">Envío local en Guadalajara</span>
-                                    <span class="text-xs text-gray-500">Disponible pago contra entrega</span>
+                                    <span class="text-xs text-gray-500">Pago contra entrega disponible</span>
                                 </div>
                             </label>
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="shipping-method" value="nacional" onchange="applyShippingRules()" class="text-black focus:ring-black">
+                                <input type="radio" name="shipping-method" value="Envío Nacional" onchange="applyShippingRules()" class="text-black focus:ring-black">
                                 <div>
                                     <span class="font-medium block">Envío Nacional</span>
                                     <span class="text-xs text-gray-500">Pago por transferencia o Mercado Pago</span>
                                 </div>
                             </label>
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="shipping-method" value="Punto de entrega / Acordar con vendedor" onchange="applyShippingRules()" class="text-black focus:ring-black">
+                                <div>
+                                    <span class="font-medium block">Punto de entrega / Acordar con vendedor</span>
+                                    <span class="text-xs text-gray-500">Ej. Plaza Forum o punto acordado</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Formulario de Datos de Contacto y Dirección -->
+                        <div class="pt-3 border-t border-gray-100 space-y-3 text-sm">
+                            <h4 class="font-bold text-xs uppercase tracking-wide text-gray-900">Datos de Envío y Contacto</h4>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">Nombre completo *</label>
+                                <input type="text" id="ship-name" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-black" placeholder="Tu nombre">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">Número de celular *</label>
+                                <input type="tel" id="ship-phone" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-black" placeholder="33 1234 5678">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">Correo electrónico (opcional)</label>
+                                <input type="email" id="ship-email" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-black" placeholder="correo@ejemplo.com">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">Dirección de entrega o referencias *</label>
+                                <textarea id="ship-address" rows="2" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-black" placeholder="Calle, número, colonia, referencias..."></textarea>
+                            </div>
                         </div>
                     </div>
 
                     <!-- PASO 3: MÉTODO DE PAGO -->
-                    <div id="step-payment" class="py-4 hidden">
-                        <h3 class="text-xs font-bold uppercase tracking-wide text-gray-900 mb-3">Selecciona tu Método de Pago</h3>
+                    <div id="step-payment" class="py-4 hidden space-y-3">
+                        <h3 class="text-xs font-bold uppercase tracking-wide text-gray-900">Selecciona tu Método de Pago</h3>
                         <div id="payment-options" class="space-y-2 text-sm">
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
                                 <input type="radio" name="payment-method" value="Mercado Pago" checked onchange="handlePaymentChange()" class="text-black focus:ring-black">
                                 <div>
                                     <span class="font-medium block">Mercado Pago (Checkout Pro)</span>
-                                    <span class="text-xs text-gray-500">Acceso seguro con Access Key</span>
+                                    <span class="text-xs text-gray-500">Acceso seguro con Tarjeta / OXXO</span>
                                 </div>
                             </label>
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
@@ -226,31 +284,26 @@
                         <!-- Datos Bancarios -->
                         <div id="bank-details" class="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-700 hidden">
                             <p class="font-bold text-gray-900 mb-1">Datos para Transferencia:</p>
-                            <p><strong>Banco/Instalación:</strong> Mercado Pago W</p>
+                            <p><strong>Institución:</strong> Mercado Pago Wallet</p>
                             <p><strong>CLABE:</strong> <span class="select-all font-mono">722969020435527654</span></p>
                             <p><strong>Beneficiario:</strong> Alexis Daniel Orozco Ortiz</p>
                         </div>
 
-                        <!-- Aviso Importante -->
                         <div class="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
                             <strong>Nota importante:</strong> Primero se debe confirmar el pago (o enviar comprobante en transferencias) para procesar y enviar el pedido.
                         </div>
                     </div>
                 </div>
 
-                <!-- Footer del Carrito con Botones de Navegación y Retroceso -->
+                <!-- Footer del Carrito -->
                 <div class="pt-4 border-t border-gray-100 mt-4 space-y-2">
                     <div class="flex justify-between text-base font-semibold text-gray-900 mb-2">
                         <span>Total:</span>
                         <span id="cart-total">$0 MXN</span>
                     </div>
-                    
-                    <!-- Botón Principal (Siguiente / Finalizar) -->
                     <button id="cart-action-btn" onclick="handleCartNext()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
                         Ir a Pagar
                     </button>
-
-                    <!-- Botón de Regresar (Aparece en los pasos 2 y 3) -->
                     <button id="cart-back-btn" onclick="handleCartBack()" class="w-full bg-gray-100 text-gray-800 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-gray-200 transition hidden">
                         Regresar
                     </button>
@@ -261,33 +314,26 @@
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        
-        <!-- INICIO -->
         <div id="home-view" class="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
             <h1 class="text-3xl font-light tracking-wide mb-4">Bienvenida a Amis Boutique</h1>
-            <p class="text-gray-500 max-w-md mx-auto mb-8">Explora nuestro menú para descubrir la colección de ropa y zapatos.</p>
+            <p class="text-gray-500 max-w-md mx-auto mb-8">Explora nuestra colección de ropa y zapatos.</p>
             <button onclick="showCategory('ropa', event)" class="inline-block bg-black text-white px-8 py-3 rounded-full text-sm tracking-widest uppercase hover:bg-gray-800 transition">Ver Colección</button>
         </div>
 
-        <!-- VISTA DE ROPA -->
         <div id="ropa-view" class="hidden">
             <h2 class="text-2xl font-serif mb-6 tracking-wider">Colección de Ropa</h2>
-
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
                     <div class="relative bg-gray-100 h-[450px]">
                         <img id="product-img-1" src="https://i.postimg.cc/YqXSG8fS/IMG-20261115-WA0058.jpg" alt="Conjunto Tejido Punto" class="w-full h-full object-cover transition-all duration-300">
                         <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">Ropa</span>
                     </div>
-
                     <div class="p-5 flex-1 flex flex-col justify-between">
                         <div>
-                            <h3 id="product-name-1" class="font-serif text-lg font-medium text-gray-900">Conjunto Tejido Punto con Gorro</h3>
+                            <h3 class="font-serif text-lg font-medium text-gray-900">Conjunto Tejido Punto con Gorro</h3>
                             <p class="text-xs text-gray-500 mt-1">Tejido Super Strech | Unitalla (Abarca 3 a 13)</p>
-                            
                             <div class="mt-4 flex items-center justify-between">
                                 <span class="text-xl font-semibold text-gray-900">$370 <span class="text-xs text-gray-500 font-normal">MXN</span></span>
-                                
                                 <div class="flex items-center space-x-2">
                                     <button onclick="changeColor(1, 'https://i.postimg.cc/YqXSG8fS/IMG-20261115-WA0058.jpg', 'Rosa', this)" class="w-6 h-6 rounded-full bg-rose-300 border-2 border-black focus:outline-none transition transform hover:scale-110 color-btn-1" title="Rosa"></button>
                                     <button onclick="changeColor(1, 'https://i.postimg.cc/jdjxbP0V/IMG-20261115-WA0059.jpg', 'Gris', this)" class="w-6 h-6 rounded-full bg-gray-400 border-2 border-transparent focus:outline-none transition transform hover:scale-110 color-btn-1" title="Gris"></button>
@@ -296,7 +342,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <button onclick="addToCart('Conjunto Tejido Punto con Gorro', 370, 'Rosa')" class="mt-6 w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
                             Añadir al Carrito
                         </button>
@@ -305,42 +350,46 @@
             </div>
         </div>
 
-        <!-- VISTA DE ZAPATOS -->
         <div id="zapatos-view" class="hidden text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
             <h2 class="text-2xl font-serif mb-4 tracking-wider">Colección de Zapatos</h2>
             <p class="text-gray-500">Pronto agregaremos los nuevos modelos de calzado.</p>
         </div>
-
     </main>
 
-    <!-- Scripts de navegación por pasos, lógica de envío, agrupación de carrito y estado de pago -->
+    <!-- Script General con Firebase y Lógica -->
     <script>
         const CORREO_BOUTIQUE = "alexisorozcoortiz@gmail.com";
-
-        const menuBtn = document.getElementById('menu-btn');
-        const closeMenuBtn = document.getElementById('close-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const menuBackdrop = document.getElementById('menu-backdrop');
-        
-        const collectionToggleBtn = document.getElementById('collection-toggle-btn');
-        const collectionSubmenu = document.getElementById('collection-submenu');
-        const collectionArrow = document.getElementById('collection-arrow');
-
-        const homeView = document.getElementById('home-view');
-        const ropaView = document.getElementById('ropa-view');
-        const zapatosView = document.getElementById('zapatos-view');
-
-        let cart = []; // Ahora cada objeto será { name, price, color, quantity }
+        let cart = JSON.parse(localStorage.getItem('amis_cart') || '[]');
         let selectedColor = 'Rosa';
-        let checkoutStep = 1; // 1: Carrito, 2: Envío, 3: Pago
-        let hasAddedFirstItem = false;
-        let timerCierreAutomatico = null;
+        let checkoutStep = 1;
+        let currentUser = null;
+        let isRegistering = false;
 
-        // Verificar si el usuario regresa de Mercado Pago al cargar la página
         window.addEventListener('DOMContentLoaded', () => {
+            // Esperar a que cargue Firebase
+            const checkFB = setInterval(() => {
+                if (window.FB_Auth) {
+                    clearInterval(checkFB);
+                    window.FB_Methods.onAuthStateChanged(window.FB_Auth, (user) => {
+                        currentUser = user;
+                        const btnText = document.getElementById('user-btn-text');
+                        if (user) {
+                            btnText.textContent = user.email.split('@')[0];
+                            loadUserOrders(user.uid);
+                        } else {
+                            btnText.textContent = "Mi Cuenta";
+                        }
+                    });
+                }
+            }, 200);
+
+            updateCartUI();
+
+            // Validación de URLs de retorno de Mercado Pago
             const urlParams = new URLSearchParams(window.location.search);
             const status = urlParams.get('status') || urlParams.get('collection_status');
-            const mpResult = urlParams.get('pago'); // Por si lo mandas desde back_urls personalizadas
+            const mpResult = urlParams.get('pago');
+            const prefId = urlParams.get('preference_id');
 
             const banner = document.getElementById('payment-status-banner');
             const card = document.getElementById('payment-status-card');
@@ -349,42 +398,113 @@
             const msg = document.getElementById('payment-status-msg');
 
             if (status === 'approved' || mpResult === 'exito') {
+                cart = [];
+                localStorage.removeItem('amis_cart');
+                updateCartUI();
                 banner.classList.remove('hidden');
                 card.className = "rounded-2xl p-5 shadow-md border bg-emerald-50 border-emerald-200 text-emerald-900 flex items-start justify-between gap-4";
                 icon.textContent = "✅";
                 title.textContent = "¡Pago exitoso!";
-                msg.textContent = "Tu pago en Mercado Pago se realizó correctamente. Ya recibimos tu orden y pronto nos pondremos en contacto contigo.";
-                // Limpiar URL para que no vuelva a salir si recarga
+                msg.textContent = "Tu pago en Mercado Pago se realizó correctamente. Ya recibimos tu orden.";
                 window.history.replaceState({}, document.title, window.location.pathname);
-            } else if (status === 'rejected' || status === 'failure' || mpResult === 'fallo') {
+            } else if (status === 'rejected' || status === 'failure' || mpResult === 'fallo' || (prefId && !status)) {
                 banner.classList.remove('hidden');
                 card.className = "rounded-2xl p-5 shadow-md border bg-red-50 border-red-200 text-red-900 flex items-start justify-between gap-4";
                 icon.textContent = "⚠️";
                 title.textContent = "Hubo un problema al realizar el pago";
-                msg.textContent = "No se pudo completar el cobro en Mercado Pago. Por favor, intenta de nuevo o elige otro método de pago.";
-                window.history.replaceState({}, document.title, window.location.pathname);
-            } else if (status === 'pending' || status === 'in_process' || mpResult === 'pendiente') {
-                banner.classList.remove('hidden');
-                card.className = "rounded-2xl p-5 shadow-md border bg-amber-50 border-amber-200 text-amber-900 flex items-start justify-between gap-4";
-                icon.textContent = "⏳";
-                title.textContent = "Pago pendiente de confirmación";
-                msg.textContent = "Tu pago está en proceso de validación. Una vez acreditado se procesará tu pedido.";
+                msg.textContent = "El pago no se completó o fue cancelado. Tus productos siguen en el carrito.";
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
         });
 
-        function closePaymentBanner() {
-            document.getElementById('payment-status-banner').classList.add('hidden');
+        // Autenticación de Firebase
+        function toggleAuthModal() {
+            const modal = document.getElementById('auth-modal');
+            modal.classList.toggle('hidden');
+            const accountView = document.getElementById('auth-account-view');
+            const formContainer = document.getElementById('auth-form-container');
+
+            if (currentUser) {
+                accountView.classList.remove('hidden');
+                formContainer.classList.add('hidden');
+                document.getElementById('auth-modal-title').textContent = 'Mi Cuenta';
+                document.getElementById('user-display-email').textContent = currentUser.email;
+            } else {
+                accountView.classList.add('hidden');
+                formContainer.classList.remove('hidden');
+            }
         }
 
-        function toggleMenu() {
-            mobileMenu.classList.toggle('hidden');
+        function switchAuthMode() {
+            isRegistering = !isRegistering;
+            document.getElementById('auth-modal-title').textContent = isRegistering ? 'Crear Cuenta' : 'Iniciar Sesión';
+            document.getElementById('auth-submit-btn').textContent = isRegistering ? 'Registrarse' : 'Entrar';
+            document.getElementById('auth-switch-btn').textContent = isRegistering ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate aquí';
         }
 
-        menuBtn.addEventListener('click', toggleMenu);
-        closeMenuBtn.addEventListener('click', toggleMenu);
-        menuBackdrop.addEventListener('click', toggleMenu);
+        async function handleAuthSubmit() {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const { signInWithEmailAndPassword, createUserWithEmailAndPassword } = window.FB_Methods;
 
+            try {
+                if (isRegistering) {
+                    await createUserWithEmailAndPassword(window.FB_Auth, email, password);
+                    alert("¡Cuenta creada con éxito!");
+                } else {
+                    await signInWithEmailAndPassword(window.FB_Auth, email, password);
+                    alert("¡Bienvenida de nuevo!");
+                }
+                toggleAuthModal();
+            } catch (error) {
+                alert("Error: " + error.message);
+            }
+        }
+
+        async function handleLogout() {
+            await window.FB_Methods.signOut(window.FB_Auth);
+            toggleAuthModal();
+            alert("Sesión cerrada.");
+        }
+
+        async function loadUserOrders(uid) {
+            const listEl = document.getElementById('user-orders-list');
+            try {
+                const { collection, query, where, getDocs } = window.FB_Methods;
+                const q = query(collection(window.FB_Db, "orders"), where("userId", "==", uid));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    listEl.innerHTML = '<p class="text-gray-400 italic">No tienes pedidos anteriores.</p>';
+                    return;
+                }
+
+                let html = '';
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    html += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100">
+                        <p class="font-medium text-gray-900">Total: ${data.total} · ${data.shipping}</p>
+                        <p class="text-gray-500 text-[10px]">${new Date(data.date?.toDate()).toLocaleString()}</p>
+                    </div>`;
+                });
+                listEl.innerHTML = html;
+            } catch (e) {
+                listEl.innerHTML = '<p class="text-red-400">Error al cargar pedidos.</p>';
+            }
+        }
+
+        // Navegación de menú y vistas
+        const menuBtn = document.getElementById('menu-btn');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuBackdrop = document.getElementById('menu-backdrop');
+        const collectionToggleBtn = document.getElementById('collection-toggle-btn');
+        const collectionSubmenu = document.getElementById('collection-submenu');
+        const collectionArrow = document.getElementById('collection-arrow');
+
+        menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+        closeMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+        menuBackdrop.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
         collectionToggleBtn.addEventListener('click', () => {
             collectionSubmenu.classList.toggle('hidden');
             collectionArrow.classList.toggle('rotate-180');
@@ -392,186 +512,126 @@
 
         function showHome(event) {
             if (event) event.preventDefault();
-            homeView.classList.remove('hidden');
-            ropaView.classList.add('hidden');
-            zapatosView.classList.add('hidden');
+            document.getElementById('home-view').classList.remove('hidden');
+            document.getElementById('ropa-view').classList.add('hidden');
+            document.getElementById('zapatos-view').classList.add('hidden');
             mobileMenu.classList.add('hidden');
         }
 
         function showCategory(category, event) {
             if (event) event.preventDefault();
-            homeView.classList.add('hidden');
-            ropaView.classList.add('hidden');
-            zapatosView.classList.add('hidden');
-
-            if (category === 'ropa') {
-                ropaView.classList.remove('hidden');
-            } else if (category === 'zapatos') {
-                zapatosView.classList.remove('hidden');
-            }
-
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('ropa-view').classList.add('hidden');
+            document.getElementById('zapatos-view').classList.add('hidden');
+            if (category === 'ropa') document.getElementById('ropa-view').classList.remove('hidden');
+            if (category === 'zapatos') document.getElementById('zapatos-view').classList.remove('hidden');
             mobileMenu.classList.add('hidden');
         }
 
         function changeColor(productId, imageUrl, colorName, buttonElement) {
             document.getElementById(`product-img-${productId}`).src = imageUrl;
             selectedColor = colorName;
-
             const buttons = buttonElement.parentElement.querySelectorAll('.color-btn-' + productId);
-            buttons.forEach(btn => btn.classList.remove('border-black'));
-            buttons.forEach(btn => btn.classList.add('border-transparent'));
-            
+            buttons.forEach(btn => { btn.classList.remove('border-black'); btn.classList.add('border-transparent'); });
             buttonElement.classList.remove('border-transparent');
             buttonElement.classList.add('border-black');
         }
 
         function toggleCartModal() {
-            if (timerCierreAutomatico) clearTimeout(timerCierreAutomatico);
             const modal = document.getElementById('cart-modal');
             const drawer = document.getElementById('cart-drawer-panel');
-
             if (modal.classList.contains('hidden')) {
                 modal.classList.remove('hidden');
-                setTimeout(() => {
-                    drawer.classList.remove('translate-x-full');
-                }, 10);
+                setTimeout(() => drawer.classList.remove('translate-x-full'), 10);
                 checkoutStep = 1;
                 updateCartUI();
             } else {
                 drawer.classList.add('translate-x-full');
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                }, 300);
+                setTimeout(() => modal.classList.add('hidden'), 300);
             }
         }
 
         function addToCart(name, price, defaultColor) {
             const colorToAdd = selectedColor || defaultColor;
-            
-            // Buscar si ya existe exactamente ese producto con ese mismo color
-            const existingIndex = cart.findIndex(item => item.name === name && item.color === colorToAdd);
-            
-            if (existingIndex !== -1) {
-                cart[existingIndex].quantity += 1;
-            } else {
-                cart.push({ name, price, color: colorToAdd, quantity: 1 });
-            }
-
+            const existing = cart.find(item => item.name === name && item.color === colorToAdd);
+            if (existing) existing.quantity += 1;
+            else cart.push({ name, price, color: colorToAdd, quantity: 1 });
+            localStorage.setItem('amis_cart', JSON.stringify(cart));
             updateCartUI();
-
-            const modal = document.getElementById('cart-modal');
-            const drawer = document.getElementById('cart-drawer-panel');
-
-            // Solo se abre automáticamente en el primer artículo añadido, durante 1.5 segundos y se oculta deslizando a la derecha
-            if (!hasAddedFirstItem) {
-                hasAddedFirstItem = true;
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    drawer.classList.remove('translate-x-full');
-                }, 10);
-
-                if (timerCierreAutomatico) clearTimeout(timerCierreAutomatico);
-                timerCierreAutomatico = setTimeout(() => {
-                    drawer.classList.add('translate-x-full');
-                    setTimeout(() => {
-                        modal.classList.add('hidden');
-                    }, 300);
-                }, 1500);
-            }
+            toggleCartModal();
         }
 
         function changeItemQuantity(index, delta) {
-            if (!cart[index]) return;
             cart[index].quantity += delta;
-            
-            if (cart[index].quantity <= 0) {
-                cart.splice(index, 1);
-            }
+            if (cart[index].quantity <= 0) cart.splice(index, 1);
+            localStorage.setItem('amis_cart', JSON.stringify(cart));
             updateCartUI();
         }
 
         function removeFromCart(index) {
             cart.splice(index, 1);
+            localStorage.setItem('amis_cart', JSON.stringify(cart));
             updateCartUI();
         }
 
         function updateCartUI() {
-            const cartCount = document.getElementById('cart-count');
-            const cartItems = document.getElementById('cart-items');
-            const cartTotal = document.getElementById('cart-total');
-            const modalTitle = document.getElementById('cart-modal-title');
-            const actionBtn = document.getElementById('cart-action-btn');
-            const backBtn = document.getElementById('cart-back-btn');
-
+            document.getElementById('cart-count').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
             const stepCart = document.getElementById('step-cart');
             const stepShipping = document.getElementById('step-shipping');
             const stepPayment = document.getElementById('step-payment');
-
-            // Sumar el total de piezas en el carrito
-            const totalPieces = cart.reduce((sum, item) => sum + item.quantity, 0);
-            cartCount.textContent = totalPieces;
+            const actionBtn = document.getElementById('cart-action-btn');
+            const backBtn = document.getElementById('cart-back-btn');
+            const modalTitle = document.getElementById('cart-modal-title');
 
             stepCart.classList.add('hidden');
             stepShipping.classList.add('hidden');
             stepPayment.classList.add('hidden');
 
-            let total = 0;
-            cart.forEach(item => {
-                total += item.price * item.quantity;
-            });
-            cartTotal.textContent = `$${total} MXN`;
+            let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('cart-total').textContent = `$${total} MXN`;
 
             if (checkoutStep === 1) {
                 modalTitle.textContent = 'Tu Carrito';
                 stepCart.classList.remove('hidden');
-                actionBtn.textContent = 'Ir a Pagar';
                 backBtn.classList.add('hidden');
-
-                if (cart.length === 0) {
-                    cartItems.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>';
-                    actionBtn.style.display = 'none';
-                    return;
-                } else {
-                    actionBtn.style.display = 'block';
-                }
+                actionBtn.textContent = 'Ir a Pagar';
+                actionBtn.style.display = cart.length === 0 ? 'none' : 'block';
 
                 let html = '';
-                cart.forEach((item, index) => {
-                    const subtotal = item.price * item.quantity;
-                    html += `
-                        <div class="flex justify-between items-center text-sm border-b border-gray-100 pb-3">
-                            <div class="pr-2">
+                if (cart.length === 0) {
+                    html = '<p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>';
+                } else {
+                    cart.forEach((item, index) => {
+                        html += `<div class="flex justify-between items-center text-sm border-b border-gray-100 pb-3">
+                            <div>
                                 <p class="font-medium text-gray-900">${item.name}</p>
                                 <p class="text-xs text-gray-500">Color: ${item.color} · $${item.price} c/u</p>
                                 <div class="flex items-center gap-2 mt-2">
-                                    <button onclick="changeItemQuantity(${index}, -1)" class="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center text-gray-700 hover:bg-gray-100 font-bold">-</button>
+                                    <button onclick="changeItemQuantity(${index}, -1)" class="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center font-bold">-</button>
                                     <span class="text-xs font-semibold w-5 text-center">${item.quantity}</span>
-                                    <button onclick="changeItemQuantity(${index}, 1)" class="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center text-gray-700 hover:bg-gray-100 font-bold">+</button>
+                                    <button onclick="changeItemQuantity(${index}, 1)" class="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center font-bold">+</button>
                                 </div>
                             </div>
                             <div class="flex flex-col items-end gap-2">
-                                <span class="font-semibold text-gray-900">$${subtotal}</span>
+                                <span class="font-semibold text-gray-900">$${item.price * item.quantity}</span>
                                 <button onclick="removeFromCart(${index})" class="text-red-500 text-xs hover:underline">Eliminar</button>
                             </div>
-                        </div>
-                    `;
-                });
-                cartItems.innerHTML = html;
-
+                        </div>`;
+                    });
+                }
+                document.getElementById('cart-items').innerHTML = html;
             } else if (checkoutStep === 2) {
-                modalTitle.textContent = 'Método de Envío';
+                modalTitle.textContent = 'Datos y Envío';
                 stepShipping.classList.remove('hidden');
-                actionBtn.textContent = 'Siguiente';
                 backBtn.classList.remove('hidden');
+                actionBtn.textContent = 'Siguiente: Pago';
                 actionBtn.style.display = 'block';
-
             } else if (checkoutStep === 3) {
                 modalTitle.textContent = 'Método de Pago';
                 stepPayment.classList.remove('hidden');
-                actionBtn.textContent = 'Finalizar Pedido';
                 backBtn.classList.remove('hidden');
+                actionBtn.textContent = 'Finalizar Pedido';
                 actionBtn.style.display = 'block';
-                
                 applyShippingRules();
             }
         }
@@ -589,31 +649,62 @@
                 checkoutStep = 2;
                 updateCartUI();
             } else if (checkoutStep === 2) {
+                const name = document.getElementById('ship-name').value;
+                const phone = document.getElementById('ship-phone').value;
+                const address = document.getElementById('ship-address').value;
+                if (!name || !phone || !address) {
+                    alert("Por favor completa los datos de envío y contacto.");
+                    return;
+                }
                 checkoutStep = 3;
                 updateCartUI();
             } else if (checkoutStep === 3) {
-                const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value === 'local' ? 'Envío local en GDL' : 'Envío Nacional';
+                const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
                 const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+                const name = document.getElementById('ship-name').value;
+                const phone = document.getElementById('ship-phone').value;
+                const email = document.getElementById('ship-email').value || (currentUser ? currentUser.email : "Invitado");
+                const address = document.getElementById('ship-address').value;
 
                 const actionBtn = document.getElementById('cart-action-btn');
                 actionBtn.disabled = true;
-                actionBtn.textContent = "Procesando pedido...";
+                actionBtn.textContent = "Procesando...";
 
                 let resumen = "";
                 let total = 0;
                 cart.forEach(item => {
-                    const subtotal = item.price * item.quantity;
-                    resumen += `${item.quantity}x ${item.name} (${item.color}) - $${subtotal} | `;
-                    total += subtotal;
+                    resumen += `${item.quantity}x ${item.name} (${item.color}) - $${item.price * item.quantity} | `;
+                    total += item.price * item.quantity;
                 });
 
                 try {
-                    // Enviar notificación por correo con FormSubmit
+                    // Guardar pedido en Firestore de Firebase si hay conexión activa
+                    if (window.FB_Db) {
+                        const { collection, addDoc, Timestamp } = window.FB_Methods;
+                        await addDoc(collection(window.FB_Db, "orders"), {
+                            userId: currentUser ? currentUser.uid : "invitado",
+                            customerName: name,
+                            phone: phone,
+                            email: email,
+                            address: address,
+                            shipping: shippingMethod,
+                            payment: paymentMethod,
+                            items: cart,
+                            total: `$${total} MXN`,
+                            date: Timestamp.now()
+                        });
+                    }
+
+                    // Enviar correo con FormSubmit
                     await fetch(`https://formsubmit.co/ajax/${CORREO_BOUTIQUE}`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json", "Accept": "application/json" },
                         body: JSON.stringify({
                             _subject: "Nuevo Pedido - Amis Boutique",
+                            Cliente: name,
+                            Telefono: phone,
+                            Correo: email,
+                            Direccion: address,
                             Envio: shippingMethod,
                             Metodo_Pago: paymentMethod,
                             Productos: resumen,
@@ -621,8 +712,8 @@
                         })
                     });
 
-                    // Si selecciona Mercado Pago, envía los datos con sus cantidades reales al endpoint de Vercel
                     if (paymentMethod === "Mercado Pago") {
+                        localStorage.setItem('amis_cart', JSON.stringify(cart));
                         const respMP = await fetch('/api/crear-preferencia', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -634,33 +725,23 @@
                                 }))
                             })
                         });
-                        
-                        const textResponse = await respMP.text();
-                        let dataMP;
-                        try {
-                            dataMP = JSON.parse(textResponse);
-                        } catch (err) {
-                            console.error("Respuesta no JSON del servidor:", textResponse);
-                            alert("Hubo un problema al conectar con Mercado Pago. Intenta de nuevo.");
-                            return;
-                        }
-
-                        if (respMP.ok && (dataMP.id || dataMP.init_point)) {
-                            const redirectUrl = dataMP.init_point || `https://www.mercadopago.com.mx/checkout/v1/redirect?pref_id=${dataMP.id}`;
-                            window.location.href = redirectUrl;
+                        const dataMP = await respMP.json();
+                        if (respMP.ok && dataMP.init_point) {
+                            window.location.href = dataMP.init_point;
                             return;
                         } else {
-                            alert("Hubo un problema al realizar el pago con Mercado Pago. Por favor, intenta de nuevo.");
+                            alert("Error al conectar con Mercado Pago.");
                         }
                     } else {
-                        alert(`¡Pedido procesado con éxito!\n\nEnvío: ${shippingMethod}\nPago: ${paymentMethod}\n\nRecuerda que tu pedido se procesará al confirmar el pago.`);
+                        alert(`¡Pedido procesado con éxito!\n\nEnvío: ${shippingMethod}\nPago: ${paymentMethod}`);
                         cart = [];
+                        localStorage.removeItem('amis_cart');
                         toggleCartModal();
                         showHome();
                     }
                 } catch (error) {
                     console.error(error);
-                    alert("Ocurrió un error al procesar el pedido. Revisa tu conexión e intenta de nuevo.");
+                    alert("Ocurrió un error al procesar tu pedido. Intenta de nuevo.");
                 } finally {
                     actionBtn.disabled = false;
                     actionBtn.textContent = "Finalizar Pedido";
@@ -668,18 +749,17 @@
             }
         }
 
-        // REGLA LÓGICA (IF): Si el envío es nacional, se ocultan los pagos contra entrega
         function applyShippingRules() {
             const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
             const payCash = document.getElementById('pay-cash');
             const payTerminal = document.getElementById('pay-terminal');
             const mpRadio = document.querySelector('input[name="payment-method"][value="Mercado Pago"]');
 
-            if (shippingMethod === 'nacional') {
+            if (shippingMethod === 'Envío Nacional') {
                 payCash.style.display = 'none';
                 payTerminal.style.display = 'none';
                 const currentPayment = document.querySelector('input[name="payment-method"]:checked');
-                if(currentPayment && (currentPayment.value.includes('efectivo') || currentPayment.value.includes('terminal'))) {
+                if(currentPayment && currentPayment.value.includes('contra entrega')) {
                     mpRadio.checked = true;
                 }
             } else {
