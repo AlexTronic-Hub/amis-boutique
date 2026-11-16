@@ -995,6 +995,52 @@
         function handlePaymentChange() {
             // Mantener lógica simple
         }
+
+        function handlePaymentChange() {
+            // Mantener lógica simple
+        }
+
+        // --- FUNCIONES PARA GESTIONAR LOS DATOS PERSONALES ---
+        async function guardarMisDatos(uid) {
+            const names = document.getElementById('input-names').value.trim();
+            const surnames = document.getElementById('input-surnames').value.trim();
+            const phone = document.getElementById('input-phone').value.trim();
+
+            if (!names) {
+                alert("Por favor ingresa al menos tu nombre.");
+                return;
+            }
+
+            try {
+                const { doc, setDoc } = window.FB_Methods;
+                const userDocRef = doc(window.FB_Db, "users", uid);
+
+                // Guardar o fusionar los datos en Firestore
+                await setDoc(userDocRef, {
+                    names,
+                    surnames,
+                    phone,
+                    email: currentUser.email || ''
+                }, { merge: true });
+
+                showToast("¡Datos guardados con éxito!");
+                loadUserDataAndOrders(uid); // Recargar la vista del menú
+            } catch (error) {
+                console.error("Error al guardar datos:", error);
+                showToast("Hubo un error al guardar tus datos.", "error");
+            }
+        }
+
+        function habilitarEdicionDatos() {
+            document.getElementById('view-data-box').classList.add('hidden');
+            document.getElementById('edit-data-box').classList.remove('hidden');
+        }
+
+        function cancelarEdicionDatos() {
+            document.getElementById('edit-data-box').classList.add('hidden');
+            document.getElementById('view-data-box').classList.remove('hidden');
+        }
+    
     </script>
 </body>
 </html>
