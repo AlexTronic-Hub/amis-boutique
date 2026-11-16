@@ -848,10 +848,14 @@
                 actionBtn.textContent = 'Siguiente: Pago';
                 actionBtn.style.display = 'block';
 
-                if (userData) {
-                    document.getElementById('ship-name').value = `${userData.names} ${userData.surnames}`;
-                    document.getElementById('ship-phone').value = userData.phone;
-                    document.getElementById('ship-email').value = currentUser.email;
+                // Autocompletar datos si el usuario tiene sesión iniciada
+                if (userData && currentUser) {
+                    document.getElementById('ship-name').value = `${userData.names || ''} ${userData.surnames || ''}`.trim();
+                    document.getElementById('ship-phone').value = userData.phone || '';
+                    document.getElementById('ship-email').value = currentUser.email || '';
+                    if (userData.addresses && userData.addresses.length > 0) {
+                        document.getElementById('ship-address').value = userData.addresses[0];
+                    }
                 }
             } else if (checkoutStep === 3) {
                 modalTitle.textContent = 'Método de Pago';
@@ -873,6 +877,16 @@
         async function handleCartNext() {
             if (checkoutStep === 1) {
                 if (cart.length === 0) return;
+                
+                // Si el usuario ya tiene sesión y sus datos registrados, autocompletamos y pasamos al paso 2 (Envío/Datos) o revisamos
+                if (userData && currentUser && userData.names && userData.phone) {
+                    document.getElementById('ship-name').value = `${userData.names} ${userData.surnames || ''}`.trim();
+                    document.getElementById('ship-phone').value = userData.phone;
+                    document.getElementById('ship-email').value = currentUser.email;
+                    if (userData.addresses && userData.addresses.length > 0) {
+                        document.getElementById('ship-address').value = userData.addresses[0];
+                    }
+                }
                 checkoutStep = 2;
                 updateCartUI();
             } else if (checkoutStep === 2) {
@@ -939,9 +953,28 @@
 
                     if (paymentMethod === "Mercado Pago") {
                         localStorage.setItem('amis_cart', JSON.stringify(cart));
-                        // Enlace directo oficial simulado para redirección inmediata a pasarela de Mercado Pago
-                        window.location.href = `https://www.mercadopago.com.mx/checkout/v1/redirect?pref_id=AMIS-${Date.now()}`;
-                        return;
+                        
+                        // Petición real a tu backend para crear la preferencia con tu Access Token
+                        const response = await fetch('/api/crear-preferencia', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                items: cart.map(item => ({
+                                    title: `${item.name} (${item.color})`,
+                                    unit_price: Number(item.price),
+                                    quantity: Number(item.quantity)
+                                }))
+                            })
+                        });
+
+                        const data = response.ok ? await response.json() : null;
+
+                        if (data && data.init_point) {
+                            window.location.href = data.init_point;
+                            return;
+                        } else {
+                            throw new Error("No se pudo obtener el enlace de pago de Mercado Pago.");
+                        }
                     } else {
                         showToast(`¡Pedido procesado con éxito!`);
                         cart = [];
@@ -951,7 +984,7 @@
                     }
                 } catch (error) {
                     console.error(error);
-                    showToast("Ocurrió un error al procesar tu pedido.", "error");
+                    showToast("Ocurrió un error al procesar tu pago con Mercado Pago.", "error");
                 } finally {
                     actionBtn.disabled = false;
                     actionBtn.textContent = "Finalizar Pedido";
