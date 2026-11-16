@@ -1,3 +1,7 @@
+import { MercadoPagoConfig, Preference } from 'mercadopago';
+
+const client = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método no permitido' });
@@ -5,47 +9,28 @@ export default async function handler(req, res) {
 
   try {
     const { items } = req.body;
-    const accessToken = process.env.MP_ACCESS_TOKEN;
 
-    if (!accessToken) {
-      return res.status(500).json({ error: 'Falta configurar MP_ACCESS_TOKEN en las variables de entorno' });
-    }
-
-    const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`
-      },
-      body: JSON.stringify({
+    const preference = new Preference(client);
+    const result = await preference.create({
+      body: {
         items: items.map(item => ({
-          title: String(item.nombre || 'Producto'),
-          unit_price: Number(item.precio),
-          quantity: Number(item.cantidad || 1),
+          title: String(item.title),
+          unit_price: Number(item.unit_price), // <--- Forzamos que sea número
+          quantity: Number(item.quantity || 1),
           currency_id: 'MXN'
         })),
         back_urls: {
-          success: `${req.headers.origin}/?status=success`,
-          failure: `${req.headers.origin}/?status=failure`,
-          pending: `${req.headers.origin}/?status=pending`
+          success: 'https://amisboutique.com',
+          failure: 'https://amisboutique.com',
+          pending: 'https://amisboutique.com'
         },
-        auto_return: 'approved'
-      })
+        auto_return: 'approved',
+      }
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error('Error de Mercado Pago:', data);
-      return res.status(500).json({ 
-        error: 'Error al procesar el pago con Mercado Pago', 
-        detalle: data.message || JSON.stringify(data) 
-      });
-    }
-
-    return res.status(200).json({ id: data.id });
+    return res.status(200).json({ id: result.id, init_point: result.init_point });
   } catch (error) {
-    console.error('Error interno:', error);
+    console.error("Error de Mercado Pago:", error.response?.data || error.message);
     return res.status(500).json({ error: error.message || 'Error al procesar el pago' });
   }
 }
