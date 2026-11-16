@@ -1,12 +1,10 @@
 import { MercadoPagoConfig, Preference } from 'mercadopago';
 
-// Configura las credenciales usando la variable de entorno que pusiste en Vercel
-const client = new MercadoPagoConfig({ 
-  access_token: process.env.MP_ACCESS_TOKEN 
+const client = new MercadoPagoConfig({
+  access_token: process.env.MP_ACCESS_TOKEN
 });
 
 export default async function handler(req, res) {
-  // Asegurarnos de que solo responda a peticiones POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método no permitido' });
   }
@@ -14,14 +12,18 @@ export default async function handler(req, res) {
   try {
     const { items } = req.body;
 
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'El carrito está vacío o los datos son inválidos' });
+    }
+
     const preference = new Preference(client);
-    
+
     const result = await preference.create({
       body: {
         items: items.map(item => ({
-          title: item.title,
-          unit_price: Number(item.unit_price),
-          quantity: Number(item.quantity),
+          title: String(item.nombre || 'Producto'),
+          unit_price: Number(item.precio),
+          quantity: Number(item.cantidad || 1),
           currency_id: 'MXN'
         })),
         back_urls: {
@@ -33,11 +35,13 @@ export default async function handler(req, res) {
       }
     });
 
-    // Devolvemos el ID de la preferencia para que el cliente abra el checkout
     return res.status(200).json({ id: result.id });
 
   } catch (error) {
-    console.error('Error al crear la preferencia:', error);
-    return res.status(500).json({ error: 'Error al procesar el pago con Mercado Pago' });
+    console.error('Error detallado de Mercado Pago:', error);
+    return res.status(500).json({ 
+      error: 'Error al procesar el pago con Mercado Pago', 
+      detalle: error.message || error 
+    });
   }
 }
