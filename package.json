@@ -1,60 +1,8 @@
-import { MercadoPagoConfig, Preference } from 'mercadopago';
-
-const client = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
-
-export default async function handler(req, res) {
-  // Configurar CORS por seguridad
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST');
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-  );
-
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método no permitido' });
-  }
-
-  try {
-    const { items } = req.body;
-
-    if (!items || !Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ error: 'El carrito está vacío o los datos son inválidos' });
-    }
-
-    const preference = new Preference(client);
-    const result = await preference.create({
-      body: {
-        items: items.map(item => ({
-          title: String(item.title),
-          unit_price: Number(item.unit_price),
-          quantity: Number(item.quantity || 1),
-          currency_id: 'MXN'
-        })),
-        back_urls: {
-          success: 'https://amisboutique.com',
-          failure: 'https://amisboutique.com',
-          pending: 'https://amisboutique.com'
-        },
-        auto_return: 'approved',
-      }
-    });
-
-    const initPoint = result.init_point || result.body?.init_point;
-    const prefId = result.id || result.body?.id;
-
-    if (!initPoint) {
-      throw new Error("Mercado Pago no devolvió un enlace de pago válido.");
-    }
-
-    return res.status(200).json({ id: prefId, init_point: initPoint });
-  } catch (error) {
-    console.error("Error de Mercado Pago:", error.response?.data || error.message);
-    return res.status(500).json({ error: error.message || 'Error al procesar el pago' });
+{
+  "name": "amis-boutique",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "mercadopago": "^2.0.15"
   }
 }
