@@ -204,7 +204,7 @@
                                         <span class="tracking-wider uppercase text-xs font-bold">Mis Pedidos</span>
                                         <svg id="orders-arrow" class="w-3.5 h-3.5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
-                                    <div id="orders-submenu" class="hidden pl-3 mt-1 space-y-1 border-l border-gray-100">
+                                    <div id="orders-container-sub" class="hidden pl-3 mt-1 space-y-1 border-l border-gray-100">
                                         <div id="menu-user-orders" class="py-1 text-xs text-gray-600 space-y-2">
                                             <p class="text-gray-400 italic">Cargando pedidos...</p>
                                         </div>
@@ -217,7 +217,7 @@
                                         <span class="tracking-wider uppercase text-xs font-bold">Direcciones Registradas</span>
                                         <svg id="addresses-arrow" class="w-3.5 h-3.5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
-                                    <div id="addresses-submenu" class="hidden pl-3 mt-1 space-y-2 border-l border-gray-100">
+                                    <div id="addresses-container-sub" class="hidden pl-3 mt-1 space-y-2 border-l border-gray-100">
                                         <div id="menu-user-addresses" class="py-1 text-xs text-gray-600 space-y-1">
                                             <p class="text-gray-400 italic">Cargando direcciones...</p>
                                         </div>
@@ -715,17 +715,20 @@
 
         function setupDropdown(toggleId, submenuId, arrowId) {
             const btn = document.getElementById(toggleId);
-            if(btn) {
-                btn.addEventListener('click', () => {
-                    document.getElementById(submenuId).classList.toggle('hidden');
-                    document.getElementById(arrowId).classList.toggle('rotate-180');
-                });
+            const submenu = document.getElementById(submenuId);
+            const arrow = document.getElementById(arrowId);
+            if(btn && submenu && arrow) {
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    submenu.classList.toggle('hidden');
+                    arrow.classList.toggle('rotate-180');
+                };
             }
         }
 
         setupDropdown('account-toggle-btn', 'account-submenu', 'account-arrow');
-        setupDropdown('orders-toggle-btn', 'orders-submenu', 'orders-arrow');
-        setupDropdown('addresses-toggle-btn', 'addresses-submenu', 'addresses-arrow');
+        setupDropdown('orders-toggle-btn', 'orders-container-sub', 'orders-arrow');
+        setupDropdown('addresses-toggle-btn', 'addresses-container-sub', 'addresses-arrow');
         setupDropdown('collection-toggle-btn', 'collection-submenu', 'collection-arrow');
 
         function showHome(event) {
@@ -776,7 +779,7 @@
             else cart.push({ name, price, color: colorToAdd, quantity: 1 });
             localStorage.setItem('amis_cart', JSON.stringify(cart));
             updateCartUI();
-            toggleCartModal();
+            showToast("¡Producto agregado al carrito!");
         }
 
         function changeItemQuantity(index, delta) {
@@ -936,9 +939,8 @@
 
                     if (paymentMethod === "Mercado Pago") {
                         localStorage.setItem('amis_cart', JSON.stringify(cart));
-                        // Redirección directa al flujo de pago de Mercado Pago usando un enlace de cobro general o simulador configurado con el monto y concepto
-                        const descripcionItems = encodeURIComponent(resumen);
-                        window.location.href = `https://www.mercadopago.com.mx/checkout/v1/redirect?pref_id=amis-boutique-${Date.now()}`;
+                        // Enlace directo oficial simulado para redirección inmediata a pasarela de Mercado Pago
+                        window.location.href = `https://www.mercadopago.com.mx/checkout/v1/redirect?pref_id=AMIS-${Date.now()}`;
                         return;
                     } else {
                         showToast(`¡Pedido procesado con éxito!`);
