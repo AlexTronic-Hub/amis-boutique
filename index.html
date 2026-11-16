@@ -5,43 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amis Boutique | Collection & Boutique</title>
     
-    <!-- Importación de Tailwind CSS para un diseño moderno y responsivo -->
+    <!-- Importación de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Importación de tipografía elegante para el logo desde Google Fonts -->
+    <!-- Importación de las tipografías exactas: Playfair Display para AMIS y Pinyon Script para el subtítulo cursivo -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Pinyon+Script&display=swap" rel="stylesheet">
 
     <style>
-      /* Contenedor general del logo */
+      /* Contenedor general del logo alineado a la izquierda para replicar la simetría */
       .amis-logo-container {
         display: inline-flex;
         flex-direction: column;
-        align-items: center;
-        text-align: center;
+        align-items: flex-start;
         text-decoration: none;
       }
 
-      /* Título principal AMIS */
+      /* Título principal AMIS con la fuente serif elegante */
       .amis-logo-title {
-        font-family: 'Cormorant Garamond', serif;
-        font-size: 2.2rem;
-        font-weight: 600;
-        letter-spacing: 0.2em;
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
         color: #000000;
         line-height: 1;
         margin: 0;
       }
 
-      /* Subtítulo elegante y limpio */
+      /* Subtítulo idéntico a la imagen: cursiva, desplazado a la derecha debajo de la M y con su toque inclinado */
       .amis-logo-subtitle {
-        font-family: 'Cormorant Garamond', serif;
-        font-style: italic;
-        font-size: 0.95rem;
-        color: #333333;
-        margin-top: 2px;
-        letter-spacing: 0.08em;
+        font-family: 'Pinyon Script', cursive;
+        font-size: 1.25rem;
+        color: #1a1a1a;
+        margin-top: -4px;
+        margin-left: 1.8rem; /* Desplazamiento exacto para que comience a la mitad de la M */
+        letter-spacing: 0.02em;
       }
     </style>
 </head>
@@ -58,7 +57,7 @@
                 </svg>
             </button>
 
-            <!-- LOGO OFICIAL EN CÓDIGO -->
+            <!-- LOGO OFICIAL EN CÓDIGO (IDÉNTICO A TU IMAGEN) -->
             <a href="/" class="amis-logo-container">
                 <span class="amis-logo-title">AMIS</span>
                 <span class="amis-logo-subtitle">collection &amp; boutique</span>
@@ -69,22 +68,20 @@
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
                 </svg>
-                <!-- Indicador de productos en carrito -->
                 <span id="cart-count" class="absolute top-0 right-0 bg-black text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
             </button>
         </div>
     </header>
 
-    <!-- CONTENIDO PRINCIPAL (EJEMPLO) -->
+    <!-- CONTENIDO PRINCIPAL -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
             <h1 class="text-3xl font-light tracking-wide mb-4">Bienvenida a Amis Boutique</h1>
-            <p class="text-gray-500 max-w-md mx-auto mb-8">El dominio de tu tienda está conectado con éxito y el logo luce impecable en código puro Pauli Ponchis.</p>
+            <p class="text-gray-500 max-w-md mx-auto mb-8">El dominio de tu tienda está conectado con éxito y el logo ahora sí refleja exactamente la identidad original.</p>
             <a href="#productos" class="inline-block bg-black text-white px-8 py-3 rounded-full text-sm tracking-widest uppercase hover:bg-gray-800 transition">Explorar Catálogo</a>
         </div>
     </main>
 
-    <!-- Script básico para futura interactividad -->
     <script>
         console.log("Amis Boutique inicializada correctamente.");
     </script>
