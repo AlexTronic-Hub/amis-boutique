@@ -540,22 +540,33 @@
             const accountToggleBtn = document.getElementById('account-toggle-btn');
 
             try {
-                const { collection, query, where, getDocs, doc, getDoc } = window.FB_Methods;
+                const { collection, query, where, getDocs, doc, getDoc, setDoc } = window.FB_Methods;
                 
-                // Cargar perfil del usuario desde Firestore
                 const userDocRef = doc(window.FB_Db, "users", uid);
-                const userSnap = await getDoc(userDocRef);
+                let userSnap = await getDoc(userDocRef);
+
+                // Si el usuario autenticado aún no tiene un documento en Firestore, lo creamos de emergencia
+                if (!userSnap.exists()) {
+                    const defaultData = {
+                        names: currentUser.email ? currentUser.email.split('@')[0] : 'Usuario',
+                        surnames: '',
+                        phone: 'No registrado',
+                        email: currentUser.email || '',
+                        addresses: [],
+                        createdAt: new Date()
+                    };
+                    await setDoc(userDocRef, defaultData);
+                    userSnap = await getDoc(userDocRef); // Volvemos a leerlo
+                }
 
                 if (userSnap.exists()) {
                     userData = userSnap.data();
                     const primerNombre = userData.names ? userData.names.split(' ')[0] : 'Cliente';
                     
-                    // Cambiar el texto del botón principal de "MI CUENTA" para saludar al usuario
                     if (accountToggleBtn) {
                         accountToggleBtn.querySelector('span').textContent = `Hola, ${primerNombre}`;
                     }
 
-                    // Mostrar datos en la subsección "Mis Datos"
                     if (profileContent) {
                         profileContent.innerHTML = `
                             <div class="p-2 bg-gray-50 rounded-lg border border-gray-100 space-y-1 text-gray-700">
@@ -606,11 +617,10 @@
                 }
 
             } catch (e) {
-                console.error(e);
+                console.error("Error detallado en loadUserDataAndOrders:", e);
                 if (profileContent) profileContent.innerHTML = '<p class="text-red-400">Error al cargar perfil.</p>';
             }
         }
-
         function toggleAuthModal() {
             const modal = document.getElementById('auth-modal');
             const errorBox = document.getElementById('auth-error-box');
