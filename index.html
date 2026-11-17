@@ -988,7 +988,9 @@
         }
 
         function updateCartUI() {
-            document.getElementById('cart-count').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const countEl = document.getElementById('cart-count');
+            if(countEl) countEl.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+
             const stepCart = document.getElementById('step-cart');
             const stepShipping = document.getElementById('step-shipping');
             const stepPayment = document.getElementById('step-payment');
@@ -996,19 +998,22 @@
             const backBtn = document.getElementById('cart-back-btn');
             const modalTitle = document.getElementById('cart-modal-title');
 
-            stepCart.classList.add('hidden');
-            stepShipping.classList.add('hidden');
-            stepPayment.classList.add('hidden');
+            if(stepCart) stepCart.classList.add('hidden');
+            if(stepShipping) stepShipping.classList.add('hidden');
+            if(stepPayment) stepPayment.classList.add('hidden');
 
             let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            document.getElementById('cart-total').textContent = `$${total} MXN`;
+            const totalEl = document.getElementById('cart-total');
+            if(totalEl) totalEl.textContent = `$${total} MXN`;
 
             if (checkoutStep === 1) {
-                modalTitle.textContent = 'Tu Carrito';
-                stepCart.classList.remove('hidden');
-                backBtn.classList.add('hidden');
-                actionBtn.textContent = 'Ir a Pagar';
-                actionBtn.style.display = cart.length === 0 ? 'none' : 'block';
+                if(modalTitle) modalTitle.textContent = 'Tu Carrito';
+                if(stepCart) stepCart.classList.remove('hidden');
+                if(backBtn) backBtn.classList.add('hidden');
+                if(actionBtn) {
+                    actionBtn.textContent = 'Ir a Pagar';
+                    actionBtn.style.display = cart.length === 0 ? 'none' : 'block';
+                }
 
                 let html = '';
                 if (cart.length === 0) {
@@ -1032,29 +1037,39 @@
                         </div>`;
                     });
                 }
-                document.getElementById('cart-items').innerHTML = html;
+                const cartItemsContainer = document.getElementById('cart-items');
+                if(cartItemsContainer) cartItemsContainer.innerHTML = html;
+
             } else if (checkoutStep === 2) {
-                modalTitle.textContent = 'Datos y Envío';
-                stepShipping.classList.remove('hidden');
-                backBtn.classList.remove('hidden');
-                actionBtn.textContent = 'Siguiente: Pago';
-                actionBtn.style.display = 'block';
+                if(modalTitle) modalTitle.textContent = 'Datos y Envío';
+                if(stepShipping) stepShipping.classList.remove('hidden');
+                if(backBtn) backBtn.classList.remove('hidden');
+                if(actionBtn) {
+                    actionBtn.textContent = 'Siguiente: Pago';
+                    actionBtn.style.display = 'block';
+                }
 
                 if (userData && currentUser) {
-                    document.getElementById('ship-name').value = `${userData.names || ''} ${userData.surnames || ''}`.trim();
-                    document.getElementById('ship-phone').value = userData.phone || '';
-                    document.getElementById('ship-email').value = currentUser.email || '';
-                    if (userData.addresses && userData.addresses.length > 0) {
-                        // Tomar la dirección completa guardada en lugar de solo la primera línea
-                        document.getElementById('ship-address').value = userData.addresses[0];
+                    const shipName = document.getElementById('ship-name');
+                    const shipPhone = document.getElementById('ship-phone');
+                    const shipEmail = document.getElementById('ship-email');
+                    const shipAddress = document.getElementById('ship-address');
+
+                    if(shipName) shipName.value = `${userData.names || ''} ${userData.surnames || ''}`.trim();
+                    if(shipPhone) shipPhone.value = userData.phone || '';
+                    if(shipEmail) shipEmail.value = currentUser.email || '';
+                    if(userData.addresses && userData.addresses.length > 0 && shipAddress) {
+                        shipAddress.value = userData.addresses[0];
                     }
                 }
             } else if (checkoutStep === 3) {
-                modalTitle.textContent = 'Método de Pago';
-                stepPayment.classList.remove('hidden');
-                backBtn.classList.remove('hidden');
-                actionBtn.textContent = 'Finalizar Pedido';
-                actionBtn.style.display = 'block';
+                if(modalTitle) modalTitle.textContent = 'Método de Pago';
+                if(stepPayment) stepPayment.classList.remove('hidden');
+                if(backBtn) backBtn.classList.remove('hidden');
+                if(actionBtn) {
+                    actionBtn.textContent = 'Finalizar Pedido';
+                    actionBtn.style.display = 'block';
+                }
                 applyShippingRules();
                 handlePaymentChange();
             }
@@ -1073,6 +1088,15 @@
                 checkoutStep = 2;
                 updateCartUI();
             } else if (checkoutStep === 2) {
+                const clientName = document.getElementById('ship-name').value.trim();
+                const clientPhone = document.getElementById('ship-phone').value.trim();
+                const clientAddress = document.getElementById('ship-address').value.trim();
+
+                if(!clientName || !clientPhone || !clientAddress) {
+                    showToast("Por favor completa los campos obligatorios de envío.", "error");
+                    return;
+                }
+
                 checkoutStep = 3;
                 updateCartUI();
             } else if (checkoutStep === 3) {
@@ -1080,7 +1104,7 @@
                 const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
                 const clientName = document.getElementById('ship-name').value.trim();
                 const clientPhone = document.getElementById('ship-phone').value.trim();
-                const clientAddress = document.getElementById('ship-address').value.trim(); // 👈 Toma todo el texto completo del textarea de dirección
+                const clientAddress = document.getElementById('ship-address').value.trim();
                 let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
                 const actionBtn = document.getElementById('cart-action-btn');
@@ -1094,7 +1118,6 @@
                     const month = (now.getMonth() + 1).toString().padStart(2, '0');
                     const prefix = `VT${year}${month}-`;
 
-                    // Generar folio consecutivo estricto empezando desde 00001
                     let nextOrderNumber = 1;
                     try {
                         const counterRef = doc(window.FB_Db, "counters", "orderCounter");
@@ -1104,7 +1127,7 @@
                             if (counterDoc.exists()) {
                                 currentSeq = (counterDoc.data().sequence || 0) + 1;
                             } else {
-                                currentSeq = 1; // Si no existe, empieza en 1 (VT2611-00001)
+                                currentSeq = 1;
                             }
                             transaction.set(counterRef, { sequence: currentSeq }, { merge: true });
                             return currentSeq;
