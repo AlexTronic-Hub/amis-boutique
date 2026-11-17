@@ -489,14 +489,14 @@
     <!-- CONTENIDO PRINCIPAL -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        <!-- BANNER DE INICIO / HERO NAVIDEÑO CON FONDO DE LUCES -->
+        <!-- BANNER DE INICIO / HERO ACTUALIZADO -->
         <div id="home-view" class="space-y-8">
             <div class="relative hero-bokeh-bg text-white rounded-3xl p-8 sm:p-16 overflow-hidden shadow-xl text-center">
                 
                 <div class="relative z-10 max-w-2xl mx-auto space-y-4">
-                    <span class="text-xs uppercase tracking-[0.3em] text-amber-300 font-semibold">ESPECIAL NAVIDAD &amp; TEMPORADA</span>
-                    <h1 class="text-3xl sm:text-5xl font-serif font-light tracking-wide">Elegancia que ilumina tus fiestas</h1>
-                    <p class="text-gray-300 text-sm sm:text-base leading-relaxed">Descubre nuestra exclusiva selección de vestidos, conjuntos y abrigos diseñados para destacar en cada celebración.</p>
+                    <span class="text-xs uppercase tracking-[0.3em] text-amber-300 font-semibold">DESCUBRE AMIS</span>
+                    <h1 class="text-3xl sm:text-5xl font-serif font-light tracking-wide">Haz espacio para algo nuevo.</h1>
+                    <p class="text-gray-300 text-sm sm:text-base leading-relaxed">Descubre nuestra selección de moda, calzado y accesorios. Encuentra piezas que reflejan tu estilo y te hacen sentir increíble.</p>
                     <div class="pt-4 flex flex-wrap justify-center gap-4">
                         <button onclick="loadCategoryProducts('temporada', event)" class="bg-amber-400 text-black px-8 py-3 rounded-full text-xs tracking-widest uppercase font-bold hover:bg-amber-300 transition shadow-lg">Ver Colección Navideña</button>
                         <button onclick="loadCategoryProducts('conjuntos', event)" class="border border-white text-white px-8 py-3 rounded-full text-xs tracking-widest uppercase hover:bg-white hover:text-black transition">Explorar Todo</button>
@@ -504,23 +504,19 @@
                 </div>
             </div>
 
-            <!-- TARJETAS DE CATEGORÍAS RÁPIDAS -->
+            <!-- TARJETAS DE CATEGORÍAS RÁPIDAS (SIN EMOJIS, ESTILO MINIMALISTA) -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div onclick="loadCategoryProducts('vestidos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group">
-                    <span class="text-2xl mb-2 block">👗</span>
-                    <h3 class="font-serif font-medium text-sm group-hover:text-amber-600 transition">Vestidos</h3>
+                <div onclick="loadCategoryProducts('vestidos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group py-8">
+                    <h3 class="font-serif font-semibold text-base tracking-wider text-gray-900 group-hover:text-amber-600 transition">Vestidos</h3>
                 </div>
-                <div onclick="loadCategoryProducts('conjuntos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group">
-                    <span class="text-2xl mb-2 block">✨</span>
-                    <h3 class="font-serif font-medium text-sm group-hover:text-amber-600 transition">Conjuntos</h3>
+                <div onclick="loadCategoryProducts('conjuntos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group py-8">
+                    <h3 class="font-serif font-semibold text-base tracking-wider text-gray-900 group-hover:text-amber-600 transition">Conjuntos</h3>
                 </div>
-                <div onclick="loadCategoryProducts('abrigos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group">
-                    <span class="text-2xl mb-2 block">🧥</span>
-                    <h3 class="font-serif font-medium text-sm group-hover:text-amber-600 transition">Abrigos</h3>
+                <div onclick="loadCategoryProducts('abrigos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group py-8">
+                    <h3 class="font-serif font-semibold text-base tracking-wider text-gray-900 group-hover:text-amber-600 transition">Abrigos</h3>
                 </div>
-                <div onclick="loadCategoryProducts('temporada', event)" class="bg-amber-50 p-6 rounded-2xl shadow-sm border border-amber-200 text-center cursor-pointer hover:shadow-md transition group">
-                    <span class="text-2xl mb-2 block">🎄</span>
-                    <h3 class="font-serif font-bold text-sm text-red-700 transition">Navidad</h3>
+                <div onclick="loadCategoryProducts('temporada', event)" class="bg-amber-50 p-6 rounded-2xl shadow-sm border border-amber-200 text-center cursor-pointer hover:shadow-md transition group py-8">
+                    <h3 class="font-serif font-bold text-base tracking-wider text-red-700 transition">Navidad</h3>
                 </div>
             </div>
         </div>
