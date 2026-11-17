@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amis Boutique | Colección Navideña y de Temporada</title>
+    <title>AMIS Boutique | Colección & Boutique</title>
     
     <!-- Favicon Personalizado con el Monograma A+B -->
     <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/9FDwKwCG/IMG-20261116-WA0002.jpg">
@@ -1045,6 +1045,7 @@
                     document.getElementById('ship-phone').value = userData.phone || '';
                     document.getElementById('ship-email').value = currentUser.email || '';
                     if (userData.addresses && userData.addresses.length > 0) {
+                        // Tomar la dirección completa guardada en lugar de solo la primera línea
                         document.getElementById('ship-address').value = userData.addresses[0];
                     }
                 }
@@ -1079,7 +1080,7 @@
                 const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
                 const clientName = document.getElementById('ship-name').value.trim();
                 const clientPhone = document.getElementById('ship-phone').value.trim();
-                const clientAddress = document.getElementById('ship-address').value.trim();
+                const clientAddress = document.getElementById('ship-address').value.trim(); // 👈 Toma todo el texto completo del textarea de dirección
                 let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
                 const actionBtn = document.getElementById('cart-action-btn');
@@ -1093,6 +1094,7 @@
                     const month = (now.getMonth() + 1).toString().padStart(2, '0');
                     const prefix = `VT${year}${month}-`;
 
+                    // Generar folio consecutivo estricto empezando desde 00001
                     let nextOrderNumber = 1;
                     try {
                         const counterRef = doc(window.FB_Db, "counters", "orderCounter");
@@ -1101,13 +1103,15 @@
                             let currentSeq = 1;
                             if (counterDoc.exists()) {
                                 currentSeq = (counterDoc.data().sequence || 0) + 1;
+                            } else {
+                                currentSeq = 1; // Si no existe, empieza en 1 (VT2611-00001)
                             }
                             transaction.set(counterRef, { sequence: currentSeq }, { merge: true });
                             return currentSeq;
                         });
                     } catch (e) {
-                        console.warn("Usando respaldo de folio por tiempo:", e);
-                        nextOrderNumber = Math.floor(Math.random() * 90000) + 10000;
+                        console.warn("Error en contador, usando respaldo inicial:", e);
+                        nextOrderNumber = 1;
                     }
 
                     const orderId = `${prefix}${nextOrderNumber.toString().padStart(5, '0')}`;
