@@ -1150,29 +1150,20 @@
                 actionBtn.textContent = "Procesando pedido...";
 
                 try {
-                    const { collection, addDoc, doc, runTransaction, Timestamp } = window.FB_Methods;
+                    const { collection, addDoc, getDocs } = window.FB_Methods;
                     const now = new Date();
                     const year = now.getFullYear().toString().slice(-2);
                     const month = (now.getMonth() + 1).toString().padStart(2, '0');
                     const prefix = `VT${year}${month}-`;
 
+                    // Conteo automático basado en el número de documentos existentes en la colección "orders"
                     let nextOrderNumber = 1;
                     try {
-                        const counterRef = doc(window.FB_Db, "counters", "orderCounter");
-                        nextOrderNumber = await runTransaction(window.FB_Db, async (transaction) => {
-                            const counterDoc = await transaction.get(counterRef);
-                            let currentSeq = 1;
-                            if (counterDoc.exists()) {
-                                currentSeq = (counterDoc.data().sequence || 0) + 1;
-                            } else {
-                                currentSeq = 1;
-                            }
-                            transaction.set(counterRef, { sequence: currentSeq }, { merge: true });
-                            return currentSeq;
-                        });
+                        const ordersSnap = await getDocs(collection(window.FB_Db, "orders"));
+                        nextOrderNumber = ordersSnap.size + 1;
                     } catch (e) {
-                        console.warn("Error en contador, usando respaldo inicial:", e);
-                        nextOrderNumber = 1;
+                        console.warn("Error calculando el consecutivo:", e);
+                        nextOrderNumber = Math.floor(Math.random() * 90000) + 10000;
                     }
 
                     const orderId = `${prefix}${nextOrderNumber.toString().padStart(5, '0')}`;
@@ -1211,7 +1202,7 @@
                             payment: paymentMethod,
                             items: cart,
                             total: `$${total} MXN`,
-                            createdAt: Timestamp.now()
+                            createdAt: window.FB_Methods.Timestamp.now()
                         };
 
                         await addDoc(collection(window.FB_Db, "orders"), orderData);
