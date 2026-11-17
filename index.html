@@ -20,7 +20,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, arrayUnion, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, arrayUnion, query, where, Timestamp, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyDpdI-Qx97QFhpM_LfIBjzlxiK2RJlTziQ",
@@ -38,7 +38,7 @@
 
         window.FB_Auth = auth;
         window.FB_Db = db;
-        window.FB_Methods = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, arrayUnion, query, where, Timestamp };
+        window.FB_Methods = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, arrayUnion, query, where, Timestamp, runTransaction };
     </script>
 
     <style>
@@ -580,14 +580,43 @@
 
             updateCartUI();
 
+            // Detectar el regreso desde Mercado Pago y guardar pedido aprobado
             const urlParams = new URLSearchParams(window.location.search);
             const status = urlParams.get('status') || urlParams.get('collection_status');
             const mpResult = urlParams.get('pago');
 
             if (status === 'approved' || mpResult === 'exito') {
-                cart = [];
-                localStorage.removeItem('amis_cart');
-                updateCartUI();
+                const pendingData = JSON.parse(localStorage.getItem('amis_pending_order'));
+                if (pendingData) {
+                    const { collection, addDoc, Timestamp } = window.FB_Methods;
+                    addDoc(collection(window.FB_Db, "orders"), {
+                        orderId: pendingData.orderId,
+                        userId: currentUser ? currentUser.uid : "guest",
+                        clientName: pendingData.clientName,
+                        clientPhone: pendingData.clientPhone,
+                        clientAddress: pendingData.clientAddress,
+                        shipping: pendingData.shippingMethod,
+                        payment: pendingData.paymentMethod,
+                        items: cart,
+                        total: `$${pendingData.total} MXN`,
+                        createdAt: Timestamp.now()
+                    }).then(() => {
+                        let detalleProductos = cart.map(i => `- ${i.quantity}x ${i.name} (${i.color})`).join('%0A');
+                        let mensajeWA = `Hola Amis Boutique! 👋 ¡Mi pago en Mercado Pago fue aprobado!%0A%0A*Pedido:* ${pendingData.orderId}%0A*Cliente:* ${pendingData.clientName}%0A*Total:* $${pendingData.total} MXN%0A*Envío:* ${pendingData.shippingMethod}%0A*Dirección:* ${pendingData.clientAddress}%0A*Productos:*%0A${detalleProductos}%0A%0A✨`;
+                        
+                        document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${mensajeWA}`;
+                        document.getElementById('order-success-modal').classList.remove('hidden');
+                        
+                        localStorage.removeItem('amis_pending_order');
+                        localStorage.removeItem('amis_cart');
+                        cart = [];
+                        updateCartUI();
+                    }).catch(err => console.error("Error guardando orden MP:", err));
+                }
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } else if (status === 'rejected' || status === 'cancelled') {
+                showToast("El pago no pudo completarse o fue cancelado.", "error");
+                localStorage.removeItem('amis_pending_order');
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
         });
@@ -624,7 +653,6 @@
 
             try {
                 const { collection, getDocs } = window.FB_Methods;
-                // Traemos todos los productos y filtramos localmente para evitar errores de índices en Firebase
                 const querySnapshot = await getDocs(collection(window.FB_Db, "products"));
                 
                 let matchingProducts = [];
@@ -787,7 +815,7 @@
                     let html = '';
                     querySnapshot.forEach((docSnap) => {
                         const data = docSnap.data();
-                        html += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 space-y-0.5 text-xs"><p class="font-medium text-gray-900">${data.total || ''} · ${data.shipping || ''}</p></div>`;
+                        html += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 space-y-0.5 text-xs"><p class="font-medium text-gray-900">${data.orderId || 'Pedido'} · ${data.total || ''}</p></div>`;
                     });
                     if (ordersContent) ordersContent.innerHTML = html;
                 }
@@ -1059,6 +1087,26 @@
                 actionBtn.textContent = "Procesando pedido...";
 
                 try {
+                    // Generar folio consecutivo automático (Ej. VT2611-00001)
+                    const { collection, addDoc, doc, runTransaction, Timestamp } = window.FB_Methods;
+                    const now = new Date();
+                    const year = now.getFullYear().toString().slice(-2);
+                    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                    const prefix = `VT${year}${month}-`;
+
+                    const counterRef = doc(window.FB_Db, "counters", "orderCounter");
+                    const nextOrderNumber = await runTransaction(window.FB_Db, async (transaction) => {
+                        const counterDoc = await transaction.get(counterRef);
+                        let currentSequence = 1;
+                        if (counterDoc.exists()) {
+                            currentSequence = (counterDoc.data().sequence || 0) + 1;
+                        }
+                        transaction.set(counterRef, { sequence: currentSequence }, { merge: true });
+                        return currentSequence;
+                    });
+
+                    const orderId = `${prefix}${nextOrderNumber.toString().padStart(5, '0')}`;
+
                     if (paymentMethod === "Mercado Pago") {
                         const respMP = await fetch('/api/crear-preferencia', {
                             method: 'POST',
@@ -1067,21 +1115,24 @@
                                 items: cart.map(item => ({
                                     title: `${item.name} (${item.color})`,
                                     unit_price: Number(item.price),
-                                    quantity: 1
+                                    quantity: item.quantity
                                 }))
                             })
                         });
                         const dataMP = await respMP.json();
                         if (dataMP && dataMP.init_point) {
                             localStorage.setItem('amis_cart', JSON.stringify(cart));
+                            localStorage.setItem('amis_pending_order', JSON.stringify({
+                                orderId, clientName, clientPhone, clientAddress, shippingMethod, paymentMethod, total
+                            }));
                             window.location.href = dataMP.init_point;
                             return;
                         } else {
                             throw new Error("No se pudo obtener el enlace de pago.");
                         }
                     } else {
-                        const { collection, addDoc, Timestamp } = window.FB_Methods;
                         await addDoc(collection(window.FB_Db, "orders"), {
+                            orderId,
                             userId: currentUser ? currentUser.uid : "guest",
                             clientName,
                             clientPhone,
@@ -1094,7 +1145,7 @@
                         });
 
                         let detalleProductos = cart.map(i => `- ${i.quantity}x ${i.name} (${i.color})`).join('%0A');
-                        let mensajeWA = `Hola Amis Boutique! 👋 Acabo de realizar un pedido.%0A%0A*Cliente:* ${clientName}%0A*Total:* $${total} MXN%0A*Método de Pago:* ${paymentMethod}%0A*Envío:* ${shippingMethod}%0A*Dirección:* ${clientAddress}%0A*Productos:*%0A${detalleProductos}%0A%0AAdjunto mi comprobante de pago. ✨`;
+                        let mensajeWA = `Hola Amis Boutique! 👋 Acabo de realizar un pedido.%0A%0A*Pedido:* ${orderId}%0A*Cliente:* ${clientName}%0A*Total:* $${total} MXN%0A*Método de Pago:* ${paymentMethod}%0A*Envío:* ${shippingMethod}%0A*Dirección:* ${clientAddress}%0A*Productos:*%0A${detalleProductos}%0A%0AAdjunto mi comprobante de pago. ✨`;
                         
                         document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${mensajeWA}`;
 
