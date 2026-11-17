@@ -72,6 +72,21 @@
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans">
 
+    <!-- FORMULARIO OCULTO PARA FORMSUBMIT -->
+    <form id="formsubmit-hidden" action="https://formsubmit.co/alexisorozcoortiz@gmail.com" method="POST" class="hidden">
+        <input type="hidden" name="_subject" value="Nuevo Pedido en AMIS Boutique 🛍️">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_template" value="table">
+        <input type="text" name="Pedido" id="fs-pedido">
+        <input type="text" name="Cliente" id="fs-cliente">
+        <input type="text" name="Teléfono" id="fs-telefono">
+        <input type="text" name="Total" id="fs-total">
+        <input type="text" name="Método_de_Pago" id="fs-pago">
+        <input type="text" name="Envío" id="fs-envio">
+        <input type="text" name="Dirección" id="fs-direccion">
+        <textarea name="Productos" id="fs-productos"></textarea>
+    </form>
+
     <!-- NOTIFICACIÓN FLOTANTE -->
     <div id="toast-notification" class="fixed top-5 right-5 z-50 transform translate-y-[-200%] transition-transform duration-300">
         <div id="toast-card" class="bg-black text-white px-5 py-3 rounded-2xl shadow-xl text-xs flex items-center gap-3">
@@ -450,11 +465,11 @@
                 <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">✓</div>
                 <h3 class="font-serif text-xl font-bold">¡Pedido Creado!</h3>
                 <p id="order-success-msg" class="text-xs text-gray-600 leading-relaxed">
-                    Tu pedido ha sido registrado con éxito. Se confirmará tu pago para procesar el envío de tus prendas.
+                    Tu pedido ha sido registrado con éxito. Envía tu número de pedido por WhatsApp para agilizar la entrega.
                 </p>
                 <div id="whatsapp-btn-container" class="pt-2">
                     <a id="whatsapp-link" href="#" target="_blank" class="w-full bg-emerald-600 text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-emerald-700 transition flex items-center justify-center gap-2 font-medium">
-                        📲 Enviar comprobante por WhatsApp
+                        📲 Enviar pedido por WhatsApp
                     </a>
                 </div>
                 <button onclick="closeSuccessModalAndReload()" class="w-full bg-gray-100 text-gray-800 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-gray-200 transition">
@@ -601,10 +616,11 @@
                         total: `$${pendingData.total} MXN`,
                         createdAt: Timestamp.now()
                     }).then(() => {
-                        let detalleProductos = cart.map(i => `- ${i.quantity}x ${i.name} (${i.color})`).join('%0A');
-                        let mensajeWA = `Hola Amis Boutique! 👋 ¡Mi pago en Mercado Pago fue aprobado!%0A%0A*Pedido:* ${pendingData.orderId}%0A*Cliente:* ${pendingData.clientName}%0A*Total:* $${pendingData.total} MXN%0A*Envío:* ${pendingData.shippingMethod}%0A*Dirección:* ${pendingData.clientAddress}%0A*Productos:*%0A${detalleProductos}%0A%0A✨`;
-                        
-                        document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${mensajeWA}`;
+                        // Enviar datos por FormSubmit en segundo plano
+                        enviarFormSubmit(pendingData);
+
+                        let mensajeWA = `Hola Amis Boutique! 👋 Mi número de pedido es: *${pendingData.orderId}*`;
+                        document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${encodeURIComponent(mensajeWA)}`;
                         document.getElementById('order-success-modal').classList.remove('hidden');
                         
                         localStorage.removeItem('amis_pending_order');
@@ -620,6 +636,28 @@
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
         });
+
+        function enviarFormSubmit(data) {
+            document.getElementById('fs-pedido').value = data.orderId;
+            document.getElementById('fs-cliente').value = data.clientName;
+            document.getElementById('fs-telefono').value = data.clientPhone;
+            document.getElementById('fs-total').value = `$${data.total} MXN`;
+            document.getElementById('fs-pago').value = data.paymentMethod;
+            document.getElementById('fs-envio').value = data.shippingMethod;
+            document.getElementById('fs-direccion').value = data.clientAddress;
+            
+            let detalleStr = cart.map(i => `${i.quantity}x ${i.name} (${i.color}) - $${i.price * i.quantity} MXN`).join('\n');
+            document.getElementById('fs-productos').value = detalleStr;
+
+            const form = document.getElementById('formsubmit-hidden');
+            const formData = new FormData(form);
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: { 'Accept': 'application/json' }
+            }).catch(err => console.error("Error enviando FormSubmit:", err));
+        }
 
         async function loadCategoryProducts(categoryKey, event) {
             if (event) event.preventDefault();
@@ -1163,7 +1201,7 @@
                             throw new Error("No se pudo obtener el enlace de pago.");
                         }
                     } else {
-                        await addDoc(collection(window.FB_Db, "orders"), {
+                        const orderData = {
                             orderId,
                             userId: currentUser ? currentUser.uid : "guest",
                             clientName,
@@ -1174,12 +1212,16 @@
                             items: cart,
                             total: `$${total} MXN`,
                             createdAt: Timestamp.now()
-                        });
+                        };
 
-                        let detalleProductos = cart.map(i => `- ${i.quantity}x ${i.name} (${i.color})`).join('%0A');
-                        let mensajeWA = `Hola Amis Boutique! 👋 Acabo de realizar un pedido.%0A%0A*Pedido:* ${orderId}%0A*Cliente:* ${clientName}%0A*Total:* $${total} MXN%0A*Método de Pago:* ${paymentMethod}%0A*Envío:* ${shippingMethod}%0A*Dirección:* ${clientAddress}%0A*Productos:*%0A${detalleProductos}%0A%0AAdjunto mi comprobante de pago. ✨`;
-                        
-                        document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${mensajeWA}`;
+                        await addDoc(collection(window.FB_Db, "orders"), orderData);
+
+                        // Enviar datos por FormSubmit a tu correo
+                        enviarFormSubmit({ orderId, clientName, clientPhone, clientAddress, shippingMethod, paymentMethod, total });
+
+                        // WhatsApp limpio: solo el saludo y el número de pedido
+                        let mensajeWA = `Hola Amis Boutique! 👋 Mi número de pedido es: *${orderId}*`;
+                        document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${encodeURIComponent(mensajeWA)}`;
 
                         toggleCartModal();
                         document.getElementById('order-success-modal').classList.remove('hidden');
