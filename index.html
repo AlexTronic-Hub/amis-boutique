@@ -66,3 +66,1258 @@
         letter-spacing: 0.02em;
       }
       #cart-drawer-panel, #mobile-menu-panel {
+        transition: transform 0.3s ease-in-out;
+      }
+      
+      /* Fondo configurado con tu URL exacta de Postimages */
+      .hero-bokeh-bg {
+        background-image: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://i.postimg.cc/SQVy0c4n/fiam.png');
+        background-size: cover;
+        background-position: center;
+      }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans">
+
+    <!-- FORMULARIO OCULTO PARA FORMSUBMIT -->
+    <form id="formsubmit-hidden" action="https://formsubmit.co/alexisorozcoortiz@gmail.com" method="POST" class="hidden">
+        <input type="hidden" name="_subject" value="Nuevo Pedido en AMIS Boutique 🛍️">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_template" value="table">
+        <input type="text" name="Pedido" id="fs-pedido">
+        <input type="text" name="Cliente" id="fs-cliente">
+        <input type="text" name="Teléfono" id="fs-telefono">
+        <input type="text" name="Total" id="fs-total">
+        <input type="text" name="Método_de_Pago" id="fs-pago">
+        <input type="text" name="Envío" id="fs-envio">
+        <input type="text" name="Dirección" id="fs-direccion">
+        <textarea name="Productos" id="fs-productos"></textarea>
+    </form>
+
+    <!-- NOTIFICACIÓN FLOTANTE -->
+    <div id="toast-notification" class="fixed top-5 right-5 z-50 transform translate-y-[-200%] transition-transform duration-300">
+        <div id="toast-card" class="bg-black text-white px-5 py-3 rounded-2xl shadow-xl text-xs flex items-center gap-3">
+            <span id="toast-icon">✨</span>
+            <span id="toast-msg">Mensaje de notificación</span>
+        </div>
+    </div>
+
+    <!-- HEADER / NAVEGACIÓN -->
+    <header class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            <button id="menu-btn" onclick="toggleMobileMenu()" class="p-2 rounded-md focus:outline-none hover:bg-gray-100 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+
+            <a href="#" onclick="showHome(event)" class="amis-logo-container">
+                <span class="amis-logo-title">AMIS</span>
+                <span class="amis-logo-subtitle">collection &amp; boutique</span>
+            </a>
+
+            <div class="flex items-center gap-2">
+                <button onclick="toggleCartModal()" class="p-2 relative rounded-md focus:outline-none hover:bg-gray-100 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <span id="cart-count" class="absolute top-0 right-0 bg-black text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MODAL DE INICIO DE SESIÓN / REGISTRO -->
+    <div id="auth-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-black bg-opacity-50" onclick="toggleAuthModal()"></div>
+            <div class="bg-white rounded-2xl max-w-md w-full p-6 relative z-10 shadow-xl">
+                <div class="flex justify-between items-center pb-4 border-b border-gray-100 mb-4">
+                    <h3 id="auth-modal-title" class="font-serif text-xl font-bold">Iniciar Sesión</h3>
+                    <button onclick="toggleAuthModal()" class="text-gray-400 hover:text-black">✕</button>
+                </div>
+
+                <div id="auth-error-box" class="hidden mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl"></div>
+
+                <div id="auth-form-container" class="space-y-3 text-sm">
+                    <div id="register-fields" class="hidden space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Nombre(s)</label>
+                            <input type="text" id="reg-names" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black text-xs" placeholder="Tus nombres">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Apellidos</label>
+                            <input type="text" id="reg-surnames" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black text-xs" placeholder="Tus apellidos">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Número de teléfono</label>
+                            <input type="tel" id="reg-phone" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black text-xs" placeholder="33 1234 5678">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Correo electrónico</label>
+                        <input type="email" id="auth-email" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black text-xs" placeholder="tucorreo@email.com">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Contraseña</label>
+                        <input type="password" id="auth-password" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black text-xs" placeholder="••••••••">
+                    </div>
+
+                    <button onclick="handleAuthSubmit()" id="auth-submit-btn" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">Entrar</button>
+                    
+                    <div class="text-center pt-2">
+                        <button onclick="switchAuthMode()" id="auth-switch-btn" class="text-xs text-gray-600 hover:underline">¿No tienes cuenta? Regístrate aquí</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PARA AGREGAR DIRECCIÓN -->
+    <div id="address-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-black bg-opacity-50" onclick="toggleAddressModal()"></div>
+            <div class="bg-white rounded-2xl max-w-md w-full p-6 relative z-10 shadow-xl space-y-3">
+                <div class="flex justify-between items-center pb-4 border-b border-gray-100">
+                    <h3 class="font-serif text-xl font-bold">Agregar Nueva Dirección</h3>
+                    <button onclick="toggleAddressModal()" class="text-gray-400 hover:text-black">✕</button>
+                </div>
+                
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <label class="block font-bold uppercase text-gray-700 mb-1">Código Postal *</label>
+                        <input type="text" id="dir-cp" maxlength="5" placeholder="Ej. 44100" oninput="buscarCodigoPostal(this.value)" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black font-mono">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-bold uppercase text-gray-700 mb-1">Calle *</label>
+                            <input type="text" id="dir-calle" placeholder="Nombre de la calle" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
+                        </div>
+                        <div>
+                            <label class="block font-bold uppercase text-gray-700 mb-1">Núm. Exterior *</label>
+                            <input type="text" id="dir-num-ext" placeholder="Ej. 123" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-bold uppercase text-gray-700 mb-1">Núm. Interior (Opc.)</label>
+                            <input type="text" id="dir-num-int" placeholder="Ej. Depto 4B" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
+                        </div>
+                        <div>
+                            <label class="block font-bold uppercase text-gray-700 mb-1">Ciudad / Municipio *</label>
+                            <input type="text" id="dir-ciudad" placeholder="Ej. Guadalajara" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold uppercase text-gray-700 mb-1">Colonia *</label>
+                        <input type="text" id="dir-colonia-input" placeholder="Ej. Centro, Moderna..." class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
+                    </div>
+
+                    <div>
+                        <label class="block font-bold uppercase text-gray-700 mb-1">Estado *</label>
+                        <input type="text" id="dir-estado" placeholder="Ej. Jalisco" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
+                    </div>
+                </div>
+
+                <button onclick="saveStructuredAddress()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition mt-2">Guardar Dirección</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MENÚ LATERAL (TRES BARRITAS) -->
+    <div id="mobile-menu" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div id="menu-backdrop" class="absolute inset-0 bg-black bg-opacity-50 transition-opacity" onclick="toggleMobileMenu()"></div>
+        <div class="absolute inset-y-0 left-0 max-w-full flex">
+            <div id="mobile-menu-panel" class="w-80 bg-white shadow-xl p-6 flex flex-col justify-between transform -translate-x-full overflow-y-auto">
+                <div>
+                    <div class="flex items-center justify-between pb-6 border-b border-gray-100">
+                        <span class="font-serif text-xl tracking-wider font-bold">Menú</span>
+                        <button onclick="toggleMobileMenu()" class="p-2 rounded-md hover:bg-gray-100">✕</button>
+                    </div>
+
+                    <nav class="mt-6 space-y-4">
+                        <!-- 1. MI CUENTA -->
+                        <div id="menu-account-wrapper" class="hidden">
+                            <button id="account-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
+                                <span class="tracking-widest uppercase text-sm font-bold">Mi Cuenta</span>
+                                <svg id="account-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                            <div id="account-submenu" class="hidden pl-4 mt-2 space-y-3 border-l-2 border-gray-100">
+                                
+                                <!-- Subsección: Mis Pedidos -->
+                                <div>
+                                    <button id="orders-toggle-btn" class="w-full flex items-center justify-between py-1.5 text-left font-medium text-gray-700 hover:text-black transition">
+                                        <span class="tracking-wider uppercase text-xs font-bold">Mis Pedidos</span>
+                                        <svg id="orders-arrow" class="w-3.5 h-3.5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </button>
+                                    <div id="orders-container-sub" class="hidden pl-3 mt-1 space-y-1 border-l border-gray-100">
+                                        <div id="menu-user-orders" class="py-1 text-xs text-gray-600 space-y-2">
+                                            <p class="text-gray-400 italic">Cargando pedidos...</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Subsección: Mis Datos -->
+                                <div>
+                                    <button id="data-toggle-btn" class="w-full flex items-center justify-between py-1.5 text-left font-medium text-gray-700 hover:text-black transition">
+                                        <span class="tracking-wider uppercase text-xs font-bold">Mis Datos</span>
+                                        <svg id="data-arrow" class="w-3.5 h-3.5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </button>
+                                    <div id="data-container-sub" class="hidden pl-3 mt-1 space-y-1 border-l border-gray-100">
+                                        <div id="menu-user-profile" class="py-1 text-xs text-gray-600 space-y-1">
+                                            <p class="text-gray-400 italic">Cargando datos...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Subsección: Direcciones Registradas -->
+                                <div>
+                                    <button id="addresses-toggle-btn" class="w-full flex items-center justify-between py-1.5 text-left font-medium text-gray-700 hover:text-black transition">
+                                        <span class="tracking-wider uppercase text-xs font-bold">Direcciones Registradas</span>
+                                        <svg id="addresses-arrow" class="w-3.5 h-3.5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </button>
+                                    <div id="addresses-container-sub" class="hidden pl-3 mt-1 space-y-2 border-l border-gray-100">
+                                        <div id="menu-user-addresses" class="py-1 text-xs text-gray-600 space-y-1">
+                                            <p class="text-gray-400 italic">Cargando direcciones...</p>
+                                        </div>
+                                        <button onclick="toggleAddressModal()" class="w-full mt-1 bg-gray-100 text-black py-1.5 rounded-full text-[10px] tracking-wider uppercase hover:bg-gray-200 transition font-medium">
+                                            + Agregar dirección
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Botón Cerrar Sesión -->
+                                <div class="pt-2">
+                                    <button onclick="handleLogout()" class="w-full bg-gray-100 text-red-600 py-2 rounded-full text-[11px] tracking-widest uppercase hover:bg-red-50 transition font-medium">Cerrar Sesión</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botón simple para Iniciar Sesión -->
+                        <div id="menu-login-wrapper">
+                            <button onclick="toggleAuthModal(); toggleMobileMenu();" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
+                                <span class="tracking-widest uppercase text-sm font-bold">Mi Cuenta</span>
+                                <span class="text-xs text-gray-400 font-normal">Iniciar sesión</span>
+                            </button>
+                        </div>
+
+                        <!-- 2. CATEGORÍAS -->
+                        <div class="pt-2 border-t border-gray-100">
+                            <button id="collection-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
+                                <span class="tracking-widest uppercase text-sm font-bold">Categorías</span>
+                                <svg id="collection-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                            <div id="collection-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
+                                <a href="#" onclick="loadCategoryProducts('vestidos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Vestidos</a>
+                                <a href="#" onclick="loadCategoryProducts('conjuntos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Conjuntos</a>
+                                <a href="#" onclick="loadCategoryProducts('blusas', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Blusas</a>
+                                <a href="#" onclick="loadCategoryProducts('abrigos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Abrigos</a>
+                                <a href="#" onclick="loadCategoryProducts('temporada', event)" class="block py-1.5 text-sm text-red-600 hover:text-red-700 transition font-bold">🎄 De Temporada (Navidad)</a>
+                            </div>
+                        </div>
+
+                        <!-- 3. CONTÁCTANOS -->
+                        <div class="pt-2 border-t border-gray-100">
+                            <button id="contact-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
+                                <span class="tracking-widest uppercase text-sm font-bold">Contáctanos</span>
+                                <svg id="contact-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                            <div id="contact-submenu" class="hidden pl-4 mt-3 space-y-3 border-l-2 border-gray-100 text-sm">
+                                <a href="https://www.instagram.com/amisboutique.official?dlrf=Y3V1a3oyMGhweHNy" target="_blank" class="flex items-center gap-2.5 text-gray-700 hover:text-black transition font-medium">
+                                    <svg class="w-4 h-4 text-pink-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+                                    Instagram
+                                </a>
+                                <a href="https://www.facebook.com/share/1CMqeKz5Su/" target="_blank" class="flex items-center gap-2.5 text-gray-700 hover:text-black transition font-medium">
+                                    <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                                    Facebook
+                                </a>
+                                <a href="https://wa.me/523312467018?text=Hola%20Amis%20Boutique,%20me%20gustaría%20más%20información." target="_blank" class="flex items-center gap-2.5 text-emerald-600 hover:text-emerald-700 transition font-medium">
+                                    <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                                    WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DEL CARRITO Y CHECKOUT -->
+    <div id="cart-modal" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="toggleCartModal()"></div>
+        <div class="absolute inset-y-0 right-0 max-w-full flex pl-10">
+            <div id="cart-drawer-panel" class="w-screen max-w-md bg-white shadow-xl p-6 flex flex-col justify-between overflow-y-auto transform translate-x-full">
+                <div>
+                    <div class="flex items-center justify-between pb-4 border-b border-gray-100">
+                        <h2 id="cart-modal-title" class="font-serif text-xl font-bold">Tu Carrito</h2>
+                        <button onclick="toggleCartModal()" class="p-2 rounded-md hover:bg-gray-100">✕</button>
+                    </div>
+
+                    <!-- PASO 1: CARRITO -->
+                    <div id="step-cart" class="py-4">
+                        <div id="cart-items" class="space-y-4 max-h-80 overflow-y-auto border-b border-gray-100 pb-4">
+                            <p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>
+                        </div>
+                    </div>
+
+                    <!-- PASO 2: ENVÍO Y DATOS -->
+                    <div id="step-shipping" class="py-4 hidden space-y-4">
+                        <h3 class="tracking-wide uppercase text-xs font-bold text-gray-900">Método de Envío</h3>
+                        <div class="space-y-2 text-sm">
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="shipping-method" value="Envío local en GDL" checked onchange="applyShippingRules()" class="text-black focus:ring-black">
+                                <div>
+                                    <span class="font-medium block">Envío local en Guadalajara</span>
+                                    <span class="text-xs text-gray-500">Pago contra entrega disponible</span>
+                                </div>
+                            </label>
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="shipping-method" value="Envío Nacional" onchange="applyShippingRules()" class="text-black focus:ring-black">
+                                <div>
+                                    <span class="font-medium block">Envío Nacional</span>
+                                    <span class="text-xs text-gray-500">Pago por transferencia o Mercado Pago</span>
+                                </div>
+                            </label>
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="shipping-method" value="Punto de entrega / Acordar con vendedor" onchange="applyShippingRules()" class="text-black focus:ring-black">
+                                <div>
+                                    <span class="font-medium block">Punto de entrega / Acordar con vendedor</span>
+                                    <span class="text-xs text-gray-500">Ej. Plaza Forum o punto acordado</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="pt-3 border-t border-gray-100 space-y-3 text-sm">
+                            <h4 class="font-bold text-xs uppercase tracking-wide text-gray-900">Tus Datos de Contacto y Envío</h4>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">Nombre completo *</label>
+                                <input type="text" id="ship-name" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-black" placeholder="Tu nombre">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">Número de celular *</label>
+                                <input type="tel" id="ship-phone" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-black" placeholder="33 1234 5678">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">Correo electrónico (opcional)</label>
+                                <input type="email" id="ship-email" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-black" placeholder="correo@ejemplo.com">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">Dirección de entrega o referencias *</label>
+                                <textarea id="ship-address" rows="2" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-black" placeholder="Calle, número, colonia, referencias..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PASO 3: PAGO -->
+                    <div id="step-payment" class="py-4 hidden space-y-3">
+                        <h3 class="text-xs font-bold uppercase tracking-wide text-gray-900">Método de Pago</h3>
+                        <div id="payment-options" class="space-y-2 text-sm">
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="payment-method" value="Mercado Pago" checked onchange="handlePaymentChange()" class="text-black focus:ring-black">
+                                <div>
+                                    <span class="font-medium block">Mercado Pago (Checkout Pro)</span>
+                                    <span class="text-xs text-gray-500">Tarjeta / OXXO</span>
+                                </div>
+                            </label>
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="payment-method" value="Transferencia Bancaria" onchange="handlePaymentChange()" class="text-black focus:ring-black">
+                                <div>
+                                    <span class="font-medium block">Transferencia Bancaria</span>
+                                    <span class="text-xs text-gray-500">CLABE de Mercado Pago Wallet</span>
+                                </div>
+                            </label>
+                            <label id="pay-cash" class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="payment-method" value="Pago contra entrega en efectivo" onchange="handlePaymentChange()" class="text-black focus:ring-black">
+                                <span class="font-medium">Pago contra entrega en efectivo</span>
+                            </label>
+                            <label id="pay-terminal" class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="payment-method" value="Pago contra entrega en terminal" onchange="handlePaymentChange()" class="text-black focus:ring-black">
+                                <span class="font-medium">Pago contra entrega en terminal</span>
+                            </label>
+                        </div>
+
+                        <!-- DATOS BANCARIOS -->
+                        <div id="bank-details" class="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-700 hidden">
+                            <p class="font-bold text-gray-900 mb-1">Datos para Transferencia:</p>
+                            <p><strong>Institución:</strong> Mercado Pago Wallet</p>
+                            <p><strong>CLABE:</strong> <span class="select-all font-mono font-bold text-black">722969020435527654</span></p>
+                            <p><strong>Beneficiario:</strong> Alexis Daniel Orozco Ortiz</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-gray-100 mt-4 space-y-2">
+                    <div class="flex justify-between text-base font-semibold text-gray-900 mb-2">
+                        <span>Total:</span>
+                        <span id="cart-total">$0 MXN</span>
+                    </div>
+                    <button id="cart-action-btn" onclick="handleCartNext()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
+                        Ir a Pagar
+                    </button>
+                    <button id="cart-back-btn" onclick="handleCartBack()" class="w-full bg-gray-100 text-gray-800 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-gray-200 transition hidden">
+                        Regresar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE PEDIDO CREADO Y WHATSAPP -->
+    <div id="order-success-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-black bg-opacity-50"></div>
+            <div class="bg-white rounded-2xl max-w-sm w-full p-6 relative z-10 shadow-xl text-center space-y-4">
+                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">✓</div>
+                <h3 class="font-serif text-xl font-bold">¡Pedido Creado!</h3>
+                <p id="order-success-msg" class="text-xs text-gray-600 leading-relaxed">
+                    Tu pedido ha sido registrado con éxito. Envía tu número de pedido por WhatsApp para agilizar la entrega.
+                </p>
+                <div id="whatsapp-btn-container" class="pt-2">
+                    <a id="whatsapp-link" href="#" target="_blank" class="w-full bg-emerald-600 text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-emerald-700 transition flex items-center justify-center gap-2 font-medium">
+                        📲 Enviar pedido por WhatsApp
+                    </a>
+                </div>
+                <button onclick="closeSuccessModalAndReload()" class="w-full bg-gray-100 text-gray-800 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-gray-200 transition">
+                    Entendido / Volver a la Tienda
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- BANNER DE INICIO / HERO -->
+        <div id="home-view" class="space-y-8">
+            <div class="relative hero-bokeh-bg text-white rounded-3xl p-8 sm:p-16 overflow-hidden shadow-xl text-center">
+                
+                <div class="relative z-10 max-w-2xl mx-auto space-y-4">
+                    <span class="text-xs uppercase tracking-[0.3em] text-amber-300 font-semibold">DESCUBRE AMIS</span>
+                    <h1 class="text-3xl sm:text-5xl font-serif font-light tracking-wide">Haz espacio para algo nuevo.</h1>
+                    <p class="text-gray-300 text-sm sm:text-base leading-relaxed">Descubre nuestra selección de moda, calzado y accesorios. Encuentra piezas que reflejan tu estilo y te hacen sentir increíble.</p>
+                    <div class="pt-4 flex flex-wrap justify-center gap-4">
+                        <button onclick="loadCategoryProducts('temporada', event)" class="bg-amber-400 text-black px-8 py-3 rounded-full text-xs tracking-widest uppercase font-bold hover:bg-amber-300 transition shadow-lg">Ver Colección Navideña</button>
+                        <button onclick="loadCategoryProducts('conjuntos', event)" class="border border-white text-white px-8 py-3 rounded-full text-xs tracking-widest uppercase hover:bg-white hover:text-black transition">Explorar Todo</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TARJETAS DE CATEGORÍAS RÁPIDAS (CON FOTOS REALES) -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <!-- Vestidos (Con tu foto real optimizada)[cite: 13] -->
+                <div onclick="loadCategoryProducts('vestidos', event)" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-center cursor-pointer hover:shadow-md transition group flex flex-col">
+                    <div class="h-32 overflow-hidden bg-gray-100">
+                        <img src="https://i.postimg.cc/MpGkyLjq/Whats-App-Image-2026-11-16-at-8-08-21-PM.jpg" alt="Vestidos" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    </div>
+                    <div class="py-4 px-2">
+                        <h3 class="font-serif font-semibold text-sm tracking-wider text-gray-900 group-hover:text-amber-600 transition">Vestidos</h3>
+                    </div>
+                </div>
+
+                <!-- Conjuntos -->
+                <div onclick="loadCategoryProducts('conjuntos', event)" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-center cursor-pointer hover:shadow-md transition group flex flex-col">
+                    <div class="h-32 overflow-hidden bg-gray-100">
+                        <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=500&q=80" alt="Conjuntos" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    </div>
+                    <div class="py-4 px-2">
+                        <h3 class="font-serif font-semibold text-sm tracking-wider text-gray-900 group-hover:text-amber-600 transition">Conjuntos</h3>
+                    </div>
+                </div>
+
+                <!-- Abrigos -->
+                <div onclick="loadCategoryProducts('abrigos', event)" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-center cursor-pointer hover:shadow-md transition group flex flex-col">
+                    <div class="h-32 overflow-hidden bg-gray-100">
+                        <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=500&q=80" alt="Abrigos" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    </div>
+                    <div class="py-4 px-2">
+                        <h3 class="font-serif font-semibold text-sm tracking-wider text-gray-900 group-hover:text-amber-600 transition">Abrigos</h3>
+                    </div>
+                </div>
+
+                <!-- Navidad -->
+                <div onclick="loadCategoryProducts('temporada', event)" class="bg-amber-50 rounded-2xl shadow-sm border border-amber-200 overflow-hidden text-center cursor-pointer hover:shadow-md transition group flex flex-col">
+                    <div class="h-32 overflow-hidden bg-gray-100">
+                        <img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=500&q=80" alt="Navidad" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    </div>
+                    <div class="py-4 px-2">
+                        <h3 class="font-serif font-bold text-sm tracking-wider text-red-700 transition">Navidad</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTENEDOR DINÁMICO DE PRODUCTOS -->
+        <div id="dynamic-category-view" class="hidden space-y-6">
+            <div id="category-header"></div>
+            <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Se cargan automáticamente desde Firestore -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Script General -->
+    <script>
+        const CORREO_BOUTIQUE = "alexisorozcoortiz@gmail.com";
+        const WHATSAPP_TIENDA = "523312467018";
+        let cart = JSON.parse(localStorage.getItem('amis_cart') || '[]');
+        let checkoutStep = 1;
+        let currentUser = null;
+        let userData = null;
+        let isRegistering = false;
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast-notification');
+            const card = document.getElementById('toast-card');
+            const icon = document.getElementById('toast-icon');
+            const msg = document.getElementById('toast-msg');
+
+            msg.textContent = message;
+            if (type === 'success') {
+                card.className = "bg-black text-white px-5 py-3 rounded-2xl shadow-xl text-xs flex items-center gap-3";
+                icon.textContent = "✨";
+            } else {
+                card.className = "bg-red-600 text-white px-5 py-3 rounded-2xl shadow-xl text-xs flex items-center gap-3";
+                icon.textContent = "⚠️";
+            }
+
+            toast.classList.remove('translate-y-[-200%]');
+            toast.classList.add('translate-y-0');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0');
+                toast.classList.add('translate-y-[-200%]');
+            }, 3500);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const checkFB = setInterval(() => {
+                if (window.FB_Auth) {
+                    clearInterval(checkFB);
+                    window.FB_Methods.onAuthStateChanged(window.FB_Auth, async (user) => {
+                        currentUser = user;
+                        const accountWrapper = document.getElementById('menu-account-wrapper');
+                        const loginWrapper = document.getElementById('menu-login-wrapper');
+
+                        if (user) {
+                            accountWrapper.classList.remove('hidden');
+                            loginWrapper.classList.add('hidden');
+                            const { doc, getDoc } = window.FB_Methods;
+                            try {
+                                const userDoc = await getDoc(doc(window.FB_Db, "users", user.uid));
+                                if (userDoc.exists()) {
+                                    userData = userDoc.data();
+                                }
+                            } catch (e) {
+                                console.error("Error cargando perfil:", e);
+                            }
+                            loadUserDataAndOrders(user.uid);
+                        } else {
+                            userData = null;
+                            accountWrapper.classList.add('hidden');
+                            loginWrapper.classList.remove('hidden');
+                        }
+                    });
+                }
+            }, 200);
+
+            updateCartUI();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status') || urlParams.get('collection_status');
+            const mpResult = urlParams.get('pago');
+
+            if (status === 'approved' || mpResult === 'exito') {
+                const pendingData = JSON.parse(localStorage.getItem('amis_pending_order'));
+                if (pendingData) {
+                    const { collection, addDoc, Timestamp } = window.FB_Methods;
+                    addDoc(collection(window.FB_Db, "orders"), {
+                        orderId: pendingData.orderId,
+                        userId: currentUser ? currentUser.uid : "guest",
+                        clientName: pendingData.clientName,
+                        clientPhone: pendingData.clientPhone,
+                        clientAddress: pendingData.clientAddress,
+                        shipping: pendingData.shippingMethod,
+                        payment: pendingData.paymentMethod,
+                        items: cart,
+                        total: `$${pendingData.total} MXN`,
+                        createdAt: Timestamp.now()
+                    }).then(() => {
+                        enviarFormSubmit(pendingData);
+
+                        let mensajeWA = `Hola Amis Boutique! 👋 Mi número de pedido es: *${pendingData.orderId}*`;
+                        document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${encodeURIComponent(mensajeWA)}`;
+                        document.getElementById('order-success-modal').classList.remove('hidden');
+                        
+                        localStorage.removeItem('amis_pending_order');
+                        localStorage.removeItem('amis_cart');
+                        cart = [];
+                        updateCartUI();
+                    }).catch(err => console.error("Error guardando orden MP:", err));
+                }
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } else if (status === 'rejected' || status === 'cancelled') {
+                showToast("El pago no pudo completarse o fue cancelado.", "error");
+                localStorage.removeItem('amis_pending_order');
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        });
+
+        function enviarFormSubmit(data) {
+            document.getElementById('fs-pedido').value = data.orderId;
+            document.getElementById('fs-cliente').value = data.clientName;
+            document.getElementById('fs-telefono').value = data.clientPhone;
+            document.getElementById('fs-total').value = `$${data.total} MXN`;
+            document.getElementById('fs-pago').value = data.paymentMethod;
+            document.getElementById('fs-envio').value = data.shippingMethod;
+            document.getElementById('fs-direccion').value = data.clientAddress;
+            
+            let detalleStr = cart.map(i => `${i.quantity}x ${i.name} (${i.color}) - $${i.price * i.quantity} MXN`).join('\n');
+            document.getElementById('fs-productos').value = detalleStr;
+
+            const form = document.getElementById('formsubmit-hidden');
+            const formData = new FormData(form);
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: { 'Accept': 'application/json' }
+            }).catch(err => console.error("Error enviando FormSubmit:", err));
+        }
+
+        async function loadCategoryProducts(categoryKey, event) {
+            if (event) event.preventDefault();
+            document.getElementById('home-view').classList.add('hidden');
+            const dynView = document.getElementById('dynamic-category-view');
+            dynView.classList.remove('hidden');
+
+            const headerEl = document.getElementById('category-header');
+            const gridEl = document.getElementById('products-grid');
+
+            let bannerHtml = '';
+            if(categoryKey === 'temporada') {
+                bannerHtml = `
+                    <div class="bg-red-900 text-white p-6 rounded-2xl mb-6 text-center space-y-2 shadow-sm">
+                        <span class="text-xs uppercase tracking-widest text-amber-300">Colección Especial</span>
+                        <h2 class="text-2xl font-serif font-bold">🎄 Especial Navidad 🎄</h2>
+                        <p class="text-xs text-red-100">Las mejores prendas para lucir deslumbrante en tus posadas y cenas navideñas.</p>
+                    </div>
+                `;
+            } else {
+                let titleName = categoryKey.toUpperCase();
+                bannerHtml = `<h2 class="text-2xl font-serif tracking-wider font-bold mb-4">${titleName}</h2>`;
+            }
+
+            headerEl.innerHTML = bannerHtml;
+            gridEl.innerHTML = '<p class="text-gray-400 italic py-8 text-center">Cargando productos...</p>';
+
+            if(!mobileMenu.classList.contains('hidden')) {
+                toggleMobileMenu();
+            }
+
+            try {
+                const { collection, getDocs } = window.FB_Methods;
+                const querySnapshot = await getDocs(collection(window.FB_Db, "products"));
+                
+                let matchingProducts = [];
+                querySnapshot.forEach((docSnap) => {
+                    const p = docSnap.data();
+                    if(p.category === categoryKey) {
+                        matchingProducts.push({ id: docSnap.id, ...p });
+                    }
+                });
+
+                if (matchingProducts.length === 0) {
+                    gridEl.innerHTML = `<p class="text-gray-500 italic py-8 text-center col-span-full">Pronto agregaremos nuevos modelos en esta categoría.</p>`;
+                    return;
+                }
+
+                let html = '';
+                matchingProducts.forEach((p) => {
+                    const prodId = p.id;
+                    const defaultImg = p.images && p.images.length > 0 ? p.images[0] : '';
+                    
+                    let colorsHtml = '';
+                    if (p.colors && p.colors.length > 0) {
+                        colorsHtml = `<div class="flex items-center space-x-2">`;
+                        p.colors.forEach((c, idx) => {
+                            const borderClass = idx === 0 ? 'border-black' : 'border-transparent';
+                            colorsHtml += `<button onclick="changeDynamicColor('${prodId}', '${c.image}', '${c.name}', this)" class="w-6 h-6 rounded-full border-2 ${borderClass} focus:outline-none transition transform hover:scale-110 color-btn-${prodId}" style="background-color: ${c.hex};" title="${c.name}"></button>`;
+                        });
+                        colorsHtml += `</div>`;
+                    }
+
+                    html += `
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                        <div class="relative bg-gray-100 h-[450px]">
+                            <img id="product-img-${prodId}" src="${defaultImg}" alt="${p.name}" class="w-full h-full object-cover transition-all duration-300">
+                            <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">${p.category}</span>
+                        </div>
+                        <div class="p-5 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-serif text-lg font-medium text-gray-900">${p.name}</h3>
+                                <p class="text-xs text-gray-500 mt-1">${p.description || ''}</p>
+                                <div class="mt-4 flex items-center justify-between">
+                                    <span class="text-xl font-semibold text-gray-900">$${p.price} <span class="text-xs text-gray-500 font-normal">MXN</span></span>
+                                    ${colorsHtml}
+                                </div>
+                            </div>
+                            <button onclick="addDynamicToCart('${p.name}', ${p.price}, '${prodId}')" class="mt-6 w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
+                                Añadir al Carrito
+                            </button>
+                        </div>
+                    </div>`;
+                });
+
+                gridEl.innerHTML = html;
+            } catch (e) {
+                console.error("Error al cargar productos:", e);
+                gridEl.innerHTML = '<p class="text-red-500 text-xs text-center py-8 col-span-full">Error al cargar el catálogo de productos.</p>';
+            }
+        }
+
+        function changeDynamicColor(prodId, imageUrl, colorName, buttonElement) {
+            document.getElementById(`product-img-${prodId}`).src = imageUrl;
+            buttonElement.dataset.selectedColor = colorName;
+            const buttons = buttonElement.parentElement.querySelectorAll('.color-btn-' + prodId);
+            buttons.forEach(btn => { btn.classList.remove('border-black'); btn.classList.add('border-transparent'); });
+            buttonElement.classList.remove('border-transparent');
+            buttonElement.classList.add('border-black');
+        }
+
+        function addDynamicToCart(name, price, prodId) {
+            const container = document.getElementById(`product-img-${prodId}`).parentElement.parentElement;
+            const activeColorBtn = container.querySelector(`.color-btn-${prodId}.border-black`);
+            const colorToAdd = activeColorBtn ? (activeColorBtn.title || 'Único') : 'Único';
+
+            const existing = cart.find(item => item.name === name && item.color === colorToAdd);
+            if (existing) existing.quantity += 1;
+            else cart.push({ name, price, color: colorToAdd, quantity: 1 });
+            localStorage.setItem('amis_cart', JSON.stringify(cart));
+            updateCartUI();
+            showToast("¡Producto agregado al carrito!");
+        }
+
+        async function loadUserDataAndOrders(uid) {
+            const ordersContent = document.getElementById('menu-user-orders');
+            const addressesContent = document.getElementById('menu-user-addresses');
+            const profileContent = document.getElementById('menu-user-profile');
+            const accountToggleBtn = document.getElementById('account-toggle-btn');
+
+            try {
+                const { collection, query, where, getDocs, doc, getDoc } = window.FB_Methods;
+                const userDocRef = doc(window.FB_Db, "users", uid);
+                const userSnap = await getDoc(userDocRef);
+
+                let names = '', surnames = '', phone = '', email = currentUser ? currentUser.email : '', hasData = false, addresses = [];
+
+                if (userSnap.exists()) {
+                    userData = userSnap.data();
+                    names = userData.names || '';
+                    surnames = userData.surnames || '';
+                    phone = userData.phone || '';
+                    hasData = names.trim() !== "";
+                    addresses = userData.addresses || [];
+                }
+
+                const primerNombre = hasData ? names.split(' ')[0] : 'Cliente';
+                if (accountToggleBtn) {
+                    const span = accountToggleBtn.querySelector('span');
+                    if (span) span.textContent = `Hola, ${primerNombre}`;
+                }
+
+                if (profileContent) {
+                    if (!hasData) {
+                        profileContent.innerHTML = `
+                            <div class="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-2 text-gray-700">
+                                <p class="text-xs text-gray-500 font-medium">Agrega tus datos personales:</p>
+                                <input type="text" id="input-names" placeholder="Nombre(s)" value="${names}" class="w-full p-2 text-xs border rounded-md">
+                                <input type="text" id="input-surnames" placeholder="Apellidos" value="${surnames}" class="w-full p-2 text-xs border rounded-md">
+                                <input type="text" id="input-phone" placeholder="Teléfono" value="${phone}" class="w-full p-2 text-xs border rounded-md">
+                                <button onclick="guardarMisDatos('${uid}')" class="w-full bg-black text-white py-2 rounded-md text-xs tracking-wider uppercase">Guardar Mis Datos</button>
+                            </div>
+                        `;
+                    } else {
+                        profileContent.innerHTML = `
+                            <div id="view-data-box" class="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-1 text-gray-700 text-xs">
+                                <p><strong>Nombre(s):</strong> ${names}</p>
+                                <p><strong>Apellidos:</strong> ${surnames || '-'}</p>
+                                <p><strong>Teléfono:</strong> ${phone || '-'}</p>
+                                <p><strong>Correo:</strong> ${email || '-'}</p>
+                                <button onclick="habilitarEdicionDatos()" class="mt-2 w-full bg-gray-200 text-gray-800 py-1.5 rounded-md text-[11px] tracking-wider uppercase">Modificar Datos</button>
+                            </div>
+                            <div id="edit-data-box" class="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-2 text-gray-700 hidden">
+                                <input type="text" id="input-names" value="${names}" class="w-full p-2 text-xs border rounded-md">
+                                <input type="text" id="input-surnames" value="${surnames}" class="w-full p-2 text-xs border rounded-md">
+                                <input type="text" id="input-phone" value="${phone}" class="w-full p-2 text-xs border rounded-md">
+                                <div class="flex gap-2">
+                                    <button onclick="guardarMisDatos('${uid}')" class="flex-1 bg-black text-white py-2 rounded-md text-xs uppercase">Actualizar</button>
+                                    <button onclick="cancelarEdicionDatos()" class="flex-1 bg-gray-200 text-gray-800 py-2 rounded-md text-xs uppercase">Cancelar</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                if (addressesContent) {
+                    if (addresses.length === 0) {
+                        addressesContent.innerHTML = '<p class="text-gray-400 italic">No hay direcciones guardadas aún.</p>';
+                    } else {
+                        let addrHtml = '';
+                        addresses.forEach(addr => {
+                            addrHtml += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 text-gray-700 mb-1"><p class="font-medium text-gray-900">📍 Dirección:</p><p class="text-[11px] text-gray-600 mt-0.5">${addr}</p></div>`;
+                        });
+                        addressesContent.innerHTML = addrHtml;
+                    }
+                }
+
+                const q = query(collection(window.FB_Db, "orders"), where("userId", "==", uid));
+                const querySnapshot = await getDocs(q);
+                if (querySnapshot.empty) {
+                    if (ordersContent) ordersContent.innerHTML = '<p class="text-gray-400 italic">No tienes pedidos anteriores.</p>';
+                } else {
+                    let html = '';
+                    querySnapshot.forEach((docSnap) => {
+                        const data = docSnap.data();
+                        html += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 space-y-0.5 text-xs"><p class="font-medium text-gray-900">${data.orderId || 'Pedido'} · ${data.total || ''}</p></div>`;
+                    });
+                    if (ordersContent) ordersContent.innerHTML = html;
+                }
+            } catch (e) {
+                console.error("Error al cargar perfil:", e);
+            }
+        }
+
+        function toggleAuthModal() { document.getElementById('auth-modal').classList.toggle('hidden'); }
+        function toggleAddressModal() { document.getElementById('address-modal').classList.toggle('hidden'); }
+
+        async function buscarCodigoPostal(cp) {
+            if (cp.length !== 5) return;
+            try {
+                const response = await fetch(`https://api.copomex.com/query/info_cp/${cp}?token=libre`);
+                const data = await response.json();
+                if (!data.error && data.response) {
+                    document.getElementById('dir-ciudad').value = data.response.municipio || '';
+                    document.getElementById('dir-estado').value = data.response.estado || '';
+                }
+            } catch (error) { console.error(error); }
+        }
+
+        async function saveStructuredAddress() {
+            const cp = document.getElementById('dir-cp').value.trim();
+            const calle = document.getElementById('dir-calle').value.trim();
+            const numExt = document.getElementById('dir-num-ext').value.trim();
+            const numInt = document.getElementById('dir-num-int').value.trim();
+            const ciudad = document.getElementById('dir-ciudad').value.trim();
+            const estado = document.getElementById('dir-estado').value.trim();
+            const colonia = document.getElementById('dir-colonia-input').value.trim();
+
+            if (!cp || !calle || !numExt || !ciudad || !colonia) {
+                showToast("Por favor completa los campos obligatorios (*).", "error");
+                return;
+            }
+            if (!currentUser) {
+                showToast("Debes iniciar sesión para guardar direcciones.", "error");
+                return;
+            }
+
+            const direccionCompleta = `${calle} #${numExt}${numInt ? ' Int. ' + numInt : ''}, Col. ${colonia}, C.P. ${cp}, ${ciudad}, ${estado}`;
+            try {
+                const { doc, updateDoc, arrayUnion } = window.FB_Methods;
+                await updateDoc(doc(window.FB_Db, "users", currentUser.uid), { addresses: arrayUnion(direccionCompleta) });
+                showToast("¡Dirección guardada con éxito!");
+                toggleAddressModal();
+                loadUserDataAndOrders(currentUser.uid);
+            } catch (e) {
+                showToast("Error al guardar la dirección.", "error");
+            }
+        }
+
+        function switchAuthMode() {
+            isRegistering = !isRegistering;
+            const regFields = document.getElementById('register-fields');
+            if (isRegistering) {
+                regFields.classList.remove('hidden');
+                document.getElementById('auth-modal-title').textContent = 'Crear Cuenta';
+                document.getElementById('auth-submit-btn').textContent = 'Registrarse';
+                document.getElementById('auth-switch-btn').textContent = '¿Ya tienes cuenta? Inicia sesión';
+            } else {
+                regFields.classList.add('hidden');
+                document.getElementById('auth-modal-title').textContent = 'Iniciar Sesión';
+                document.getElementById('auth-submit-btn').textContent = 'Entrar';
+                document.getElementById('auth-switch-btn').textContent = '¿No tienes cuenta? Regístrate aquí';
+            }
+        }
+
+        async function handleAuthSubmit() {
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value.trim();
+            const errorBox = document.getElementById('auth-error-box');
+            errorBox.classList.add('hidden');
+
+            const { signInWithEmailAndPassword, createUserWithEmailAndPassword, doc, setDoc } = window.FB_Methods;
+            try {
+                if (isRegistering) {
+                    const names = document.getElementById('reg-names').value.trim();
+                    const surnames = document.getElementById('reg-surnames').value.trim();
+                    const phone = document.getElementById('reg-phone').value.trim();
+                    if (!names || !surnames || !phone) {
+                        errorBox.textContent = "Completa todos los campos.";
+                        errorBox.classList.remove('hidden');
+                        return;
+                    }
+                    const res = await createUserWithEmailAndPassword(window.FB_Auth, email, password);
+                    await setDoc(doc(window.FB_Db, "users", res.user.uid), { names, surnames, phone, email, addresses: [], createdAt: new Date() });
+                    showToast("¡Cuenta creada con éxito!");
+                } else {
+                    await signInWithEmailAndPassword(window.FB_Auth, email, password);
+                    showToast("¡Bienvenida de nuevo!");
+                }
+                toggleAuthModal();
+            } catch (error) {
+                errorBox.textContent = "Correo o contraseña incorrectos.";
+                errorBox.classList.remove('hidden');
+            }
+        }
+
+        async function handleLogout() {
+            await window.FB_Methods.signOut(window.FB_Auth);
+            showToast("Has salido de tu cuenta.");
+            toggleMobileMenu();
+        }
+
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuPanel = document.getElementById('mobile-menu-panel');
+        function toggleMobileMenu() {
+            if (mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.remove('hidden');
+                setTimeout(() => mobileMenuPanel.classList.remove('-translate-x-full'), 10);
+            } else {
+                mobileMenuPanel.classList.add('-translate-x-full');
+                setTimeout(() => mobileMenu.classList.add('hidden'), 300);
+            }
+        }
+
+        function setupDropdown(toggleId, submenuId, arrowId) {
+            const btn = document.getElementById(toggleId);
+            const submenu = document.getElementById(submenuId);
+            const arrow = document.getElementById(arrowId);
+            if(btn && submenu && arrow) {
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    submenu.classList.toggle('hidden');
+                    arrow.classList.toggle('rotate-180');
+                };
+            }
+        }
+        setupDropdown('account-toggle-btn', 'account-submenu', 'account-arrow');
+        setupDropdown('orders-toggle-btn', 'orders-container-sub', 'orders-arrow');
+        setupDropdown('addresses-toggle-btn', 'addresses-container-sub', 'addresses-arrow');
+        setupDropdown('collection-toggle-btn', 'collection-submenu', 'collection-arrow');
+        setupDropdown('data-toggle-btn', 'data-container-sub', 'data-arrow');
+        setupDropdown('contact-toggle-btn', 'contact-submenu', 'contact-arrow');
+
+        function showHome(event) {
+            if (event) event.preventDefault();
+            document.getElementById('home-view').classList.remove('hidden');
+            document.getElementById('dynamic-category-view').classList.add('hidden');
+            toggleMobileMenu();
+        }
+
+        function toggleCartModal() {
+            const modal = document.getElementById('cart-modal');
+            const drawer = document.getElementById('cart-drawer-panel');
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                setTimeout(() => drawer.classList.remove('translate-x-full'), 10);
+                checkoutStep = 1;
+                updateCartUI();
+            } else {
+                drawer.classList.add('translate-x-full');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+        }
+
+        function changeItemQuantity(index, delta) {
+            cart[index].quantity += delta;
+            if (cart[index].quantity <= 0) cart.splice(index, 1);
+            localStorage.setItem('amis_cart', JSON.stringify(cart));
+            updateCartUI();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            localStorage.setItem('amis_cart', JSON.stringify(cart));
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const countEl = document.getElementById('cart-count');
+            if(countEl) countEl.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+            const stepCart = document.getElementById('step-cart');
+            const stepShipping = document.getElementById('step-shipping');
+            const stepPayment = document.getElementById('step-payment');
+            const actionBtn = document.getElementById('cart-action-btn');
+            const backBtn = document.getElementById('cart-back-btn');
+            const modalTitle = document.getElementById('cart-modal-title');
+
+            if(stepCart) stepCart.classList.add('hidden');
+            if(stepShipping) stepShipping.classList.add('hidden');
+            if(stepPayment) stepPayment.classList.add('hidden');
+
+            let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const totalEl = document.getElementById('cart-total');
+            if(totalEl) totalEl.textContent = `$${total} MXN`;
+
+            if (checkoutStep === 1) {
+                if(modalTitle) modalTitle.textContent = 'Tu Carrito';
+                if(stepCart) stepCart.classList.remove('hidden');
+                if(backBtn) backBtn.classList.add('hidden');
+                if(actionBtn) {
+                    actionBtn.textContent = 'Ir a Pagar';
+                    actionBtn.style.display = cart.length === 0 ? 'none' : 'block';
+                }
+
+                let html = '';
+                if (cart.length === 0) {
+                    html = '<p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>';
+                } else {
+                    cart.forEach((item, index) => {
+                        html += `<div class="flex justify-between items-center text-sm border-b border-gray-100 pb-3">
+                            <div>
+                                <p class="font-medium text-gray-900">${item.name}</p>
+                                <p class="text-xs text-gray-500">Color: ${item.color} · $${item.price} c/u</p>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <button onclick="changeItemQuantity(${index}, -1)" class="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center font-bold">-</button>
+                                    <span class="text-xs font-semibold w-5 text-center">${item.quantity}</span>
+                                    <button onclick="changeItemQuantity(${index}, 1)" class="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center font-bold">+</button>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-end gap-2">
+                                <span class="font-semibold text-gray-900">$${item.price * item.quantity}</span>
+                                <button onclick="removeFromCart(${index})" class="text-red-500 text-xs hover:underline">Eliminar</button>
+                            </div>
+                        </div>`;
+                    });
+                }
+                const cartItemsContainer = document.getElementById('cart-items');
+                if(cartItemsContainer) cartItemsContainer.innerHTML = html;
+
+            } else if (checkoutStep === 2) {
+                if(modalTitle) modalTitle.textContent = 'Datos y Envío';
+                if(stepShipping) stepShipping.classList.remove('hidden');
+                if(backBtn) backBtn.classList.remove('hidden');
+                if(actionBtn) {
+                    actionBtn.textContent = 'Siguiente: Pago';
+                    actionBtn.style.display = 'block';
+                }
+
+                if (userData && currentUser) {
+                    const shipName = document.getElementById('ship-name');
+                    const shipPhone = document.getElementById('ship-phone');
+                    const shipEmail = document.getElementById('ship-email');
+                    const shipAddress = document.getElementById('ship-address');
+
+                    if(shipName) shipName.value = `${userData.names || ''} ${userData.surnames || ''}`.trim();
+                    if(shipPhone) shipPhone.value = userData.phone || '';
+                    if(shipEmail) shipEmail.value = currentUser.email || '';
+                    if(userData.addresses && userData.addresses.length > 0 && shipAddress) {
+                        shipAddress.value = userData.addresses[0];
+                    }
+                }
+            } else if (checkoutStep === 3) {
+                if(modalTitle) modalTitle.textContent = 'Método de Pago';
+                if(stepPayment) stepPayment.classList.remove('hidden');
+                if(backBtn) backBtn.classList.remove('hidden');
+                if(actionBtn) {
+                    actionBtn.textContent = 'Finalizar Pedido';
+                    actionBtn.style.display = 'block';
+                }
+                applyShippingRules();
+                handlePaymentChange();
+            }
+        }
+
+        function handleCartBack() {
+            if (checkoutStep > 1) {
+                checkoutStep--;
+                updateCartUI();
+            }
+        }
+
+        async function handleCartNext() {
+            if (checkoutStep === 1) {
+                if (cart.length === 0) return;
+                checkoutStep = 2;
+                updateCartUI();
+            } else if (checkoutStep === 2) {
+                const clientName = document.getElementById('ship-name').value.trim();
+                const clientPhone = document.getElementById('ship-phone').value.trim();
+                const clientAddress = document.getElementById('ship-address').value.trim();
+
+                if(!clientName || !clientPhone || !clientAddress) {
+                    showToast("Por favor completa los campos obligatorios de envío.", "error");
+                    return;
+                }
+
+                checkoutStep = 3;
+                updateCartUI();
+            } else if (checkoutStep === 3) {
+                const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
+                const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+                const clientName = document.getElementById('ship-name').value.trim();
+                const clientPhone = document.getElementById('ship-phone').value.trim();
+                const clientAddress = document.getElementById('ship-address').value.trim();
+                let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+                const actionBtn = document.getElementById('cart-action-btn');
+                actionBtn.disabled = true;
+                actionBtn.textContent = "Procesando pedido...";
+
+                try {
+                    const { collection, addDoc, getDocs } = window.FB_Methods;
+                    const now = new Date();
+                    const year = now.getFullYear().toString().slice(-2);
+                    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                    const prefix = `VT${year}${month}-`;
+
+                    let nextOrderNumber = 1;
+                    try {
+                        const ordersSnap = await getDocs(collection(window.FB_Db, "orders"));
+                        nextOrderNumber = ordersSnap.size + 1;
+                    } catch (e) {
+                        console.warn("Error calculando el consecutivo:", e);
+                        nextOrderNumber = Math.floor(Math.random() * 90000) + 10000;
+                    }
+
+                    const orderId = `${prefix}${nextOrderNumber.toString().padStart(5, '0')}`;
+
+                    if (paymentMethod === "Mercado Pago") {
+                        const respMP = await fetch('/api/crear-preferencia', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                items: cart.map(item => ({
+                                    title: `${item.name} (${item.color})`,
+                                    unit_price: Number(item.price),
+                                    quantity: item.quantity
+                                }))
+                            })
+                        });
+                        const dataMP = await respMP.json();
+                        if (dataMP && dataMP.init_point) {
+                            localStorage.setItem('amis_cart', JSON.stringify(cart));
+                            localStorage.setItem('amis_pending_order', JSON.stringify({
+                                orderId, clientName, clientPhone, clientAddress, shippingMethod, paymentMethod, total
+                            }));
+                            window.location.href = dataMP.init_point;
+                            return;
+                        } else {
+                            throw new Error("No se pudo obtener el enlace de pago.");
+                        }
+                    } else {
+                        const orderData = {
+                            orderId,
+                            userId: currentUser ? currentUser.uid : "guest",
+                            clientName,
+                            clientPhone,
+                            clientAddress,
+                            shipping: shippingMethod,
+                            payment: paymentMethod,
+                            items: cart,
+                            total: `$${total} MXN`,
+                            createdAt: window.FB_Methods.Timestamp.now()
+                        };
+
+                        await addDoc(collection(window.FB_Db, "orders"), orderData);
+
+                        enviarFormSubmit({ orderId, clientName, clientPhone, clientAddress, shippingMethod, paymentMethod, total });
+
+                        let mensajeWA = `Hola Amis Boutique! 👋 Mi número de pedido es: *${orderId}*`;
+                        document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${encodeURIComponent(mensajeWA)}`;
+
+                        toggleCartModal();
+                        document.getElementById('order-success-modal').classList.remove('hidden');
+                        actionBtn.disabled = false;
+                        actionBtn.textContent = "Ir a Pagar";
+                    }
+                } catch (error) {
+                    console.error("Error detallado:", error);
+                    alert("Hubo un error al procesar tu pedido.");
+                    actionBtn.disabled = false;
+                    actionBtn.textContent = "Finalizar Pedido";
+                }
+            }
+        }
+
+        function closeSuccessModalAndReload() {
+            document.getElementById('order-success-modal').classList.add('hidden');
+            cart = [];
+            localStorage.removeItem('amis_cart');
+            location.reload();
+        }
+
+        function applyShippingRules() {
+            const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
+            const payCash = document.getElementById('pay-cash');
+            const payTerminal = document.getElementById('pay-terminal');
+            const mpRadio = document.querySelector('input[name="payment-method"][value="Mercado Pago"]');
+
+            if (shippingMethod === 'Envío Nacional') {
+                payCash.style.display = 'none';
+                payTerminal.style.display = 'none';
+                const currentPayment = document.querySelector('input[name="payment-method"]:checked');
+                if(currentPayment && (currentPayment.value.includes('contra entrega'))) {
+                    mpRadio.checked = true;
+                    handlePaymentChange();
+                }
+            } else {
+                payCash.style.display = 'flex';
+                payTerminal.style.display = 'flex';
+            }
+        }
+
+        function handlePaymentChange() {
+            const selectedPay = document.querySelector('input[name="payment-method"]:checked').value;
+            const bankDetails = document.getElementById('bank-details');
+            if (selectedPay === 'Transferencia Bancaria') {
+                bankDetails.classList.remove('hidden');
+            } else {
+                bankDetails.classList.add('hidden');
+            }
+        }
+
+        async function guardarMisDatos(uid) {
+            const names = document.getElementById('input-names').value.trim();
+            const surnames = document.getElementById('input-surnames').value.trim();
+            const phone = document.getElementById('input-phone').value.trim();
+
+            if (!names) {
+                alert("Por favor ingresa al menos tu nombre.");
+                return;
+            }
+
+            try {
+                const { doc, setDoc } = window.FB_Methods;
+                await setDoc(doc(window.FB_Db, "users", uid), { names, surnames, phone, email: currentUser.email || '' }, { merge: true });
+                showToast("¡Datos guardados con éxito!");
+                loadUserDataAndOrders(uid);
+            } catch (error) {
+                showToast("Error al guardar datos.", "error");
+            }
+        }
+
+        function habilitarEdicionDatos() {
+            document.getElementById('view-data-box').classList.add('hidden');
+            document.getElementById('edit-data-box').classList.remove('hidden');
+        }
+
+        function cancelarEdicionDatos() {
+            document.getElementById('edit-data-box').classList.add('hidden');
+            document.getElementById('view-data-box').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
