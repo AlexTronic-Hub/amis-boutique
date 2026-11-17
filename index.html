@@ -69,9 +69,9 @@
         transition: transform 0.3s ease-in-out;
       }
       
-      /* Fondo correcto con las luces bokeh navideñas que elegiste */
+      /* Fondo configurado con tu URL exacta de Postimages */
       .hero-bokeh-bg {
-        background-image: linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.65)), url('https://i.postimg.cc/135z9j2q/fiam.jpg');
+        background-image: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://i.postimg.cc/SQVy0c4n/fiam.png');
         background-size: cover;
         background-position: center;
       }
@@ -489,7 +489,7 @@
     <!-- CONTENIDO PRINCIPAL -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        <!-- BANNER DE INICIO / HERO NAVIDEÑO CON EL FONDO DE LUCES -->
+        <!-- BANNER DE INICIO / HERO NAVIDEÑO CON TU FONDO DE LUCES -->
         <div id="home-view" class="space-y-8">
             <div class="relative hero-bokeh-bg text-white rounded-3xl p-8 sm:p-16 overflow-hidden shadow-xl text-center">
                 
@@ -601,7 +601,6 @@
 
             updateCartUI();
 
-            // Detectar el regreso desde Mercado Pago y guardar pedido aprobado
             const urlParams = new URLSearchParams(window.location.search);
             const status = urlParams.get('status') || urlParams.get('collection_status');
             const mpResult = urlParams.get('pago');
