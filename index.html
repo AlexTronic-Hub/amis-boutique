@@ -489,7 +489,7 @@
     <!-- CONTENIDO PRINCIPAL -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        <!-- BANNER DE INICIO / HERO ACTUALIZADO -->
+        <!-- BANNER DE INICIO / HERO -->
         <div id="home-view" class="space-y-8">
             <div class="relative hero-bokeh-bg text-white rounded-3xl p-8 sm:p-16 overflow-hidden shadow-xl text-center">
                 
@@ -504,19 +504,30 @@
                 </div>
             </div>
 
-            <!-- TARJETAS DE CATEGORÍAS RÁPIDAS (SIN EMOJIS, ESTILO MINIMALISTA) -->
+            <!-- TARJETAS DE CATEGORÍAS RÁPIDAS (CON ICONOS VECTORIALES SVG LIMPIOS) -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div onclick="loadCategoryProducts('vestidos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group py-8">
-                    <h3 class="font-serif font-semibold text-base tracking-wider text-gray-900 group-hover:text-amber-600 transition">Vestidos</h3>
+                <!-- Vestidos -->
+                <div onclick="loadCategoryProducts('vestidos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group py-6 flex flex-col items-center justify-center">
+                    <svg class="w-6 h-6 mb-2 text-gray-700 group-hover:text-amber-600 transition" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.25 8.25 0 0012 4.5a8.25 8.25 0 00-3.362.714m6.724 0a39.82 39.82 0 01-6.724 0m6.724 0L18 21H6l2.638-15.786"></path></svg>
+                    <h3 class="font-serif font-semibold text-sm tracking-wider text-gray-900 group-hover:text-amber-600 transition">Vestidos</h3>
                 </div>
-                <div onclick="loadCategoryProducts('conjuntos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group py-8">
-                    <h3 class="font-serif font-semibold text-base tracking-wider text-gray-900 group-hover:text-amber-600 transition">Conjuntos</h3>
+
+                <!-- Conjuntos -->
+                <div onclick="loadCategoryProducts('conjuntos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group py-6 flex flex-col items-center justify-center">
+                    <svg class="w-6 h-6 mb-2 text-gray-700 group-hover:text-amber-600 transition" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"></path></svg>
+                    <h3 class="font-serif font-semibold text-sm tracking-wider text-gray-900 group-hover:text-amber-600 transition">Conjuntos</h3>
                 </div>
-                <div onclick="loadCategoryProducts('abrigos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group py-8">
-                    <h3 class="font-serif font-semibold text-base tracking-wider text-gray-900 group-hover:text-amber-600 transition">Abrigos</h3>
+
+                <!-- Abrigos -->
+                <div onclick="loadCategoryProducts('abrigos', event)" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md transition group py-6 flex flex-col items-center justify-center">
+                    <svg class="w-6 h-6 mb-2 text-gray-700 group-hover:text-amber-600 transition" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.622 0 1.142.508 1.119 1.137z"></path></svg>
+                    <h3 class="font-serif font-semibold text-sm tracking-wider text-gray-900 group-hover:text-amber-600 transition">Abrigos</h3>
                 </div>
-                <div onclick="loadCategoryProducts('temporada', event)" class="bg-amber-50 p-6 rounded-2xl shadow-sm border border-amber-200 text-center cursor-pointer hover:shadow-md transition group py-8">
-                    <h3 class="font-serif font-bold text-base tracking-wider text-red-700 transition">Navidad</h3>
+
+                <!-- Navidad -->
+                <div onclick="loadCategoryProducts('temporada', event)" class="bg-amber-50 p-6 rounded-2xl shadow-sm border border-amber-200 text-center cursor-pointer hover:shadow-md transition group py-6 flex flex-col items-center justify-center">
+                    <svg class="w-6 h-6 mb-2 text-red-700 transition" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"></path></svg>
+                    <h3 class="font-serif font-bold text-sm tracking-wider text-red-700 transition">Navidad</h3>
                 </div>
             </div>
         </div>
