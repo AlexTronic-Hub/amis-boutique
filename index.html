@@ -1325,7 +1325,6 @@
 
             let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             
-            // Si el cliente selecciona Envío Nacional, sumamos los $149 fijos
             const shippingMethodChecked = document.querySelector('input[name="shipping-method"]:checked');
             if (shippingMethodChecked && shippingMethodChecked.value === 'Envío Nacional') {
                 total += 149;
@@ -1334,7 +1333,6 @@
             const totalEl = document.getElementById('cart-total');
             if(totalEl) totalEl.textContent = `$${total} MXN`;
 
-            // Actualizamos también el monto exacto en el bloque de transferencia bancaria
             const transferAmountDisplay = document.getElementById('transfer-amount-display');
             if(transferAmountDisplay) {
                 transferAmountDisplay.textContent = `$${total} MXN`;
@@ -1385,21 +1383,26 @@
 
                 applyShippingRules();
 
-                // AUTORRELLENADO AUTOMÁTICO DE DATOS Y DIRECCIÓN GUARDADA
+                // BUSCAR SIEMPRE DIRECTAMENTE EN FIRESTORE AL LLEGAR AL PASO 2
                 const shipName = document.getElementById('ship-name');
                 const shipPhone = document.getElementById('ship-phone');
                 const shipEmail = document.getElementById('ship-email');
                 const shipAddress = document.getElementById('ship-address');
 
-                if (userData) {
-                    if(shipName) shipName.value = `${userData.names || ''} ${userData.surnames || ''}`.trim();
-                    if(shipPhone) shipPhone.value = userData.phone || '';
-                    if(userData.addresses && userData.addresses.length > 0 && shipAddress) {
-                        shipAddress.value = userData.addresses[0];
-                    }
-                }
-                if (currentUser && shipEmail) {
-                    shipEmail.value = currentUser.email || '';
+                if (currentUser) {
+                    if (shipEmail) shipEmail.value = currentUser.email || '';
+                    
+                    const { doc, getDoc } = window.FB_Methods;
+                    getDoc(doc(window.FB_Db, "users", currentUser.uid)).then(docSnap => {
+                        if (docSnap.exists()) {
+                            const uData = docSnap.data();
+                            if (shipName) shipName.value = `${uData.names || ''} ${uData.surnames || ''}`.trim();
+                            if (shipPhone) shipPhone.value = uData.phone || '';
+                            if (uData.addresses && uData.addresses.length > 0 && shipAddress) {
+                                shipAddress.value = uData.addresses[0];
+                            }
+                        }
+                    }).catch(err => console.error("Error consultando usuario en Firestore:", err));
                 }
 
             } else if (checkoutStep === 3) {
@@ -1632,6 +1635,8 @@
             document.getElementById('view-data-box').classList.add('hidden');
             document.getElementById('edit-data-box').classList.remove('hidden');
         }
+
+        function encryptedEdicionDatos() {}
 
         function cancelarEdicionDatos() {
             document.getElementById('edit-data-box').classList.add('hidden');
