@@ -69,7 +69,6 @@
         transition: transform 0.3s ease-in-out;
       }
       
-      /* Fondo configurado con tu URL exacta de Postimages */
       .hero-bokeh-bg {
         background-image: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://i.postimg.cc/SQVy0c4n/fiam.png');
         background-size: cover;
@@ -276,7 +275,7 @@
                     </div>
 
                     <nav class="mt-6 space-y-4">
-                        <!-- BOTÓN DE ADMINISTRADOR (SOLO APARECE SI ES TU CORREO O EL DE TU ESPOSA) -->
+                        <!-- BOTÓN DE ADMINISTRADOR (SE MUESTRA SOLO SI FIRESTORE DICE role === 'admin') -->
                         <div id="menu-admin-wrapper" class="hidden pb-2 border-b border-gray-100">
                             <button onclick="openAdminPanel(); toggleMobileMenu();" class="w-full flex items-center justify-between py-2 text-left font-bold text-amber-600 hover:text-amber-700 transition">
                                 <span class="tracking-widest uppercase text-xs">⚙️ Panel de Administración</span>
@@ -607,13 +606,6 @@
     <script>
         const CORREO_BOUTIQUE = "alexisorozcoortiz@gmail.com";
         const WHATSAPP_TIENDA = "523312467018";
-
-        // 📝 AGREGA AQUÍ LOS CORREOS DE ADMINISTRADOR (Tuyo y de tu esposa)
-        const ADMIN_EMAILS = [
-            "alexisorozcoortiz@gmail.com",
-            "amisboutiqueof@gmail.com"
-        ];
-
         let cart = JSON.parse(localStorage.getItem('amis_cart') || '[]');
         let checkoutStep = 1;
         let currentUser = null;
@@ -658,18 +650,18 @@
                             accountWrapper.classList.remove('hidden');
                             loginWrapper.classList.add('hidden');
 
-                            // Verificar si es Administrador
-                            if (ADMIN_EMAILS.includes(user.email)) {
-                                adminWrapper.classList.remove('hidden');
-                            } else {
-                                adminWrapper.classList.add('hidden');
-                            }
-
                             const { doc, getDoc } = window.FB_Methods;
                             try {
                                 const userDoc = await getDoc(doc(window.FB_Db, "users", user.uid));
                                 if (userDoc.exists()) {
                                     userData = userDoc.data();
+                                    
+                                    // Validar rol de administrador directo desde Firestore
+                                    if (userData.role === "admin") {
+                                        adminWrapper.classList.remove('hidden');
+                                    } else {
+                                        adminWrapper.classList.add('hidden');
+                                    }
                                 }
                             } catch (e) {
                                 console.error("Error cargando perfil:", e);
@@ -705,7 +697,7 @@
                         payment: pendingData.paymentMethod,
                         items: cart,
                         total: `$${pendingData.total} MXN`,
-                        status: "En proceso", // Estatus inicial
+                        status: "En proceso",
                         createdAt: Timestamp.now()
                     }).then(() => {
                         enviarFormSubmit(pendingData);
@@ -961,7 +953,6 @@
             }
         }
 
-        // FUNCIÓN PARA VER EL DETALLE DEL PEDIDO (CLIENTE)
         function verDetallePedido(orderJson) {
             const data = JSON.parse(decodeURIComponent(orderJson));
             document.getElementById('modal-order-title').textContent = `Pedido: ${data.orderId}`;
@@ -991,7 +982,6 @@
             document.getElementById('order-detail-modal').classList.toggle('hidden');
         }
 
-        // FUNCIONES DE ADMINISTRACIÓN
         async function openAdminPanel() {
             const modal = document.getElementById('admin-modal');
             const panel = document.getElementById('admin-modal-panel');
