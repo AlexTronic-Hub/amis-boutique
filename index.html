@@ -253,6 +253,7 @@
                                         <a href="?categoria=conjuntos" onclick="loadCategoryProducts('conjuntos', event); toggleMobileMenu();" class="block py-1 text-gray-600 hover:text-black">• Conjuntos</a>
                                         <a href="?categoria=blusas" onclick="loadCategoryProducts('blusas', event); toggleMobileMenu();" class="block py-1 text-gray-600 hover:text-black">• Blusas</a>
                                         <a href="?categoria=abrigos" onclick="loadCategoryProducts('abrigos', event); toggleMobileMenu();" class="block py-1 text-gray-600 hover:text-black">• Abrigos</a>
+                                        <a href="?categoria=pantalones_faldas" onclick="loadCategoryProducts('pantalones_faldas', event); toggleMobileMenu();" class="block py-1 text-gray-600 hover:text-black">• Pantalones & Faldas</a>
                                         <a href="?categoria=temporada" onclick="loadCategoryProducts('temporada', event); toggleMobileMenu();" class="block py-1 text-red-600 font-bold">• Navidad</a>
                                     </div>
                                 </div>
@@ -271,6 +272,7 @@
                                             <option value="conjuntos">Conjuntos</option>
                                             <option value="blusas">Blusas</option>
                                             <option value="abrigos">Abrigos</option>
+                                            <option value="pantalones_faldas">Pantalones & Faldas</option>
                                             <option value="temporada">Navidad (Temporada)</option>
                                         </select>
 
@@ -374,6 +376,7 @@
                                 <a href="?categoria=conjuntos" onclick="loadCategoryProducts('conjuntos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Conjuntos</a>
                                 <a href="?categoria=blusas" onclick="loadCategoryProducts('blusas', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Blusas</a>
                                 <a href="?categoria=abrigos" onclick="loadCategoryProducts('abrigos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Abrigos</a>
+                                <a href="?categoria=pantalones_faldas" onclick="loadCategoryProducts('pantalones_faldas', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Pantalones & Faldas</a>
                                 <a href="?categoria=temporada" onclick="loadCategoryProducts('temporada', event)" class="block py-1.5 text-sm text-red-600 hover:text-red-700 transition font-bold">🎄 De Temporada (Navidad)</a>
                             </div>
                         </div>
@@ -950,7 +953,7 @@
                     </div>
                 `;
             } else {
-                let titleName = categoryKey.toUpperCase();
+                let titleName = categoryKey === 'pantalones_faldas' ? 'PANTALONES & FALDAS' : categoryKey.toUpperCase();
                 bannerHtml = `<h2 class="text-2xl font-serif tracking-wider font-bold mb-4">${titleName}</h2>`;
             }
 
