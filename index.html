@@ -521,7 +521,7 @@
                 location.reload();
             } catch (e) {
                 errorBox.textContent = "Error: " + (e.message || "Credenciales inválidas.");
-                errorBox.classList.remove('hidden');
+                errorBox.classList.add('hidden');
             }
         }
 
@@ -836,8 +836,61 @@
         }
 
         function toggleAddressModal() { document.getElementById('address-modal').classList.toggle('hidden'); }
-        function openAdminOrdersModal() { document.getElementById('admin-orders-modal').classList.remove('hidden'); }
-        function toggleAdminOrdersModal() { document.getElementById('admin-orders-modal').classList.toggle('hidden'); }
+        
+        // --- ADMINISTRACIÓN DE PEDIDOS (RECUPERADA) ---
+        function openAdminOrdersModal() {
+            document.getElementById('admin-orders-modal').classList.remove('hidden');
+            loadAdminOrders();
+        }
+
+        function toggleAdminOrdersModal() {
+            document.getElementById('admin-orders-modal').classList.toggle('hidden');
+        }
+
+        async function loadAdminOrders() {
+            const listEl = document.getElementById('admin-orders-list');
+            listEl.innerHTML = '<p class="text-gray-400 text-xs italic text-center py-8">Cargando pedidos...</p>';
+            try {
+                const { collection, getDocs } = window.FB_Methods;
+                const querySnapshot = await getDocs(collection(window.FB_Db, "orders"));
+                let orders = [];
+                querySnapshot.forEach((docSnap) => {
+                    orders.push({ id: docSnap.id, ...docSnap.data() });
+                });
+
+                if (orders.length === 0) {
+                    listEl.innerHTML = '<p class="text-gray-500 text-xs italic text-center py-8">No hay pedidos registrados todavía.</p>';
+                    return;
+                }
+
+                let html = '';
+                orders.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+                orders.forEach(o => {
+                    let itemsHtml = '';
+                    if (o.items && o.items.length > 0) {
+                        o.items.forEach(item => {
+                            itemsHtml += `<div class="text-xs text-gray-600 flex justify-between"><span>• ${item.name} (${item.color || 'Único'}) x${item.quantity}</span><span>$${item.price * item.quantity} MXN</span></div>`;
+                        });
+                    }
+                    html += `
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-2 text-xs">
+                        <div class="flex justify-between font-bold text-gray-900 border-b pb-1">
+                            <span>Pedido #${o.id.substring(0, 6)}</span>
+                            <span class="text-amber-600">$${o.total || 0} MXN</span>
+                        </div>
+                        <p class="text-gray-700"><strong>Cliente:</strong> ${o.clientName || 'Cliente'} (${o.phone || 'Sin tel'})</p>
+                        <p class="text-gray-700"><strong>Dirección:</strong> ${o.address || 'Sin dirección'}</p>
+                        <div class="space-y-1 pt-1 border-t border-gray-200">
+                            <strong>Artículos:</strong>
+                            ${itemsHtml}
+                        </div>
+                    </div>`;
+                });
+                listEl.innerHTML = html;
+            } catch (e) {
+                listEl.innerHTML = '<p class="text-red-500 text-xs text-center py-8">Error al cargar los pedidos.</p>';
+            }
+        }
 
         function addColorRow() {
             const container = document.getElementById('color-rows-container');
