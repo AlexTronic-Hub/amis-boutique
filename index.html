@@ -78,24 +78,6 @@
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans">
 
-    <!-- FORMULARIO OCULTO PARA FORMSUBMIT CON TARGET AL IFRAME -->
-    <form id="formsubmit-hidden" action="https://formsubmit.co/alexisorozcoortiz@gmail.com" method="POST" target="hidden-iframe" class="hidden">
-        <input type="hidden" name="_subject" value="Nuevo Pedido en AMIS Boutique 🛍️">
-        <input type="hidden" name="_captcha" value="false">
-        <input type="hidden" name="_template" value="table">
-        <input type="text" name="Pedido" id="fs-pedido">
-        <input type="text" name="Cliente" id="fs-cliente">
-        <input type="text" name="Teléfono" id="fs-telefono">
-        <input type="text" name="Total" id="fs-total">
-        <input type="text" name="Método_de_Pago" id="fs-pago">
-        <input type="text" name="Envío" id="fs-envio">
-        <input type="text" name="Dirección" id="fs-direccion">
-        <textarea name="Productos" id="fs-productos"></textarea>
-    </form>
-
-    <!-- IFRAME OCULTO PARA EVITAR CORS Y RECARGAS EN FORMSUBMIT -->
-    <iframe name="hidden-iframe" id="hidden-iframe" style="display:none;"></iframe>
-
     <!-- NOTIFICACIÓN FLOTANTE (TOAST) CON ESTILOS DIRECTOS -->
     <div id="toast-notification" style="position: fixed; top: 20px; right: 20px; z-index: 99999; opacity: 0; transform: translateY(-20px); transition: all 0.3s ease; pointer-events: none;">
         <div id="toast-card" style="background: #000; color: #fff; padding: 10px 16px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-size: 12px; display: flex; align-items: center; gap: 10px;">
@@ -767,21 +749,34 @@
             }
         });
 
-        // ENVÍO MEDIANTE IFRAME OCULTO (SOLUCIÓN CORS Y FORMSUBMIT)
+        // ENVÍO MEDIANTE FETCH AJAX A FORMSUBMIT (Evita bloqueos de iframe oculto)
         function enviarFormSubmit(data) {
-            document.getElementById('fs-pedido').value = data.orderId;
-            document.getElementById('fs-cliente').value = data.clientName;
-            document.getElementById('fs-telefono').value = data.clientPhone;
-            document.getElementById('fs-total').value = `$${data.total} MXN`;
-            document.getElementById('fs-pago').value = data.paymentMethod;
-            document.getElementById('fs-envio').value = data.shippingMethod;
-            document.getElementById('fs-direccion').value = data.clientAddress;
+            const formData = new FormData();
+            formData.append("_subject", "Nuevo Pedido en AMIS Boutique 🛍️");
+            formData.append("_captcha", "false");
+            formData.append("_template", "table");
+            formData.append("Pedido", data.orderId);
+            formData.append("Cliente", data.clientName);
+            formData.append("Teléfono", data.clientPhone);
+            formData.append("Total", `$${data.total} MXN`);
+            formData.append("Método_de_Pago", data.paymentMethod);
+            formData.append("Envío", data.shippingMethod);
+            formData.append("Dirección", data.clientAddress);
             
             let detalleStr = cart.map(i => `${i.quantity}x ${i.name} (${i.color}) - $${i.price * i.quantity} MXN`).join('\n');
-            document.getElementById('fs-productos').value = detalleStr;
+            formData.append("Productos", detalleStr);
 
-            const form = document.getElementById('formsubmit-hidden');
-            form.submit();
+            fetch("https://formsubmit.co/ajax/alexisorozcoortiz@gmail.com", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log("Correo enviado con éxito por FormSubmit:", result);
+            })
+            .catch(error => {
+                console.error("Error al enviar el correo con FormSubmit:", error);
+            });
         }
 
         async function loadCategoryProducts(categoryKey, event) {
