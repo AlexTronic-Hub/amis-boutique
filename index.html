@@ -692,11 +692,21 @@
                             accountWrapper.classList.remove('hidden');
                             loginWrapper.classList.add('hidden');
 
-                            const { doc, getDoc } = window.FB_Methods;
+                            const { doc, getDoc, collection, query, where, getDocs } = window.FB_Methods;
                             try {
-                                const userDoc = await getDoc(doc(window.FB_Db, "users", user.uid));
-                                if (userDoc.exists()) {
-                                    userData = userDoc.data();
+                                const userDocRef = doc(window.FB_Db, "users", user.uid);
+                                let userSnap = await getDoc(userDocRef);
+
+                                if (!userSnap.exists() && user.email) {
+                                    const q = query(collection(window.FB_Db, "users"), where("email", "==", user.email));
+                                    const qSnap = await getDocs(q);
+                                    if (!qSnap.empty) {
+                                        userSnap = qSnap.docs[0];
+                                    }
+                                }
+
+                                if (userSnap && userSnap.exists()) {
+                                    userData = userSnap.data();
                                     if (userData.role === "admin") {
                                         adminWrapper.classList.remove('hidden');
                                     } else {
@@ -903,12 +913,19 @@
 
             try {
                 const { collection, query, where, getDocs, doc, getDoc } = window.FB_Methods;
-                const userDocRef = doc(window.FB_Db, "users", uid);
-                const userSnap = await getDoc(userDocRef);
+                
+                let userSnap = await getDoc(doc(window.FB_Db, "users", uid));
+                if (!userSnap.exists() && currentUser && currentUser.email) {
+                    const qUser = query(collection(window.FB_Db, "users"), where("email", "==", currentUser.email));
+                    const qSnap = await getDocs(qUser);
+                    if (!qSnap.empty) {
+                        userSnap = qSnap.docs[0];
+                    }
+                }
 
                 let names = '', surnames = '', phone = '', email = currentUser ? currentUser.email : '', hasData = false, addresses = [];
 
-                if (userSnap.exists()) {
+                if (userSnap && userSnap.exists()) {
                     userData = userSnap.data();
                     names = userData.names || '';
                     surnames = userData.surnames || '';
@@ -1383,7 +1400,7 @@
 
                 applyShippingRules();
 
-                // BUSCAR SIEMPRE DIRECTAMENTE EN FIRESTORE AL LLEGAR AL PASO 2
+                // BÚSQUEDA ROBUSTA EN FIRESTORE POR UID O POR EMAIL
                 const shipName = document.getElementById('ship-name');
                 const shipPhone = document.getElementById('ship-phone');
                 const shipEmail = document.getElementById('ship-email');
@@ -1392,17 +1409,27 @@
                 if (currentUser) {
                     if (shipEmail) shipEmail.value = currentUser.email || '';
                     
-                    const { doc, getDoc } = window.FB_Methods;
-                    getDoc(doc(window.FB_Db, "users", currentUser.uid)).then(docSnap => {
-                        if (docSnap.exists()) {
-                            const uData = docSnap.data();
+                    const { doc, getDoc, collection, query, where, getDocs } = window.FB_Methods;
+                    async function fetchAndFillCheckoutData() {
+                        let userSnap = await getDoc(doc(window.FB_Db, "users", currentUser.uid));
+                        if (!userSnap.exists() && currentUser.email) {
+                            const qUser = query(collection(window.FB_Db, "users"), where("email", "==", currentUser.email));
+                            const qSnap = await getDocs(qUser);
+                            if (!qSnap.empty) {
+                                userSnap = qSnap.docs[0];
+                            }
+                        }
+
+                        if (userSnap && userSnap.exists()) {
+                            const uData = userSnap.data();
                             if (shipName) shipName.value = `${uData.names || ''} ${uData.surnames || ''}`.trim();
                             if (shipPhone) shipPhone.value = uData.phone || '';
                             if (uData.addresses && uData.addresses.length > 0 && shipAddress) {
                                 shipAddress.value = uData.addresses[0];
                             }
                         }
-                    }).catch(err => console.error("Error consultando usuario en Firestore:", err));
+                    }
+                    fetchAndFillCheckoutData();
                 }
 
             } else if (checkoutStep === 3) {
@@ -1635,8 +1662,6 @@
             document.getElementById('view-data-box').classList.add('hidden');
             document.getElementById('edit-data-box').classList.remove('hidden');
         }
-
-        function encryptedEdicionDatos() {}
 
         function cancelarEdicionDatos() {
             document.getElementById('edit-data-box').classList.add('hidden');
