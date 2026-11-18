@@ -170,7 +170,7 @@
                 <div class="space-y-3 text-xs">
                     <div>
                         <label class="block font-bold uppercase text-gray-700 mb-1">Código Postal *</label>
-                        <input type="text" id="dir-cp" maxlength="5" placeholder="Ej. 44100" oninput="buscarCodigoPostal(this.value)" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black font-mono">
+                        <input type="text" id="dir-cp" maxlength="5" placeholder="Ej. 44100" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black font-mono">
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
@@ -201,7 +201,7 @@
                         <input type="text" id="dir-estado" placeholder="Ej. Jalisco" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
                     </div>
                 </div>
-                <button onclick="saveStructuredAddress()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition mt-2">Guardar Dirección</button>
+                <button onclick="toggleAddressModal()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition mt-2">Guardar Dirección</button>
             </div>
         </div>
     </div>
@@ -225,13 +225,13 @@
                     <nav class="mt-6 space-y-4">
                         <!-- PANEL DE ADMINISTRACIÓN -->
                         <div id="menu-admin-wrapper" class="hidden">
-                            <button id="admin-menu-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-serif font-bold text-black text-base hover:opacity-75 transition tracking-wide">
+                            <button id="admin-menu-toggle-btn" onclick="toggleSubmenu('admin-menu-submenu', 'admin-menu-arrow')" class="w-full flex items-center justify-between py-2 text-left font-serif font-bold text-black text-base hover:opacity-75 transition tracking-wide">
                                 <span>Panel de Administración</span>
                                 <svg id="admin-menu-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div id="admin-menu-submenu" class="hidden pl-4 mt-2 space-y-3 border-l-2 border-black text-xs">
                                 <div>
-                                    <button id="admin-products-toggle" class="w-full flex items-center justify-between py-1.5 font-bold text-gray-900">
+                                    <button id="admin-products-toggle" onclick="toggleSubmenu('admin-products-sub', 'admin-prod-arrow')" class="w-full flex items-center justify-between py-1.5 font-bold text-gray-900">
                                         <span>📦 Productos por Colección</span>
                                         <svg id="admin-prod-arrow" class="w-3.5 h-3.5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
@@ -245,7 +245,7 @@
                                 </div>
 
                                 <div>
-                                    <button id="admin-add-toggle" class="w-full flex items-center justify-between py-1.5 font-bold text-black">
+                                    <button id="admin-add-toggle" onclick="toggleSubmenu('admin-add-sub', 'admin-add-arrow')" class="w-full flex items-center justify-between py-1.5 font-bold text-black">
                                         <span>➕ Agregar Nuevo Producto</span>
                                         <svg id="admin-add-arrow" class="w-3.5 h-3.5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
@@ -288,45 +288,11 @@
 
                         <!-- MI CUENTA -->
                         <div id="menu-account-wrapper" class="hidden">
-                            <button id="account-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
+                            <button id="account-toggle-btn" onclick="toggleSubmenu('account-submenu', 'account-arrow')" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Mi Cuenta</span>
                                 <svg id="account-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div id="account-submenu" class="hidden pl-4 mt-2 space-y-3 border-l-2 border-gray-100">
-                                <div>
-                                    <button id="orders-toggle-btn" class="w-full flex items-center justify-between py-1.5 text-left font-medium text-gray-700 hover:text-black transition">
-                                        <span class="tracking-wider uppercase text-xs font-bold">Mis Pedidos</span>
-                                        <svg id="orders-arrow" class="w-3.5 h-3.5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                    </button>
-                                    <div id="orders-container-sub" class="hidden pl-3 mt-1 space-y-1 border-l border-gray-100">
-                                        <div id="menu-user-orders" class="py-1 text-xs text-gray-600 space-y-2">
-                                            <p class="text-gray-400 italic">Cargando pedidos...</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <button id="data-toggle-btn" class="w-full flex items-center justify-between py-1.5 text-left font-medium text-gray-700 hover:text-black transition">
-                                        <span class="tracking-wider uppercase text-xs font-bold">Mis Datos</span>
-                                        <svg id="data-arrow" class="w-3.5 h-3.5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                    </button>
-                                    <div id="data-container-sub" class="hidden pl-3 mt-1 space-y-1 border-l border-gray-100">
-                                        <div id="menu-user-profile" class="py-1 text-xs text-gray-600 space-y-1">
-                                            <p class="text-gray-400 italic">Cargando datos...</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <button id="addresses-toggle-btn" class="w-full flex items-center justify-between py-1.5 text-left font-medium text-gray-700 hover:text-black transition">
-                                        <span class="tracking-wider uppercase text-xs font-bold">Direcciones Registradas</span>
-                                        <svg id="addresses-arrow" class="w-3.5 h-3.5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                    </button>
-                                    <div id="addresses-container-sub" class="hidden pl-3 mt-1 space-y-2 border-l border-gray-100">
-                                        <div id="menu-user-addresses" class="py-1 text-xs text-gray-600 space-y-1">
-                                            <p class="text-gray-400 italic">Cargando direcciones...</p>
-                                        </div>
-                                        <button onclick="toggleAddressModal()" class="w-full mt-1 bg-gray-100 text-black py-1.5 rounded-full text-[10px] tracking-wider uppercase hover:bg-gray-200 transition font-medium">+ Agregar dirección</button>
-                                    </div>
-                                </div>
                                 <div class="pt-2">
                                     <button onclick="handleLogout()" class="w-full bg-gray-100 text-red-600 py-2 rounded-full text-[11px] tracking-widest uppercase hover:bg-red-50 transition font-medium">Cerrar Sesión</button>
                                 </div>
@@ -342,7 +308,7 @@
 
                         <!-- CATEGORÍAS -->
                         <div id="menu-categories-wrapper" class="pt-2 border-t border-gray-100">
-                            <button id="collection-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
+                            <button id="collection-toggle-btn" onclick="toggleSubmenu('collection-submenu', 'collection-arrow')" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Categorías</span>
                                 <svg id="collection-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
@@ -357,7 +323,7 @@
 
                         <!-- CONTÁCTANOS -->
                         <div id="menu-contact-wrapper" class="pt-2 border-t border-gray-100">
-                            <button id="contact-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
+                            <button id="contact-toggle-btn" onclick="toggleSubmenu('contact-submenu', 'contact-arrow')" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Contáctanos</span>
                                 <svg id="contact-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
@@ -421,32 +387,8 @@
         </div>
     </div>
 
-    <!-- MODAL DE PEDIDO CREADO EXITOSAMENTE -->
-    <div id="order-success-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
-        <div class="flex items-center justify-center min-h-screen px-4">
-            <div class="fixed inset-0 bg-black bg-opacity-50"></div>
-            <div class="bg-white rounded-2xl max-w-sm w-full p-6 relative z-10 shadow-xl text-center space-y-4">
-                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">✓</div>
-                <h3 class="font-serif text-xl font-bold">¡Pedido Registrado!</h3>
-                <p class="text-xs text-gray-600 leading-relaxed">
-                    Tu pedido ha sido creado con éxito. Haz clic en el botón de abajo para enviarnos los detalles directamente por WhatsApp y agilizar tu entrega.
-                </p>
-                <div id="whatsapp-btn-container" class="pt-2">
-                    <a id="whatsapp-link" href="#" target="_blank" class="w-full bg-emerald-600 text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-emerald-700 transition flex items-center justify-center gap-2 font-medium shadow-md">
-                        📲 Enviar pedido por WhatsApp
-                    </a>
-                </div>
-                <button onclick="closeSuccessModalAndReload()" class="w-full bg-gray-100 text-gray-800 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-gray-200 transition">
-                    Volver a la Tienda
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- CONTENIDO PRINCIPAL -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        <!-- VISTA DE INICIO -->
         <div id="home-view" class="space-y-8">
             <div class="relative hero-bokeh-bg text-white rounded-3xl p-8 sm:p-16 overflow-hidden shadow-xl text-center">
                 <div class="relative z-10 max-w-2xl mx-auto space-y-4">
@@ -480,7 +422,6 @@
             </div>
         </div>
 
-        <!-- CONTENEDOR DINÁMICO DE CATEGORÍAS Y BÚSQUEDA -->
         <div id="dynamic-category-view" class="hidden space-y-6">
             <div id="category-header"></div>
             <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
@@ -491,12 +432,13 @@
         </div>
     </main>
 
-    <!-- SCRIPT DE ENRUTAMIENTO, BÚSQUEDA Y WHATSAPP -->
+    <!-- SCRIPT DE ENRUTAMIENTO, BÚSQUEDA Y ADMINISTRACIÓN -->
     <script>
         const WHATSAPP_TIENDA = "523312467018";
         let cart = JSON.parse(localStorage.getItem('amis_cart') || '[]');
         let currentUser = null;
         let userData = null;
+        let isRegistering = false;
 
         function showToast(message) {
             const toast = document.getElementById('toast-notification');
@@ -507,6 +449,80 @@
                 toast.style.opacity = '0';
                 toast.style.transform = 'translateY(-20px)';
             }, 3000);
+        }
+
+        // --- CONTROL DE SUBMENÚS DESPLEGABLES ---
+        function toggleSubmenu(submenuId, arrowId) {
+            const submenu = document.getElementById(submenuId);
+            const arrow = document.getElementById(arrowId);
+            if (submenu.classList.contains('hidden')) {
+                submenu.classList.remove('hidden');
+                if (arrow) arrow.classList.add('rotate-180');
+            } else {
+                submenu.classList.add('hidden');
+                if (arrow) arrow.classList.remove('rotate-180');
+            }
+        }
+
+        // --- AUTENTICACIÓN Y LOGIN ---
+        function toggleAuthModal() {
+            document.getElementById('auth-modal').classList.toggle('hidden');
+        }
+
+        function switchAuthMode() {
+            isRegistering = !isRegistering;
+            const title = document.getElementById('auth-modal-title');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const switchBtn = document.getElementById('auth-switch-btn');
+            const regFields = document.getElementById('register-fields');
+
+            if (isRegistering) {
+                title.textContent = "Crear Cuenta";
+                submitBtn.textContent = "Registrarse";
+                switchBtn.textContent = "¿Ya tienes cuenta? Inicia sesión aquí";
+                regFields.classList.remove('hidden');
+            } else {
+                title.textContent = "Iniciar Sesión";
+                submitBtn.textContent = "Entrar";
+                switchBtn.textContent = "¿No tienes cuenta? Regístrate aquí";
+                regFields.classList.add('hidden');
+            }
+        }
+
+        async function handleAuthSubmit() {
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value.trim();
+            const errorBox = document.getElementById('auth-error-box');
+            errorBox.classList.add('hidden');
+
+            if (!email || !password) {
+                errorBox.textContent = "Por favor completa todos los campos.";
+                errorBox.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const { signInWithEmailAndPassword, createUserWithEmailAndPassword, doc, setDoc } = window.FB_Methods;
+                if (isRegistering) {
+                    const names = document.getElementById('reg-names').value.trim();
+                    const surnames = document.getElementById('reg-surnames').value.trim();
+                    const phone = document.getElementById('reg-phone').value.trim();
+                    
+                    const cred = await createUserWithEmailAndPassword(window.FB_Auth, email, password);
+                    await setDoc(doc(window.FB_Db, "users", cred.user.uid), {
+                        names, surnames, phone, email, role: "client", createdAt: new Date()
+                    });
+                    showToast("¡Cuenta creada con éxito!");
+                } else {
+                    await signInWithEmailAndPassword(window.FB_Auth, email, password);
+                    showToast("¡Bienvenido de nuevo!");
+                }
+                toggleAuthModal();
+                location.reload();
+            } catch (e) {
+                errorBox.textContent = "Error: " + (e.message || "Credenciales inválidas.");
+                errorBox.classList.remove('hidden');
+            }
         }
 
         // --- BÚSQUEDA EN TIEMPO REAL ---
@@ -551,7 +567,7 @@
                 });
 
                 if (matchingProducts.length === 0) {
-                    gridEl.innerHTML = `<p class="text-gray-500 italic py-8 text-center col-span-full">No encontramos prendas con ese término. Intenta con otra palabra.</p>`;
+                    gridEl.innerHTML = `<p class="text-gray-500 italic py-8 text-center col-span-full">No encontramos prendas con ese término.</p>`;
                     return;
                 }
 
@@ -589,7 +605,6 @@
             gridEl.innerHTML = html;
         }
 
-        // --- COMPARTIR PRODUCTO ---
         function shareProduct(productId, productName, event) {
             if (event) event.stopPropagation();
             const shareUrl = `${window.location.origin}/producto/${productId}`;
@@ -676,7 +691,6 @@
                                     loginWrapper.classList.add('hidden');
                                     categoriesWrapper.classList.remove('hidden');
                                     contactWrapper.classList.remove('hidden');
-                                    loadUserDataAndOrders(user.uid);
                                 }
                             }
                         } else {
@@ -821,16 +835,9 @@
             if(countEl) countEl.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
         }
 
-        function toggleAuthModal() { document.getElementById('auth-modal').classList.toggle('hidden'); }
         function toggleAddressModal() { document.getElementById('address-modal').classList.toggle('hidden'); }
         function openAdminOrdersModal() { document.getElementById('admin-orders-modal').classList.remove('hidden'); }
         function toggleAdminOrdersModal() { document.getElementById('admin-orders-modal').classList.toggle('hidden'); }
-        function closeSuccessModalAndReload() {
-            document.getElementById('order-success-modal').classList.add('hidden');
-            cart = [];
-            localStorage.removeItem('amis_cart');
-            location.reload();
-        }
 
         function addColorRow() {
             const container = document.getElementById('color-rows-container');
@@ -860,18 +867,6 @@
                 toggleMobileMenu();
                 navigateTo('/' + category);
             } catch(e) { showToast("Error al guardar."); }
-        }
-
-        async function loadUserDataAndOrders(uid) {
-            const profileContent = document.getElementById('menu-user-profile');
-            try {
-                const { doc, getDoc } = window.FB_Methods;
-                const snap = await getDoc(doc(window.FB_Db, "users", uid));
-                if (snap.exists()) {
-                    const d = snap.data();
-                    if (profileContent) profileContent.innerHTML = `<p>${d.names} ${d.surnames}</p><p>${d.phone}</p>`;
-                }
-            } catch(e) {}
         }
 
         async function handleLogout() {
