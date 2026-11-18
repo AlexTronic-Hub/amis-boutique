@@ -1400,7 +1400,7 @@
 
                 applyShippingRules();
 
-                // LLENADO DIRECTO USANDO LA VARIABLE GLOBAL 'userData' QUE YA TIENE EL PERFIL EN MEMORIA
+                // LLENADO ROBUSTO: VERIFICA userData GLOBAL Y CONSULTA FIRESTORE SI ES NECESARIO
                 const shipName = document.getElementById('ship-name');
                 const shipPhone = document.getElementById('ship-phone');
                 const shipEmail = document.getElementById('ship-email');
@@ -1411,15 +1411,23 @@
                 }
 
                 if (userData) {
-                    if (shipName) {
-                        shipName.value = `${userData.names || ''} ${userData.surnames || ''}`.trim();
-                    }
-                    if (shipPhone) {
-                        shipPhone.value = userData.phone || '';
-                    }
+                    if (shipName) shipName.value = `${userData.names || ''} ${userData.surnames || ''}`.trim();
+                    if (shipPhone) shipPhone.value = userData.phone || '';
                     if (userData.addresses && userData.addresses.length > 0 && shipAddress) {
                         shipAddress.value = userData.addresses[0];
                     }
+                } else if (currentUser) {
+                    const { doc, getDoc } = window.FB_Methods;
+                    getDoc(doc(window.FB_Db, "users", currentUser.uid)).then(snap => {
+                        if (snap.exists()) {
+                            const d = snap.data();
+                            if (shipName) shipName.value = `${d.names || ''} ${d.surnames || ''}`.trim();
+                            if (shipPhone) shipPhone.value = d.phone || '';
+                            if (d.addresses && d.addresses.length > 0 && shipAddress) {
+                                shipAddress.value = d.addresses[0];
+                            }
+                        }
+                    }).catch(err => console.error("Error buscando datos en checkout:", err));
                 }
 
             } else if (checkoutStep === 3) {
@@ -1602,7 +1610,7 @@
             const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
             const payCash = document.getElementById('pay-cash');
             const payTerminal = document.getElementById('pay-terminal');
-            const mpRadio = document.querySelector('input[name="payment-method"][value="Mercado Pago"]`');
+            const mpRadio = document.querySelector('input[name="payment-method"][value="Mercado Pago"]');
 
             if (shippingMethod === 'Envío Nacional') {
                 payCash.style.display = 'none';
