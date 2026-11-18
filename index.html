@@ -521,7 +521,7 @@
                 location.reload();
             } catch (e) {
                 errorBox.textContent = "Error: " + (e.message || "Credenciales inválidas.");
-                errorBox.classList.remove('hidden');
+                errorBox.classList.add('hidden');
             }
         }
 
@@ -824,6 +824,7 @@
             if (modal.classList.contains('hidden')) {
                 modal.classList.remove('hidden');
                 setTimeout(() => drawer.classList.remove('translate-x-full'), 10);
+                updateCartUI();
             } else {
                 drawer.classList.add('translate-x-full');
                 setTimeout(() => modal.classList.add('hidden'), 300);
@@ -833,6 +834,49 @@
         function updateCartUI() {
             const countEl = document.getElementById('cart-count');
             if(countEl) countEl.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+            let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const totalEl = document.getElementById('cart-total');
+            if(totalEl) totalEl.textContent = `$${total} MXN`;
+
+            let html = '';
+            if (cart.length === 0) {
+                html = '<p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>';
+            } else {
+                cart.forEach((item, index) => {
+                    html += `
+                    <div class="flex justify-between items-center text-sm border-b border-gray-100 pb-3">
+                        <div>
+                            <p class="font-medium text-gray-900">${item.name}</p>
+                            <p class="text-xs text-gray-500">Color: ${item.color} · $${item.price} c/u</p>
+                            <div class="flex items-center gap-2 mt-2">
+                                <button onclick="changeItemQuantity(${index}, -1)" class="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center font-bold">-</button>
+                                <span class="text-xs font-semibold w-5 text-center">${item.quantity}</span>
+                                <button onclick="changeItemQuantity(${index}, 1)" class="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center font-bold">+</button>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end gap-2">
+                            <span class="font-semibold text-gray-900">$${item.price * item.quantity}</span>
+                            <button onclick="removeFromCart(${index})" class="text-red-500 text-xs hover:underline">Eliminar</button>
+                        </div>
+                    </div>`;
+                });
+            }
+            const cartItemsEl = document.getElementById('cart-items');
+            if(cartItemsEl) cartItemsEl.innerHTML = html;
+        }
+
+        function changeItemQuantity(index, delta) {
+            cart[index].quantity += delta;
+            if (cart[index].quantity <= 0) cart.splice(index, 1);
+            localStorage.setItem('amis_cart', JSON.stringify(cart));
+            updateCartUI();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            localStorage.setItem('amis_cart', JSON.stringify(cart));
+            updateCartUI();
         }
 
         function toggleAddressModal() { document.getElementById('address-modal').classList.toggle('hidden'); }
