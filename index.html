@@ -1145,6 +1145,7 @@
                 const { doc, updateDoc } = window.FB_Methods;
                 await updateDoc(doc(window.FB_Db, "orders", docId), { status: nuevoEstatus });
                 showToast(`Estatus actualizado a: ${nuevoEstatus}`);
+                await cargarPedidosAdmin(); // Recarga inmediata del panel
             } catch (e) {
                 console.error(e);
                 showToast("Error al actualizar estatus", "error");
@@ -1156,6 +1157,7 @@
                 const { doc, updateDoc } = window.FB_Methods;
                 await updateDoc(doc(window.FB_Db, "orders", docId), { shipping: nuevoEnvio });
                 showToast(`Método de envío actualizado a: ${nuevoEnvio}`);
+                await cargarPedidosAdmin(); // Recarga inmediata del panel para reflejar el cambio al instante
             } catch (e) {
                 console.error(e);
                 showToast("Error al actualizar el envío", "error");
@@ -1400,7 +1402,6 @@
 
                 applyShippingRules();
 
-                // LLENADO ROBUSTO: VERIFICA userData GLOBAL Y CONSULTA FIRESTORE SI ES NECESARIO
                 const shipName = document.getElementById('ship-name');
                 const shipPhone = document.getElementById('ship-phone');
                 const shipEmail = document.getElementById('ship-email');
