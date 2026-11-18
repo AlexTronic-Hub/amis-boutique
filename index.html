@@ -275,7 +275,7 @@
                     </div>
 
                     <nav class="mt-6 space-y-4">
-                        <!-- BOTÓN DE ADMINISTRADOR (SE MUESTRA SOLO SI FIRESTORE DICE role === 'admin') -->
+                        <!-- BOTÓN DE ADMINISTRADOR -->
                         <div id="menu-admin-wrapper" class="hidden pb-2 border-b border-gray-100">
                             <button onclick="openAdminPanel(); toggleMobileMenu();" class="w-full flex items-center justify-between py-2 text-left font-bold text-amber-600 hover:text-amber-700 transition">
                                 <span class="tracking-widest uppercase text-xs">⚙️ Panel de Administración</span>
@@ -426,12 +426,40 @@
                                 </div>
                             </label>
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="shipping-method" value="Punto de entrega / Acordar con vendedor" onchange="applyShippingRules()" class="text-black focus:ring-black">
+                                <input type="radio" name="shipping-method" value="Punto de entrega" onchange="applyShippingRules()" class="text-black focus:ring-black">
                                 <div>
-                                    <span class="font-medium block">Punto de entrega / Acordar con vendedor</span>
-                                    <span class="text-xs text-gray-500">Ej. Plaza Forum o punto acordado</span>
+                                    <span class="font-medium block">Punto de entrega</span>
+                                    <span class="text-xs text-gray-500">Elige tu plaza o punto de encuentro</span>
                                 </div>
                             </label>
+                        </div>
+
+                        <!-- SELECCIÓN DE PUNTOS DE ENTREGA CON RADIO BUTTONS Y ENLACES A MAPAS -->
+                        <div id="meeting-points-container" class="hidden pt-2 space-y-2 bg-gray-50 p-3 rounded-xl border border-gray-200">
+                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Selecciona el punto de entrega *</label>
+                            
+                            <div class="space-y-2 text-xs">
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="radio" name="meeting-point-radio" value="Plaza Forum" checked class="text-black focus:ring-black">
+                                    <a href="https://maps.app.goo.gl/YA6AYi19UgDrsrZB8" target="_blank" class="text-blue-600 hover:underline font-medium">Plaza Forum Tlaquepaque 📍</a>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="radio" name="meeting-point-radio" value="Plaza Revolución" class="text-black focus:ring-black">
+                                    <a href="https://maps.app.goo.gl/zJ9e6eoFnnL8h25w9" target="_blank" class="text-blue-600 hover:underline font-medium">Plaza Revolución 📍</a>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="radio" name="meeting-point-radio" value="Plaza Patria" class="text-black focus:ring-black">
+                                    <a href="https://maps.app.goo.gl/27YwUG4VzpAk31u18" target="_blank" class="text-blue-600 hover:underline font-medium">Plaza Patria 📍</a>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="radio" name="meeting-point-radio" value="Terraza Belenes" class="text-black focus:ring-black">
+                                    <a href="https://maps.app.goo.gl/VoHEE5zBkpQac5HE7" target="_blank" class="text-blue-600 hover:underline font-medium">Terraza Belenes 📍</a>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="radio" name="meeting-point-radio" value="OXXO Medrano" class="text-black focus:ring-black">
+                                    <a href="https://maps.app.goo.gl/fe53VxNUDgjH4nNq6" target="_blank" class="text-blue-600 hover:underline font-medium">OXXO Medrano 📍</a>
+                                </label>
+                            </div>
                         </div>
 
                         <div class="pt-3 border-t border-gray-100 space-y-3 text-sm">
@@ -448,7 +476,7 @@
                                 <label class="block text-xs text-gray-600 mb-1">Correo electrónico (opcional)</label>
                                 <input type="email" id="ship-email" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-black" placeholder="correo@ejemplo.com">
                             </div>
-                            <div>
+                            <div id="address-field-container">
                                 <label class="block text-xs text-gray-600 mb-1">Dirección de entrega o referencias *</label>
                                 <textarea id="ship-address" rows="2" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-black" placeholder="Calle, número, colonia, referencias..."></textarea>
                             </div>
@@ -549,9 +577,8 @@
                 </div>
             </div>
 
-            <!-- TARJETAS DE CATEGORÍAS RÁPIDAS (CON TUS FOTOS OFICIALES) -->
+            <!-- TARJETAS DE CATEGORÍAS RÁPIDAS -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <!-- Vestidos -->
                 <div onclick="loadCategoryProducts('vestidos', event)" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-center cursor-pointer hover:shadow-md transition group flex flex-col">
                     <div class="h-32 overflow-hidden bg-gray-100">
                         <img src="https://i.postimg.cc/MpGkyLjq/Whats-App-Image-2026-11-16-at-8-08-21-PM.jpg" alt="Vestidos" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
@@ -561,7 +588,6 @@
                     </div>
                 </div>
 
-                <!-- Conjuntos -->
                 <div onclick="loadCategoryProducts('conjuntos', event)" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-center cursor-pointer hover:shadow-md transition group flex flex-col">
                     <div class="h-32 overflow-hidden bg-gray-100">
                         <img src="https://i.postimg.cc/YqXSG8fS/IMG-20261115-WA0058.jpg" alt="Conjuntos" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
@@ -571,7 +597,6 @@
                     </div>
                 </div>
 
-                <!-- Abrigos -->
                 <div onclick="loadCategoryProducts('abrigos', event)" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-center cursor-pointer hover:shadow-md transition group flex flex-col">
                     <div class="h-32 overflow-hidden bg-gray-100">
                         <img src="https://i.postimg.cc/wT2MqSpK/Whats-App-Image-2026-11-10-at-6-58-14-PM.jpg" alt="Abrigos" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
@@ -581,7 +606,6 @@
                     </div>
                 </div>
 
-                <!-- Navidad -->
                 <div onclick="loadCategoryProducts('temporada', event)" class="bg-amber-50 rounded-2xl shadow-sm border border-amber-200 overflow-hidden text-center cursor-pointer hover:shadow-md transition group flex flex-col">
                     <div class="h-32 overflow-hidden bg-gray-100">
                         <img src="https://i.postimg.cc/nLnFbr67/sueternavidenogrinchrojo.jpg" alt="Navidad" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
@@ -596,9 +620,7 @@
         <!-- CONTENEDOR DINÁMICO DE PRODUCTOS -->
         <div id="dynamic-category-view" class="hidden space-y-6">
             <div id="category-header"></div>
-            <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Se cargan automáticamente desde Firestore -->
-            </div>
+            <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
     </main>
 
@@ -606,6 +628,16 @@
     <script>
         const CORREO_BOUTIQUE = "alexisorozcoortiz@gmail.com";
         const WHATSAPP_TIENDA = "523312467018";
+
+        // MAPA DE ENLACES OFICIALES DE GOOGLE MAPS PROPORCIONADOS POR ALEXIS
+        const MAPS_LOCATIONS = {
+            "Plaza Forum": "https://maps.app.goo.gl/YA6AYi19UgDrsrZB8",
+            "Plaza Revolución": "https://maps.app.goo.gl/zJ9e6eoFnnL8h25w9",
+            "Plaza Patria": "https://maps.app.goo.gl/27YwUG4VzpAk31u18",
+            "Terraza Belenes": "https://maps.app.goo.gl/VoHEE5zBkpQac5HE7",
+            "OXXO Medrano": "https://maps.app.goo.gl/fe53VxNUDgjH4nNq6"
+        };
+
         let cart = JSON.parse(localStorage.getItem('amis_cart') || '[]');
         let checkoutStep = 1;
         let currentUser = null;
@@ -655,8 +687,6 @@
                                 const userDoc = await getDoc(doc(window.FB_Db, "users", user.uid));
                                 if (userDoc.exists()) {
                                     userData = userDoc.data();
-                                    
-                                    // Validar rol de administrador directo desde Firestore
                                     if (userData.role === "admin") {
                                         adminWrapper.classList.remove('hidden');
                                     } else {
@@ -965,12 +995,22 @@
             }
             itemsHtml += '</div>';
 
+            let envioInfo = data.shipping;
+            if (MAPS_LOCATIONS[data.shipping]) {
+                envioInfo = `Punto de entrega: <strong>${data.shipping}</strong> (<a href="${MAPS_LOCATIONS[data.shipping]}" target="_blank" class="text-blue-600 underline font-medium">Ver en Google Maps 📍</a>)`;
+            }
+
+            let puntoOpcionHtml = data.clientAddress;
+            if (MAPS_LOCATIONS[data.clientAddress]) {
+                puntoOpcionHtml = `<a href="${MAPS_LOCATIONS[data.clientAddress]}" target="_blank" class="text-blue-600 underline font-medium">${data.clientAddress} 📍</a>`;
+            }
+
             let bodyHtml = `
                 ${itemsHtml}
                 <p><strong>Estatus actual:</strong> <span class="text-amber-600 font-bold">${data.status || 'En proceso'}</span></p>
                 <p><strong>Método de pago:</strong> ${data.payment}</p>
-                <p><strong>Método de envío:</strong> ${data.shipping}</p>
-                <p><strong>Dirección:</strong> ${data.clientAddress}</p>
+                <p><strong>Método de envío:</strong> ${envioInfo}</p>
+                <p><strong>Punto seleccionado:</strong> ${puntoOpcionHtml}</p>
                 <p class="font-bold text-gray-900 pt-1">Total pagado: ${data.total}</p>
             `;
 
@@ -1023,6 +1063,16 @@
                         });
                     }
 
+                    let adminEnvio = d.shipping;
+                    if (MAPS_LOCATIONS[d.shipping]) {
+                        adminEnvio = `Punto de Entrega: <strong>${d.shipping}</strong>`;
+                    }
+
+                    let adminPunto = d.clientAddress;
+                    if (MAPS_LOCATIONS[d.clientAddress]) {
+                        adminPunto = `<a href="${MAPS_LOCATIONS[d.clientAddress]}" target="_blank" class="text-blue-600 underline font-bold">${d.clientAddress} (Ver Mapa 📍)</a>`;
+                    }
+
                     html += `
                     <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-2 text-xs text-gray-700">
                         <div class="flex justify-between items-center font-bold text-gray-900">
@@ -1030,7 +1080,8 @@
                             <span class="text-amber-600">${d.total}</span>
                         </div>
                         <p><strong>Cliente:</strong> ${d.clientName} (${d.clientPhone})</p>
-                        <p><strong>Envío:</strong> ${d.shipping} - ${d.clientAddress}</p>
+                        <p><strong>Envío:</strong> ${adminEnvio}</p>
+                        <p><strong>Punto / Ubicación:</strong> ${adminPunto}</p>
                         <p><strong>Pago:</strong> ${d.payment}</p>
                         <div>
                             <strong>Productos:</strong>
@@ -1291,6 +1342,8 @@
                     actionBtn.style.display = 'block';
                 }
 
+                applyShippingRules();
+
                 if (userData && currentUser) {
                     const shipName = document.getElementById('ship-name');
                     const shipPhone = document.getElementById('ship-phone');
@@ -1312,7 +1365,7 @@
                     actionBtn.textContent = 'Finalizar Pedido';
                     actionBtn.style.display = 'block';
                 }
-                applyShippingRules();
+                applyPaymentRules();
                 handlePaymentChange();
             }
         }
@@ -1332,7 +1385,15 @@
             } else if (checkoutStep === 2) {
                 const clientName = document.getElementById('ship-name').value.trim();
                 const clientPhone = document.getElementById('ship-phone').value.trim();
-                const clientAddress = document.getElementById('ship-address').value.trim();
+                const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
+                
+                let clientAddress = "";
+                if (shippingMethod === "Punto de entrega") {
+                    const selectedPointRadio = document.querySelector('input[name="meeting-point-radio"]:checked');
+                    clientAddress = selectedPointRadio ? selectedPointRadio.value : "Plaza Forum";
+                } else {
+                    clientAddress = document.getElementById('ship-address').value.trim();
+                }
 
                 if(!clientName || !clientPhone || !clientAddress) {
                     showToast("Por favor completa los campos obligatorios de envío.", "error");
@@ -1346,7 +1407,15 @@
                 const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
                 const clientName = document.getElementById('ship-name').value.trim();
                 const clientPhone = document.getElementById('ship-phone').value.trim();
-                const clientAddress = document.getElementById('ship-address').value.trim();
+                
+                let clientAddress = "";
+                if (shippingMethod === "Punto de entrega") {
+                    const selectedPointRadio = document.querySelector('input[name="meeting-point-radio"]:checked');
+                    clientAddress = selectedPointRadio ? selectedPointRadio.value : "Plaza Forum";
+                } else {
+                    clientAddress = document.getElementById('ship-address').value.trim();
+                }
+
                 let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
                 const actionBtn = document.getElementById('cart-action-btn');
@@ -1438,6 +1507,21 @@
         }
 
         function applyShippingRules() {
+            const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
+            const meetingPointsContainer = document.getElementById('meeting-points-container');
+            const addressFieldContainer = document.getElementById('address-field-container');
+
+            if (shippingMethod === 'Punto de entrega') {
+                meetingPointsContainer.classList.remove('hidden');
+                addressFieldContainer.classList.add('hidden');
+            } else {
+                meetingPointsContainer.classList.add('hidden');
+                addressFieldContainer.classList.remove('hidden');
+            }
+            applyPaymentRules();
+        }
+
+        function applyPaymentRules() {
             const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
             const payCash = document.getElementById('pay-cash');
             const payTerminal = document.getElementById('pay-terminal');
