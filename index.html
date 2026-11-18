@@ -94,7 +94,7 @@
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
 
-            <a href="#" onclick="showHome(event)" class="amis-logo-container">
+            <a href="?" onclick="showHome(event)" class="amis-logo-container">
                 <span class="amis-logo-title">AMIS</span>
                 <span class="amis-logo-subtitle">collection &amp; boutique</span>
             </a>
@@ -236,29 +236,27 @@
                     </div>
 
                     <nav class="mt-6 space-y-4">
-                        <!-- PANEL DE ADMINISTRACIÓN EXCLUSIVO ADMIN (ESTILO ELEGANTE Y CLÁSICO EN NEGRO) -->
+                        <!-- PANEL DE ADMINISTRACIÓN EXCLUSIVO ADMIN -->
                         <div id="menu-admin-wrapper" class="hidden">
                             <button id="admin-menu-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-serif font-bold text-black text-base hover:opacity-75 transition tracking-wide">
                                 <span>Panel de Administración</span>
                                 <svg id="admin-menu-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div id="admin-menu-submenu" class="hidden pl-4 mt-2 space-y-3 border-l-2 border-black text-xs">
-                                <!-- Subsección: Productos (Divididos por colección) -->
                                 <div>
                                     <button id="admin-products-toggle" class="w-full flex items-center justify-between py-1.5 font-bold text-gray-900">
                                         <span>📦 Productos por Colección</span>
                                         <svg id="admin-prod-arrow" class="w-3.5 h-3.5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
                                     <div id="admin-products-sub" class="hidden pl-3 mt-1 space-y-2 border-l border-gray-200">
-                                        <a href="#" onclick="loadCategoryProducts('vestidos', event); toggleMobileMenu();" class="block py-1 text-gray-600 hover:text-black">• Vestidos</a>
-                                        <a href="#" onclick="loadCategoryProducts('conjuntos', event); toggleMobileMenu();" class="block py-1 text-gray-600 hover:text-black">• Conjuntos</a>
-                                        <a href="#" onclick="loadCategoryProducts('blusas', event); toggleMobileMenu();" class="block py-1 text-gray-600 hover:text-black">• Blusas</a>
-                                        <a href="#" onclick="loadCategoryProducts('abrigos', event); toggleMobileMenu();" class="block py-1 text-gray-600 hover:text-black">• Abrigos</a>
-                                        <a href="#" onclick="loadCategoryProducts('temporada', event); toggleMobileMenu();" class="block py-1 text-red-600 font-bold">• Navidad</a>
+                                        <a href="?categoria=vestidos" onclick="loadCategoryProducts('vestidos', event); toggleMobileMenu();" class="block py-1 text-gray-600 hover:text-black">• Vestidos</a>
+                                        <a href="?categoria=conjuntos" onclick="loadCategoryProducts('conjuntos', event); toggleMobileMenu();" class="block py-1 text-gray-600 hover:text-black">• Conjuntos</a>
+                                        <a href="?categoria=blusas" onclick="loadCategoryProducts('blusas', event); toggleMobileMenu();" class="block py-1 text-gray-600 hover:text-black">• Blusas</a>
+                                        <a href="?categoria=abrigos" onclick="loadCategoryProducts('abrigos', event); toggleMobileMenu();" class="block py-1 text-gray-600 hover:text-black">• Abrigos</a>
+                                        <a href="?categoria=temporada" onclick="loadCategoryProducts('temporada', event); toggleMobileMenu();" class="block py-1 text-red-600 font-bold">• Navidad</a>
                                     </div>
                                 </div>
 
-                                <!-- Subsección: Agregar Producto desde la página -->
                                 <div>
                                     <button id="admin-add-toggle" class="w-full flex items-center justify-between py-1.5 font-bold text-black">
                                         <span>➕ Agregar Nuevo Producto</span>
@@ -276,7 +274,6 @@
                                             <option value="temporada">Navidad (Temporada)</option>
                                         </select>
 
-                                        <!-- Gestión de Colores y Fotos (Con campo de HEX editable) -->
                                         <div class="space-y-1 pt-1">
                                             <label class="font-bold text-[11px] text-gray-700">Colores y Fotos (URLs):</label>
                                             <div id="color-rows-container" class="space-y-2">
@@ -293,14 +290,12 @@
                                     </div>
                                 </div>
 
-                                <!-- Subsección: Pedidos -->
                                 <div>
                                     <button onclick="openAdminOrdersModal(); toggleMobileMenu();" class="w-full py-1.5 font-bold text-gray-900 text-left hover:text-black">
                                         📋 Administrar Pedidos
                                     </button>
                                 </div>
 
-                                <!-- Cerrar Sesión Admin -->
                                 <div class="pt-2">
                                     <button onclick="handleLogout()" class="w-full bg-gray-100 text-red-600 py-2 rounded-full text-[11px] tracking-widest uppercase hover:bg-red-50 transition font-medium">Cerrar Sesión</button>
                                 </div>
@@ -360,7 +355,7 @@
                             </div>
                         </div>
 
-                        <!-- Botón simple para Iniciar Sesión (Si no está logueado) -->
+                        <!-- Botón simple para Iniciar Sesión -->
                         <div id="menu-login-wrapper">
                             <button onclick="toggleAuthModal(); toggleMobileMenu();" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Mi Cuenta</span>
@@ -368,22 +363,22 @@
                             </button>
                         </div>
 
-                        <!-- 2. CATEGORÍAS (CLIENTES) -->
+                        <!-- 2. CATEGORÍAS -->
                         <div id="menu-categories-wrapper" class="pt-2 border-t border-gray-100">
                             <button id="collection-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Categorías</span>
                                 <svg id="collection-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div id="collection-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
-                                <a href="#" onclick="loadCategoryProducts('vestidos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Vestidos</a>
-                                <a href="#" onclick="loadCategoryProducts('conjuntos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Conjuntos</a>
-                                <a href="#" onclick="loadCategoryProducts('blusas', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Blusas</a>
-                                <a href="#" onclick="loadCategoryProducts('abrigos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Abrigos</a>
-                                <a href="#" onclick="loadCategoryProducts('temporada', event)" class="block py-1.5 text-sm text-red-600 hover:text-red-700 transition font-bold">🎄 De Temporada (Navidad)</a>
+                                <a href="?categoria=vestidos" onclick="loadCategoryProducts('vestidos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Vestidos</a>
+                                <a href="?categoria=conjuntos" onclick="loadCategoryProducts('conjuntos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Conjuntos</a>
+                                <a href="?categoria=blusas" onclick="loadCategoryProducts('blusas', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Blusas</a>
+                                <a href="?categoria=abrigos" onclick="loadCategoryProducts('abrigos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Abrigos</a>
+                                <a href="?categoria=temporada" onclick="loadCategoryProducts('temporada', event)" class="block py-1.5 text-sm text-red-600 hover:text-red-700 transition font-bold">🎄 De Temporada (Navidad)</a>
                             </div>
                         </div>
 
-                        <!-- 3. CONTÁCTANOS (CLIENTES) -->
+                        <!-- 3. CONTÁCTANOS -->
                         <div id="menu-contact-wrapper" class="pt-2 border-t border-gray-100">
                             <button id="contact-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Contáctanos</span>
@@ -711,6 +706,7 @@
             const checkFB = setInterval(() => {
                 if (window.FB_Auth) {
                     clearInterval(checkFB);
+                    checkURLParametersAndLoad();
                     window.FB_Methods.onAuthStateChanged(window.FB_Auth, async (user) => {
                         currentUser = user;
                         const accountWrapper = document.getElementById('menu-account-wrapper');
@@ -801,6 +797,45 @@
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
         });
+
+        // VERIFICAR PARÁMETROS EN LA URL AL CARGAR (CATEGORÍA O PRODUCTO)
+        async function checkURLParametersAndLoad() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('producto');
+            const categoryKey = urlParams.get('categoria');
+
+            if (productId) {
+                await loadAndShowSingleProduct(productId);
+            } else if (categoryKey) {
+                await loadCategoryProducts(categoryKey);
+            }
+        }
+
+        async function loadAndShowSingleProduct(prodId) {
+            document.getElementById('home-view').classList.add('hidden');
+            const dynView = document.getElementById('dynamic-category-view');
+            dynView.classList.remove('hidden');
+
+            const headerEl = document.getElementById('category-header');
+            const gridEl = document.getElementById('products-grid');
+
+            headerEl.innerHTML = `<h2 class="text-2xl font-serif tracking-wider font-bold mb-4">Detalle del Producto</h2>`;
+            gridEl.innerHTML = '<p class="text-gray-400 italic py-8 text-center">Cargando producto...</p>';
+
+            try {
+                const { doc, getDoc } = window.FB_Methods;
+                const pSnap = await getDoc(doc(window.FB_Db, "products", prodId));
+                if (pSnap.exists()) {
+                    const p = { id: pSnap.id, ...pSnap.data() };
+                    gridEl.innerHTML = renderProductCardHTML(p);
+                } else {
+                    gridEl.innerHTML = '<p class="text-gray-500 italic py-8 text-center col-span-full">El producto no existe o fue eliminado.</p>';
+                }
+            } catch (e) {
+                console.error(e);
+                gridEl.innerHTML = '<p class="text-red-500 text-xs text-center py-8 col-span-full">Error al cargar el producto.</p>';
+            }
+        }
 
         function addColorRow() {
             const container = document.getElementById('color-rows-container');
@@ -894,6 +929,7 @@
 
         async function loadCategoryProducts(categoryKey, event) {
             if (event) event.preventDefault();
+            window.history.pushState({}, '', `?categoria=${categoryKey}`);
             document.getElementById('home-view').classList.add('hidden');
             const dynView = document.getElementById('dynamic-category-view');
             dynView.classList.remove('hidden');
@@ -937,53 +973,72 @@
 
                 let html = '';
                 matchingProducts.forEach((p) => {
-                    const prodId = p.id;
-                    const defaultImg = p.images && p.images.length > 0 ? p.images[0] : '';
-                    
-                    let colorsHtml = '';
-                    if (p.colors && p.colors.length > 0) {
-                        colorsHtml = `<div class="flex items-center space-x-2">`;
-                        p.colors.forEach((c, idx) => {
-                            const borderClass = idx === 0 ? 'border-black' : 'border-transparent';
-                            colorsHtml += `<button onclick="changeDynamicColor('${prodId}', '${c.image}', '${c.name}', this)" class="w-6 h-6 rounded-full border-2 ${borderClass} focus:outline-none transition transform hover:scale-110 color-btn-${prodId}" style="background-color: ${c.hex};" title="${c.name}"></button>`;
-                        });
-                        colorsHtml += `</div>`;
-                    }
-
-                    let adminDeleteBtn = '';
-                    if (userData && userData.role === 'admin') {
-                        adminDeleteBtn = `<button onclick="eliminarProducto('${prodId}')" class="mt-2 text-red-600 text-[11px] underline font-bold">🗑️ Eliminar Producto</button>`;
-                    }
-
-                    html += `
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
-                        <div class="relative bg-gray-100 h-[450px]">
-                            <img id="product-img-${prodId}" src="${defaultImg}" alt="${p.name}" class="w-full h-full object-cover transition-all duration-300">
-                            <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">${p.category}</span>
-                        </div>
-                        <div class="p-5 flex-1 flex flex-col justify-between">
-                            <div>
-                                <h3 class="font-serif text-lg font-medium text-gray-900">${p.name}</h3>
-                                <p class="text-xs text-gray-500 mt-1">${p.description || ''}</p>
-                                <div class="mt-4 flex items-center justify-between">
-                                    <span class="text-xl font-semibold text-gray-900">$${p.price} <span class="text-xs text-gray-500 font-normal">MXN</span></span>
-                                    ${colorsHtml}
-                                </div>
-                            </div>
-                            <div>
-                                <button onclick="addDynamicToCart('${p.name}', ${p.price}, '${prodId}')" class="mt-4 w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
-                                    Añadir al Carrito
-                                </button>
-                                ${adminDeleteBtn}
-                            </div>
-                        </div>
-                    </div>`;
+                    html += renderProductCardHTML(p);
                 });
 
                 gridEl.innerHTML = html;
             } catch (e) {
                 console.error(e);
                 gridEl.innerHTML = '<p class="text-red-500 text-xs text-center py-8 col-span-full">Error al cargar productos.</p>';
+            }
+        }
+
+        function renderProductCardHTML(p) {
+            const prodId = p.id;
+            const defaultImg = p.images && p.images.length > 0 ? p.images[0] : '';
+            
+            let colorsHtml = '';
+            if (p.colors && p.colors.length > 0) {
+                colorsHtml = `<div class="flex items-center space-x-2">`;
+                p.colors.forEach((c, idx) => {
+                    const borderClass = idx === 0 ? 'border-black' : 'border-transparent';
+                    colorsHtml += `<button onclick="changeDynamicColor('${prodId}', '${c.image}', '${c.name}', this)" class="w-6 h-6 rounded-full border-2 ${borderClass} focus:outline-none transition transform hover:scale-110 color-btn-${prodId}" style="background-color: ${c.hex};" title="${c.name}"></button>`;
+                });
+                colorsHtml += `</div>`;
+            }
+
+            let adminDeleteBtn = '';
+            if (userData && userData.role === 'admin') {
+                adminDeleteBtn = `<button onclick="eliminarProducto('${prodId}')" class="mt-2 text-red-600 text-[11px] underline font-bold">🗑️ Eliminar Producto</button>`;
+            }
+
+            const productDirectUrl = `${window.location.origin}${window.location.pathname}?producto=${prodId}`;
+
+            return `
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col relative group">
+                <!-- BOTÓN COMPARTIR CON URL ÚNICA -->
+                <button onclick="shareProduct('${p.name}', '${p.price}', '${productDirectUrl}')" class="absolute top-3 right-3 z-20 bg-white/90 hover:bg-white text-black p-2 rounded-full shadow transition backdrop-blur-sm" title="Compartir enlace directo">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                </button>
+                <div class="relative bg-gray-100 h-[450px]">
+                    <img id="product-img-${prodId}" src="${defaultImg}" alt="${p.name}" class="w-full h-full object-cover transition-all duration-300">
+                    <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">${p.category}</span>
+                </div>
+                <div class="p-5 flex-1 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-serif text-lg font-medium text-gray-900">${p.name}</h3>
+                        <p class="text-xs text-gray-500 mt-1">${p.description || ''}</p>
+                        <div class="mt-4 flex items-center justify-between">
+                            <span class="text-xl font-semibold text-gray-900">$${p.price} <span class="text-xs text-gray-500 font-normal">MXN</span></span>
+                            ${colorsHtml}
+                        </div>
+                    </div>
+                    <div>
+                        <button onclick="addDynamicToCart('${p.name}', ${p.price}, '${prodId}')" class="mt-4 w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
+                            Añadir al Carrito
+                        </button>
+                        ${adminDeleteBtn}
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function shareProduct(name, price, directUrl) {
+            if (navigator.share) {
+                navigator.share({ title: name, text: `Mira este producto en AMIS Boutique: ${name} por $${price} MXN`, url: directUrl }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(directUrl);
+                showToast("¡Enlace directo del producto copiado al portapapeles!");
             }
         }
 
@@ -1279,7 +1334,7 @@
                 toggleAuthModal();
             } catch (error) {
                 errorBox.textContent = "Correo o contraseña incorrectos.";
-                errorBox.classList.remove('hidden');
+                errorBox.classList.add('hidden');
             }
         }
 
@@ -1325,9 +1380,13 @@
 
         function showHome(event) {
             if (event) event.preventDefault();
+            window.history.pushState({}, '', window.location.pathname);
             document.getElementById('home-view').classList.remove('hidden');
             document.getElementById('dynamic-category-view').classList.add('hidden');
-            toggleMobileMenu();
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                toggleMobileMenu();
+            }
         }
 
         function toggleCartModal() {
