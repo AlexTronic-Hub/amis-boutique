@@ -20,7 +20,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, arrayUnion, query, where, Timestamp, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, arrayUnion, query, where, Timestamp, runTransaction, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyDpdI-Qx97QFhpM_LfIBjzlxiK2RJlTziQ",
@@ -38,7 +38,7 @@
 
         window.FB_Auth = auth;
         window.FB_Db = db;
-        window.FB_Methods = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, arrayUnion, query, where, Timestamp, runTransaction };
+        window.FB_Methods = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, arrayUnion, query, where, Timestamp, runTransaction, orderBy };
     </script>
 
     <style>
@@ -65,7 +65,7 @@
         margin-left: 1.8rem;
         letter-spacing: 0.02em;
       }
-      #cart-drawer-panel, #mobile-menu-panel {
+      #cart-drawer-panel, #mobile-menu-panel, #admin-modal-panel {
         transition: transform 0.3s ease-in-out;
       }
       
@@ -225,6 +225,45 @@
         </div>
     </div>
 
+    <!-- PANEL DE ADMINISTRACIÓN (MODAL) -->
+    <div id="admin-modal" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="toggleAdminModal()"></div>
+        <div class="absolute inset-y-0 right-0 max-w-full flex pl-10">
+            <div id="admin-modal-panel" class="w-screen max-w-xl bg-white shadow-xl p-6 flex flex-col justify-between overflow-y-auto transform translate-x-full">
+                <div>
+                    <div class="flex items-center justify-between pb-4 border-b border-gray-100 mb-4">
+                        <h2 class="font-serif text-xl font-bold flex items-center gap-2">⚙️ Panel de Administración - Pedidos</h2>
+                        <button onclick="toggleAdminModal()" class="p-2 rounded-md hover:bg-gray-100">✕</button>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-4">Aquí puedes supervisar los pedidos de los clientes y actualizar su estatus en tiempo real.</p>
+                    <div id="admin-orders-list" class="space-y-4">
+                        <p class="text-gray-400 text-xs italic text-center py-8">Cargando pedidos...</p>
+                    </div>
+                </div>
+                <div class="pt-4 border-t border-gray-100 mt-4">
+                    <button onclick="toggleAdminModal()" class="w-full bg-gray-100 text-gray-800 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-gray-200 transition">Cerrar Panel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE DETALLE DE PEDIDO PARA CLIENTES -->
+    <div id="order-detail-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-black bg-opacity-50" onclick="toggleOrderDetailModal()"></div>
+            <div class="bg-white rounded-2xl max-w-md w-full p-6 relative z-10 shadow-xl space-y-4">
+                <div class="flex justify-between items-center pb-3 border-b border-gray-100">
+                    <h3 id="modal-order-title" class="font-serif text-lg font-bold">Detalle del Pedido</h3>
+                    <button onclick="toggleOrderDetailModal()" class="text-gray-400 hover:text-black">✕</button>
+                </div>
+                <div id="modal-order-body" class="space-y-3 text-xs text-gray-700">
+                    <!-- Contenido dinámico -->
+                </div>
+                <button onclick="toggleOrderDetailModal()" class="w-full bg-black text-white py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MENÚ LATERAL (TRES BARRITAS) -->
     <div id="mobile-menu" class="fixed inset-0 z-50 overflow-hidden hidden">
         <div id="menu-backdrop" class="absolute inset-0 bg-black bg-opacity-50 transition-opacity" onclick="toggleMobileMenu()"></div>
@@ -237,6 +276,13 @@
                     </div>
 
                     <nav class="mt-6 space-y-4">
+                        <!-- BOTÓN DE ADMINISTRADOR (SOLO APARECE SI ES TU CORREO O EL DE TU ESPOSA) -->
+                        <div id="menu-admin-wrapper" class="hidden pb-2 border-b border-gray-100">
+                            <button onclick="openAdminPanel(); toggleMobileMenu();" class="w-full flex items-center justify-between py-2 text-left font-bold text-amber-600 hover:text-amber-700 transition">
+                                <span class="tracking-widest uppercase text-xs">⚙️ Panel de Administración</span>
+                            </button>
+                        </div>
+
                         <!-- 1. MI CUENTA -->
                         <div id="menu-account-wrapper" class="hidden">
                             <button id="account-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
@@ -561,6 +607,13 @@
     <script>
         const CORREO_BOUTIQUE = "alexisorozcoortiz@gmail.com";
         const WHATSAPP_TIENDA = "523312467018";
+
+        // 📝 AGREGA AQUÍ LOS CORREOS DE ADMINISTRADOR (Tuyo y de tu esposa)
+        const ADMIN_EMAILS = [
+            "alexisorozcoortiz@gmail.com",
+            // "correo_de_tu_esposa@email.com" // Descomenta y pon el correo de tu esposa cuando lo requieras
+        ];
+
         let cart = JSON.parse(localStorage.getItem('amis_cart') || '[]');
         let checkoutStep = 1;
         let currentUser = null;
@@ -599,10 +652,19 @@
                         currentUser = user;
                         const accountWrapper = document.getElementById('menu-account-wrapper');
                         const loginWrapper = document.getElementById('menu-login-wrapper');
+                        const adminWrapper = document.getElementById('menu-admin-wrapper');
 
                         if (user) {
                             accountWrapper.classList.remove('hidden');
                             loginWrapper.classList.add('hidden');
+
+                            // Verificar si es Administrador
+                            if (ADMIN_EMAILS.includes(user.email)) {
+                                adminWrapper.classList.remove('hidden');
+                            } else {
+                                adminWrapper.classList.add('hidden');
+                            }
+
                             const { doc, getDoc } = window.FB_Methods;
                             try {
                                 const userDoc = await getDoc(doc(window.FB_Db, "users", user.uid));
@@ -617,6 +679,7 @@
                             userData = null;
                             accountWrapper.classList.add('hidden');
                             loginWrapper.classList.remove('hidden');
+                            adminWrapper.classList.add('hidden');
                         }
                     });
                 }
@@ -642,6 +705,7 @@
                         payment: pendingData.paymentMethod,
                         items: cart,
                         total: `$${pendingData.total} MXN`,
+                        status: "En proceso", // Estatus inicial
                         createdAt: Timestamp.now()
                     }).then(() => {
                         enviarFormSubmit(pendingData);
@@ -880,12 +944,135 @@
                     let html = '';
                     querySnapshot.forEach((docSnap) => {
                         const data = docSnap.data();
-                        html += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 space-y-0.5 text-xs"><p class="font-medium text-gray-900">${data.orderId || 'Pedido'} · ${data.total || ''}</p></div>`;
+                        const orderString = encodeURIComponent(JSON.stringify(data));
+                        html += `
+                        <div onclick="verDetallePedido('${orderString}')" class="p-2.5 bg-gray-50 rounded-lg border border-gray-100 space-y-1 text-xs cursor-pointer hover:bg-gray-100 transition">
+                            <div class="flex justify-between items-center font-medium text-gray-900">
+                                <span>${data.orderId || 'Pedido'}</span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${data.status === 'Entregado' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${data.status || 'En proceso'}</span>
+                            </div>
+                            <p class="text-gray-500">Total: ${data.total || ''} · Clic para ver detalle</p>
+                        </div>`;
                     });
                     if (ordersContent) ordersContent.innerHTML = html;
                 }
             } catch (e) {
                 console.error("Error al cargar perfil:", e);
+            }
+        }
+
+        // FUNCIÓN PARA VER EL DETALLE DEL PEDIDO (CLIENTE)
+        function verDetallePedido(orderJson) {
+            const data = JSON.parse(decodeURIComponent(orderJson));
+            document.getElementById('modal-order-title').textContent = `Pedido: ${data.orderId}`;
+            
+            let itemsHtml = '<div class="space-y-1 border-b border-gray-100 pb-2 mb-2">';
+            if (data.items) {
+                data.items.forEach(i => {
+                    itemsHtml += `<div class="flex justify-between"><span>${i.quantity}x ${i.name} (${i.color})</span><span>$${i.price * i.quantity} MXN</span></div>`;
+                });
+            }
+            itemsHtml += '</div>';
+
+            let bodyHtml = `
+                ${itemsHtml}
+                <p><strong>Estatus actual:</strong> <span class="text-amber-600 font-bold">${data.status || 'En proceso'}</span></p>
+                <p><strong>Método de pago:</strong> ${data.payment}</p>
+                <p><strong>Método de envío:</strong> ${data.shipping}</p>
+                <p><strong>Dirección:</strong> ${data.clientAddress}</p>
+                <p class="font-bold text-gray-900 pt-1">Total pagado: ${data.total}</p>
+            `;
+
+            document.getElementById('modal-order-body').innerHTML = bodyHtml;
+            document.getElementById('order-detail-modal').classList.remove('hidden');
+        }
+
+        function toggleOrderDetailModal() {
+            document.getElementById('order-detail-modal').classList.toggle('hidden');
+        }
+
+        // FUNCIONES DE ADMINISTRACIÓN
+        async function openAdminPanel() {
+            const modal = document.getElementById('admin-modal');
+            const panel = document.getElementById('admin-modal-panel');
+            modal.classList.remove('hidden');
+            setTimeout(() => panel.classList.remove('translate-x-full'), 10);
+            await cargarPedidosAdmin();
+        }
+
+        function toggleAdminModal() {
+            const modal = document.getElementById('admin-modal');
+            const panel = document.getElementById('admin-modal-panel');
+            panel.classList.add('translate-x-full');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        async function cargarPedidosAdmin() {
+            const container = document.getElementById('admin-orders-list');
+            container.innerHTML = '<p class="text-gray-400 text-xs italic text-center py-4">Cargando pedidos de la tienda...</p>';
+
+            try {
+                const { collection, getDocs } = window.FB_Methods;
+                const querySnapshot = await getDocs(collection(window.FB_Db, "orders"));
+
+                if (querySnapshot.empty) {
+                    container.innerHTML = '<p class="text-gray-400 text-xs italic text-center py-4">No hay pedidos registrados todavía.</p>';
+                    return;
+                }
+
+                let html = '';
+                querySnapshot.forEach((docSnap) => {
+                    const id = docSnap.id;
+                    const d = docSnap.data();
+                    const currentStatus = d.status || 'En proceso';
+
+                    let itemsStr = '';
+                    if (d.items) {
+                        d.items.forEach(i => {
+                            itemsStr += `<li>${i.quantity}x ${i.name} (${i.color}) - $${i.price * i.quantity}</li>`;
+                        });
+                    }
+
+                    html += `
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-2 text-xs text-gray-700">
+                        <div class="flex justify-between items-center font-bold text-gray-900">
+                            <span>Folio: ${d.orderId}</span>
+                            <span class="text-amber-600">${d.total}</span>
+                        </div>
+                        <p><strong>Cliente:</strong> ${d.clientName} (${d.clientPhone})</p>
+                        <p><strong>Envío:</strong> ${d.shipping} - ${d.clientAddress}</p>
+                        <p><strong>Pago:</strong> ${d.payment}</p>
+                        <div>
+                            <strong>Productos:</strong>
+                            <ul class="list-disc pl-4 text-gray-600 mt-1">${itemsStr}</ul>
+                        </div>
+                        <div class="pt-2 border-t border-gray-200 flex items-center justify-between">
+                            <label class="font-bold">Estatus:</label>
+                            <select onchange="actualizarEstatusPedido('${id}', this.value)" class="p-1.5 border border-gray-300 rounded-lg text-xs bg-white font-medium focus:outline-none focus:border-black">
+                                <option value="En proceso" ${currentStatus === 'En proceso' ? 'selected' : ''}>⏳ En proceso</option>
+                                <option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>💳 Pagado</option>
+                                <option value="Enviado" ${currentStatus === 'Enviado' ? 'selected' : ''}>🚚 Enviado</option>
+                                <option value="Entregado" ${currentStatus === 'Entregado' ? 'selected' : ''}>✅ Entregado</option>
+                            </select>
+                        </div>
+                    </div>`;
+                });
+
+                container.innerHTML = html;
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = '<p class="text-red-500 text-xs text-center py-4">Error al cargar los pedidos.</p>';
+            }
+        }
+
+        async function actualizarEstatusPedido(docId, nuevoEstatus) {
+            try {
+                const { doc, updateDoc } = window.FB_Methods;
+                await updateDoc(doc(window.FB_Db, "orders", docId), { status: nuevoEstatus });
+                showToast(`Estatus actualizado a: ${nuevoEstatus}`);
+            } catch (e) {
+                console.error(e);
+                showToast("Error al actualizar estatus", "error");
             }
         }
 
@@ -1228,6 +1415,7 @@
                             payment: paymentMethod,
                             items: cart,
                             total: `$${total} MXN`,
+                            status: "En proceso",
                             createdAt: window.FB_Methods.Timestamp.now()
                         };
 
