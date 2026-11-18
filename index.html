@@ -236,16 +236,16 @@
                     </div>
 
                     <nav class="mt-6 space-y-4">
-                        <!-- PANEL DE ADMINISTRACIÓN EXCLUSIVO ADMIN -->
+                        <!-- PANEL DE ADMINISTRACIÓN EXCLUSIVO ADMIN (ESTILO ELEGANTE Y CLÁSICO EN NEGRO) -->
                         <div id="menu-admin-wrapper" class="hidden">
-                            <button id="admin-menu-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-bold text-amber-700 hover:text-amber-800 transition">
-                                <span class="tracking-widest uppercase text-sm">⚙️ Panel de Administración</span>
+                            <button id="admin-menu-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-serif font-bold text-black text-base hover:opacity-75 transition tracking-wide">
+                                <span>Panel de Administración</span>
                                 <svg id="admin-menu-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
-                            <div id="admin-menu-submenu" class="hidden pl-4 mt-2 space-y-3 border-l-2 border-amber-200 text-xs">
+                            <div id="admin-menu-submenu" class="hidden pl-4 mt-2 space-y-3 border-l-2 border-black text-xs">
                                 <!-- Subsección: Productos (Divididos por colección) -->
                                 <div>
-                                    <button id="admin-products-toggle" class="w-full flex items-center justify-between py-1.5 font-bold text-gray-800">
+                                    <button id="admin-products-toggle" class="w-full flex items-center justify-between py-1.5 font-bold text-gray-900">
                                         <span>📦 Productos por Colección</span>
                                         <svg id="admin-prod-arrow" class="w-3.5 h-3.5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
@@ -260,11 +260,11 @@
 
                                 <!-- Subsección: Agregar Producto desde la página -->
                                 <div>
-                                    <button id="admin-add-toggle" class="w-full flex items-center justify-between py-1.5 font-bold text-emerald-700">
+                                    <button id="admin-add-toggle" class="w-full flex items-center justify-between py-1.5 font-bold text-black">
                                         <span>➕ Agregar Nuevo Producto</span>
                                         <svg id="admin-add-arrow" class="w-3.5 h-3.5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
-                                    <div id="admin-add-sub" class="hidden pl-3 mt-2 space-y-2 border-l border-emerald-200 pr-1">
+                                    <div id="admin-add-sub" class="hidden pl-3 mt-2 space-y-2 border-l border-black pr-1">
                                         <input type="text" id="new-prod-name" placeholder="Nombre del producto" class="w-full p-2 border rounded-md text-xs">
                                         <textarea id="new-prod-desc" placeholder="Descripción" rows="2" class="w-full p-2 border rounded-md text-xs"></textarea>
                                         <input type="number" id="new-prod-price" placeholder="Precio (Ej. 599)" class="w-full p-2 border rounded-md text-xs">
@@ -276,26 +276,26 @@
                                             <option value="temporada">Navidad (Temporada)</option>
                                         </select>
 
-                                        <!-- Gestión de Colores y Fotos -->
+                                        <!-- Gestión de Colores y Fotos (Con campo de HEX editable) -->
                                         <div class="space-y-1 pt-1">
                                             <label class="font-bold text-[11px] text-gray-700">Colores y Fotos (URLs):</label>
                                             <div id="color-rows-container" class="space-y-2">
                                                 <div class="flex gap-1 items-center color-row">
-                                                    <input type="color" value="#000000" class="w-8 h-8 rounded border p-0.5 color-hex-input">
-                                                    <input type="text" placeholder="Nombre color (Ej. Negro)" class="w-20 p-1.5 border rounded text-[11px] color-name-input">
+                                                    <input type="text" placeholder="#HEX" class="w-20 p-1.5 border rounded text-[11px] font-mono color-hex-input" value="#000000">
+                                                    <input type="text" placeholder="Nombre color" class="w-20 p-1.5 border rounded text-[11px] color-name-input">
                                                     <input type="text" placeholder="URL Foto" class="flex-1 p-1.5 border rounded text-[11px] color-url-input">
                                                 </div>
                                             </div>
                                             <button onclick="addColorRow()" class="text-[10px] text-blue-600 underline font-bold">+ Agregar otro color</button>
                                         </div>
 
-                                        <button onclick="guardarNuevoProducto()" class="w-full bg-emerald-600 text-white py-2 rounded-md font-bold tracking-wider uppercase mt-1">Guardar Producto</button>
+                                        <button onclick="guardarNuevoProducto()" class="w-full bg-black text-white py-2 rounded-md font-bold tracking-wider uppercase mt-1 hover:bg-gray-800">Guardar Producto</button>
                                     </div>
                                 </div>
 
                                 <!-- Subsección: Pedidos -->
                                 <div>
-                                    <button onclick="openAdminOrdersModal(); toggleMobileMenu();" class="w-full py-1.5 font-bold text-gray-800 text-left hover:text-black">
+                                    <button onclick="openAdminOrdersModal(); toggleMobileMenu();" class="w-full py-1.5 font-bold text-gray-900 text-left hover:text-black">
                                         📋 Administrar Pedidos
                                     </button>
                                 </div>
@@ -736,14 +736,12 @@
                                 if (userSnap && userSnap.exists()) {
                                     userData = userSnap.data();
                                     if (userData.role === "admin") {
-                                        // Es ADMIN: Ocultar cuentas, categorías y contáctanos; mostrar panel admin exclusivo
                                         adminWrapper.classList.remove('hidden');
                                         accountWrapper.classList.add('hidden');
                                         loginWrapper.classList.add('hidden');
                                         categoriesWrapper.classList.add('hidden');
                                         contactWrapper.classList.add('hidden');
                                     } else {
-                                        // Es cliente normal
                                         adminWrapper.classList.add('hidden');
                                         accountWrapper.classList.remove('hidden');
                                         loginWrapper.classList.add('hidden');
@@ -809,7 +807,7 @@
             const row = document.createElement('div');
             row.className = 'flex gap-1 items-center color-row mt-1';
             row.innerHTML = `
-                <input type="color" value="#000000" class="w-8 h-8 rounded border p-0.5 color-hex-input">
+                <input type="text" placeholder="#HEX" class="w-20 p-1.5 border rounded text-[11px] font-mono color-hex-input" value="#000000">
                 <input type="text" placeholder="Nombre color" class="w-20 p-1.5 border rounded text-[11px] color-name-input">
                 <input type="text" placeholder="URL Foto" class="flex-1 p-1.5 border rounded text-[11px] color-url-input">
                 <button onclick="this.parentElement.remove()" class="text-red-500 font-bold px-1 text-xs">✕</button>
@@ -834,7 +832,7 @@
             let images = [];
 
             colorRows.forEach(row => {
-                const hex = row.querySelector('.color-hex-input').value;
+                const hex = row.querySelector('.color-hex-input').value.trim() || '#000000';
                 const cname = row.querySelector('.color-name-input').value.trim() || 'Único';
                 const url = row.querySelector('.color-url-input').value.trim();
                 if (url) {
@@ -952,7 +950,6 @@
                         colorsHtml += `</div>`;
                     }
 
-                    // Si es admin, mostrar botón para eliminar producto directamente
                     let adminDeleteBtn = '';
                     if (userData && userData.role === 'admin') {
                         adminDeleteBtn = `<button onclick="eliminarProducto('${prodId}')" class="mt-2 text-red-600 text-[11px] underline font-bold">🗑️ Eliminar Producto</button>`;
