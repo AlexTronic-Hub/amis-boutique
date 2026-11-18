@@ -1400,36 +1400,26 @@
 
                 applyShippingRules();
 
-                // BÚSQUEDA ROBUSTA EN FIRESTORE POR UID O POR EMAIL
+                // LLENADO DIRECTO USANDO LA VARIABLE GLOBAL 'userData' QUE YA TIENE EL PERFIL EN MEMORIA
                 const shipName = document.getElementById('ship-name');
                 const shipPhone = document.getElementById('ship-phone');
                 const shipEmail = document.getElementById('ship-email');
                 const shipAddress = document.getElementById('ship-address');
 
-                if (currentUser) {
-                    if (shipEmail) shipEmail.value = currentUser.email || '';
-                    
-                    const { doc, getDoc, collection, query, where, getDocs } = window.FB_Methods;
-                    async function fetchAndFillCheckoutData() {
-                        let userSnap = await getDoc(doc(window.FB_Db, "users", currentUser.uid));
-                        if (!userSnap.exists() && currentUser.email) {
-                            const qUser = query(collection(window.FB_Db, "users"), where("email", "==", currentUser.email));
-                            const qSnap = await getDocs(qUser);
-                            if (!qSnap.empty) {
-                                userSnap = qSnap.docs[0];
-                            }
-                        }
+                if (currentUser && shipEmail) {
+                    shipEmail.value = currentUser.email || '';
+                }
 
-                        if (userSnap && userSnap.exists()) {
-                            const uData = userSnap.data();
-                            if (shipName) shipName.value = `${uData.names || ''} ${uData.surnames || ''}`.trim();
-                            if (shipPhone) shipPhone.value = uData.phone || '';
-                            if (uData.addresses && uData.addresses.length > 0 && shipAddress) {
-                                shipAddress.value = uData.addresses[0];
-                            }
-                        }
+                if (userData) {
+                    if (shipName) {
+                        shipName.value = `${userData.names || ''} ${userData.surnames || ''}`.trim();
                     }
-                    fetchAndFillCheckoutData();
+                    if (shipPhone) {
+                        shipPhone.value = userData.phone || '';
+                    }
+                    if (userData.addresses && userData.addresses.length > 0 && shipAddress) {
+                        shipAddress.value = userData.addresses[0];
+                    }
                 }
 
             } else if (checkoutStep === 3) {
@@ -1612,7 +1602,7 @@
             const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
             const payCash = document.getElementById('pay-cash');
             const payTerminal = document.getElementById('pay-terminal');
-            const mpRadio = document.querySelector('input[name="payment-method"][value="Mercado Pago"]');
+            const mpRadio = document.querySelector('input[name="payment-method"][value="Mercado Pago"]`');
 
             if (shippingMethod === 'Envío Nacional') {
                 payCash.style.display = 'none';
