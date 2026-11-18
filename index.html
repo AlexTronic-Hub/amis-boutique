@@ -422,7 +422,6 @@
                                 <input type="radio" name="shipping-method" value="Envío Nacional" onchange="applyShippingRules()" class="text-black focus:ring-black">
                                 <div>
                                     <span class="font-medium block">Envío Nacional ($149 MXN)</span>
-                                    <span class="text-xs text-gray-500">Pago por transferencia o Mercado Pago</span>
                                 </div>
                             </label>
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
@@ -519,9 +518,10 @@
                             </label>
                         </div>
 
-                        <!-- DATOS BANCARIOS -->
-                        <div id="bank-details" class="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-700 hidden">
+                        <!-- DATOS BANCARIOS CON MONTO EXACTO -->
+                        <div id="bank-details" class="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-700 hidden space-y-1">
                             <p class="font-bold text-gray-900 mb-1">Datos para Transferencia:</p>
+                            <p class="text-amber-700 font-bold bg-amber-50 p-2 rounded-lg border border-amber-200">Monto exacto a transferir: <span id="transfer-amount-display" class="font-mono text-sm">$0 MXN</span></p>
                             <p><strong>Institución:</strong> Mercado Pago Wallet</p>
                             <p><strong>CLABE:</strong> <span class="select-all font-mono font-bold text-black">722969020435527654</span></p>
                             <p><strong>Beneficiario:</strong> Alexis Daniel Orozco Ortiz</p>
@@ -637,7 +637,7 @@
         const CORREO_BOUTIQUE = "alexisorozcoortiz@gmail.com";
         const WHATSAPP_TIENDA = "523312467018";
 
-        // MAPA DE ENLACES OFICIALES DE GOOGLE MAPS PARA LOS PUNTOS DE ENTREGA Y ENVÍOS NACIONALES
+        // MAPA DE ENLACES OFICIALES DE GOOGLE MAPS PARA LOS PUNTOS DE ENTREGA
         const MAPS_LOCATIONS = {
             "Plaza Forum": "https://maps.app.goo.gl/YA6AYi19UgDrsrZB8",
             "Plaza Revolución": "https://maps.app.goo.gl/zJ9e6eoFnnL8h25w9",
@@ -1333,6 +1333,12 @@
 
             const totalEl = document.getElementById('cart-total');
             if(totalEl) totalEl.textContent = `$${total} MXN`;
+
+            // Actualizamos también el monto exacto en el bloque de transferencia bancaria
+            const transferAmountDisplay = document.getElementById('transfer-amount-display');
+            if(transferAmountDisplay) {
+                transferAmountDisplay.textContent = `$${total} MXN`;
+            }
 
             if (checkoutStep === 1) {
                 if(modalTitle) modalTitle.textContent = 'Tu Carrito';
