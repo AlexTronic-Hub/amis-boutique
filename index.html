@@ -6,7 +6,7 @@
     <title>AMIS Boutique | Colección & Boutique</title>
     
     <!-- Favicon Personalizado con el Monograma A+B -->
-    <link rel="icon" type="image/jpeg" href="image/jpeg" href="https://i.postimg.cc/sgpQr4gR/AM.png">
+    <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/sgpQr4gR/AM.png">
 
     <!-- Importación de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -396,7 +396,6 @@
                             <p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>
                         </div>
                     </div>
-                    <!-- (Pasos de checkout simplificados o completos según tu estructura) -->
                 </div>
                 <div class="pt-4 border-t border-gray-100 mt-4">
                     <div class="flex justify-between text-base font-semibold text-gray-900 mb-2">
@@ -453,7 +452,6 @@
         </div>
 
         <div id="single-product-view" class="hidden space-y-6">
-            <!-- Vista detallada de un producto individual -->
             <div id="single-product-content"></div>
         </div>
     </main>
@@ -499,7 +497,7 @@
 
             if (path === '/' || path === '') {
                 homeView.classList.remove('hidden');
-            } else if (path === '/vestidos' || path === '/conjuntos' || path === '/blusas' || path === '/abrigos' || path === '/temporada') {
+            } else if (['/vestidos', '/conjuntos', '/blusas', '/abrigos', '/temporada'].includes(path)) {
                 const categoryKey = path.replace('/', '');
                 dynView.classList.remove('hidden');
                 await loadCategoryProductsData(categoryKey);
@@ -508,7 +506,7 @@
                 singleView.classList.remove('hidden');
                 await loadSingleProductData(productId);
             } else {
-                homeView.classList.remove('hidden'); // Página 404 por defecto al home
+                homeView.classList.remove('hidden');
             }
         }
 
@@ -562,7 +560,7 @@
             }, 200);
 
             updateCartUI();
-            handleRouting(); // Cargar la ruta actual al iniciar
+            handleRouting();
         });
 
         async function loadCategoryProductsData(categoryKey) {
@@ -680,7 +678,6 @@
             showToast("¡Agregado al carrito con éxito!");
         }
 
-        // Funciones auxiliares de UI y menú
         function toggleMobileMenu() {
             const menu = document.getElementById('mobile-menu');
             const panel = document.getElementById('mobile-menu-panel');
@@ -714,6 +711,7 @@
         function toggleAddressModal() { document.getElementById('address-modal').classList.toggle('hidden'); }
         function openAdminOrdersModal() { document.getElementById('admin-orders-modal').classList.remove('hidden'); }
         function toggleAdminOrdersModal() { document.getElementById('admin-orders-modal').classList.toggle('hidden'); }
+        
         function addColorRow() {
             const container = document.getElementById('color-rows-container');
             const row = document.createElement('div');
@@ -721,6 +719,7 @@
             row.innerHTML = `<input type="text" placeholder="#HEX" class="w-20 p-1.5 border rounded text-[11px] font-mono color-hex-input" value="#000000"><input type="text" placeholder="Nombre color" class="w-20 p-1.5 border rounded text-[11px] color-name-input"><input type="text" placeholder="URL Foto" class="flex-1 p-1.5 border rounded text-[11px] color-url-input"><button onclick="this.parentElement.remove()" class="text-red-500 font-bold px-1 text-xs">✕</button>`;
             container.appendChild(row);
         }
+
         async function guardarNuevoProducto() {
             const name = document.getElementById('new-prod-name').value.trim();
             const description = document.getElementById('new-prod-desc').value.trim();
@@ -742,8 +741,8 @@
                 navigateTo('/' + category);
             } catch(e) { showToast("Error al guardar."); }
         }
+
         async function loadUserDataAndOrders(uid) {
-            const ordersContent = document.getElementById('menu-user-orders');
             const profileContent = document.getElementById('menu-user-profile');
             try {
                 const { doc, getDoc } = window.FB_Methods;
@@ -754,6 +753,7 @@
                 }
             } catch(e) {}
         }
+
         async function handleLogout() {
             await window.FB_Methods.signOut(window.FB_Auth);
             location.reload();
