@@ -88,22 +88,39 @@
 
     <!-- HEADER / NAVEGACIÓN -->
     <header class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
             
-            <button id="menu-btn" onclick="toggleMobileMenu()" class="p-2 rounded-md focus:outline-none hover:bg-gray-100 transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            </button>
+            <div class="flex items-center gap-3">
+                <button id="menu-btn" onclick="toggleMobileMenu()" class="p-2 rounded-md focus:outline-none hover:bg-gray-100 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
 
-            <a href="#" onclick="showHome(event)" class="amis-logo-container">
-                <span class="amis-logo-title">AMIS</span>
-                <span class="amis-logo-subtitle">collection &amp; boutique</span>
-            </a>
+                <a href="#" onclick="showHome(event)" class="amis-logo-container">
+                    <span class="amis-logo-title">AMIS</span>
+                    <span class="amis-logo-subtitle">collection &amp; boutique</span>
+                </a>
+            </div>
+
+            <!-- BARRA DE BÚSQUEDA (ESCRITORIO) -->
+            <div class="flex-1 max-w-md hidden sm:block">
+                <div class="relative">
+                    <input type="text" id="header-search-input" oninput="handleGlobalSearch(this.value)" placeholder="Buscar vestidos, conjuntos, abrigos..." class="w-full pl-10 pr-4 py-2 bg-gray-100 border border-transparent rounded-full text-xs focus:outline-none focus:bg-white focus:border-black transition">
+                    <svg class="w-4 h-4 text-gray-400 absolute left-3.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+            </div>
 
             <div class="flex items-center gap-2">
                 <button onclick="toggleCartModal()" class="p-2 relative rounded-md focus:outline-none hover:bg-gray-100 transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     <span id="cart-count" class="absolute top-0 right-0 bg-black text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
                 </button>
+            </div>
+        </div>
+        <!-- BARRA DE BÚSQUEDA (MÓVIL) -->
+        <div class="px-4 pb-3 sm:hidden">
+            <div class="relative">
+                <input type="text" id="mobile-search-input" oninput="handleGlobalSearch(this.value)" placeholder="Buscar productos..." class="w-full pl-10 pr-4 py-2 bg-gray-100 border border-transparent rounded-full text-xs focus:outline-none focus:bg-white focus:border-black transition">
+                <svg class="w-4 h-4 text-gray-400 absolute left-3.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </div>
         </div>
     </header>
@@ -236,14 +253,13 @@
                     </div>
 
                     <nav class="mt-6 space-y-4">
-                        <!-- PANEL DE ADMINISTRACIÓN EXCLUSIVO ADMIN (ESTILO ELEGANTE Y CLÁSICO EN NEGRO) -->
+                        <!-- PANEL DE ADMINISTRACIÓN -->
                         <div id="menu-admin-wrapper" class="hidden">
                             <button id="admin-menu-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-serif font-bold text-black text-base hover:opacity-75 transition tracking-wide">
                                 <span>Panel de Administración</span>
                                 <svg id="admin-menu-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div id="admin-menu-submenu" class="hidden pl-4 mt-2 space-y-3 border-l-2 border-black text-xs">
-                                <!-- Subsección: Productos (Divididos por colección) -->
                                 <div>
                                     <button id="admin-products-toggle" class="w-full flex items-center justify-between py-1.5 font-bold text-gray-900">
                                         <span>📦 Productos por Colección</span>
@@ -258,7 +274,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Subsección: Agregar Producto desde la página -->
                                 <div>
                                     <button id="admin-add-toggle" class="w-full flex items-center justify-between py-1.5 font-bold text-black">
                                         <span>➕ Agregar Nuevo Producto</span>
@@ -276,7 +291,6 @@
                                             <option value="temporada">Navidad (Temporada)</option>
                                         </select>
 
-                                        <!-- Gestión de Colores y Fotos (Con campo de HEX editable) -->
                                         <div class="space-y-1 pt-1">
                                             <label class="font-bold text-[11px] text-gray-700">Colores y Fotos (URLs):</label>
                                             <div id="color-rows-container" class="space-y-2">
@@ -293,21 +307,19 @@
                                     </div>
                                 </div>
 
-                                <!-- Subsección: Pedidos -->
                                 <div>
                                     <button onclick="openAdminOrdersModal(); toggleMobileMenu();" class="w-full py-1.5 font-bold text-gray-900 text-left hover:text-black">
                                         📋 Administrar Pedidos
                                     </button>
                                 </div>
 
-                                <!-- Cerrar Sesión Admin -->
                                 <div class="pt-2">
                                     <button onclick="handleLogout()" class="w-full bg-gray-100 text-red-600 py-2 rounded-full text-[11px] tracking-widest uppercase hover:bg-red-50 transition font-medium">Cerrar Sesión</button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 1. MI CUENTA (CLIENTES NORMALES) -->
+                        <!-- 1. MI CUENTA (CLIENTES) -->
                         <div id="menu-account-wrapper" class="hidden">
                             <button id="account-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Mi Cuenta</span>
@@ -360,7 +372,7 @@
                             </div>
                         </div>
 
-                        <!-- Botón simple para Iniciar Sesión (Si no está logueado) -->
+                        <!-- Botón simple para Iniciar Sesión -->
                         <div id="menu-login-wrapper">
                             <button onclick="toggleAuthModal(); toggleMobileMenu();" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Mi Cuenta</span>
@@ -368,7 +380,7 @@
                             </button>
                         </div>
 
-                        <!-- 2. CATEGORÍAS (CLIENTES) -->
+                        <!-- 2. CATEGORÍAS -->
                         <div id="menu-categories-wrapper" class="pt-2 border-t border-gray-100">
                             <button id="collection-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Categorías</span>
@@ -383,7 +395,7 @@
                             </div>
                         </div>
 
-                        <!-- 3. CONTÁCTANOS (CLIENTES) -->
+                        <!-- 3. CONTÁCTANOS -->
                         <div id="menu-contact-wrapper" class="pt-2 border-t border-gray-100">
                             <button id="contact-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Contáctanos</span>
@@ -670,6 +682,15 @@
             <div id="category-header"></div>
             <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
+
+        <!-- CONTENEDOR DE RESULTADOS DE BÚSQUEDA -->
+        <div id="search-results-view" class="hidden space-y-6">
+            <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+                <h2 id="search-results-title" class="text-2xl font-serif tracking-wider font-bold">Resultados de búsqueda</h2>
+                <button onclick="showHome(event)" class="text-xs uppercase tracking-widest underline font-bold">← Volver al inicio</button>
+            </div>
+            <div id="search-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
     </main>
 
     <!-- Script General -->
@@ -693,6 +714,7 @@
         let userData = null;
         let isRegistering = false;
         let toastTimeout = null;
+        let allProductsCache = [];
 
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast-notification');
@@ -711,6 +733,7 @@
             const checkFB = setInterval(() => {
                 if (window.FB_Auth) {
                     clearInterval(checkFB);
+                    preloadAllProducts();
                     window.FB_Methods.onAuthStateChanged(window.FB_Auth, async (user) => {
                         currentUser = user;
                         const accountWrapper = document.getElementById('menu-account-wrapper');
@@ -802,6 +825,115 @@
             }
         });
 
+        async function preloadAllProducts() {
+            try {
+                const { collection, getDocs } = window.FB_Methods;
+                const querySnapshot = await getDocs(collection(window.FB_Db, "products"));
+                allProductsCache = [];
+                querySnapshot.forEach(docSnap => {
+                    allProductsCache.push({ id: docSnap.id, ...docSnap.data() });
+                });
+            } catch(e) { console.error("Error precargando productos:", e); }
+        }
+
+        function handleGlobalSearch(queryText) {
+            const term = queryText.trim().toLowerCase();
+            if (term.length === 0) {
+                document.getElementById('search-results-view').classList.add('hidden');
+                document.getElementById('home-view').classList.remove('hidden');
+                document.getElementById('dynamic-category-view').classList.add('hidden');
+                return;
+            }
+
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('dynamic-category-view').classList.add('hidden');
+            const searchView = document.getElementById('search-results-view');
+            searchView.classList.remove('hidden');
+
+            const searchGrid = document.getElementById('search-grid');
+            document.getElementById('search-results-title').textContent = `Resultados para: "${queryText}"`;
+
+            const filtered = allProductsCache.filter(p => 
+                (p.name && p.name.toLowerCase().includes(term)) || 
+                (p.description && p.description.toLowerCase().includes(term)) ||
+                (p.category && p.category.toLowerCase().includes(term))
+            );
+
+            if (filtered.length === 0) {
+                searchGrid.innerHTML = `<p class="text-gray-500 italic py-8 text-center col-span-full">No se encontraron productos que coincidan con tu búsqueda.</p>`;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(p => {
+                html += renderProductCard(p);
+            });
+            searchGrid.innerHTML = html;
+        }
+
+        function renderProductCard(p) {
+            const prodId = p.id;
+            const defaultImg = p.images && p.images.length > 0 ? p.images[0] : '';
+            
+            let colorsHtml = '';
+            if (p.colors && p.colors.length > 0) {
+                colorsHtml = `<div class="flex items-center space-x-2">`;
+                p.colors.forEach((c, idx) => {
+                    const borderClass = idx === 0 ? 'border-black' : 'border-transparent';
+                    colorsHtml += `<button onclick="changeDynamicColor('${prodId}', '${c.image}', '${c.name}', this)" class="w-6 h-6 rounded-full border-2 ${borderClass} focus:outline-none transition transform hover:scale-110 color-btn-${prodId}" style="background-color: ${c.hex};" title="${c.name}"></button>`;
+                });
+                colorsHtml += `</div>`;
+            }
+
+            let adminDeleteBtn = '';
+            if (userData && userData.role === 'admin') {
+                adminDeleteBtn = `<button onclick="eliminarProducto('${prodId}')" class="mt-2 text-red-600 text-[11px] underline font-bold">🗑️ Eliminar Producto</button>`;
+            }
+
+            return `
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col relative group/card">
+                <!-- Botón Compartir Producto -->
+                <button onclick="shareProduct('${p.name}', '${p.price}', '${defaultImg}')" class="absolute top-3 right-3 z-20 bg-white/80 hover:bg-white text-black p-2 rounded-full shadow transition backdrop-blur-sm" title="Compartir producto">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                </button>
+
+                <div class="relative bg-gray-100 h-[450px]">
+                    <img id="product-img-${prodId}" src="${defaultImg}" alt="${p.name}" class="w-full h-full object-cover transition-all duration-300">
+                    <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">${p.category}</span>
+                </div>
+                <div class="p-5 flex-1 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-serif text-lg font-medium text-gray-900">${p.name}</h3>
+                        <p class="text-xs text-gray-500 mt-1">${p.description || ''}</p>
+                        <div class="mt-4 flex items-center justify-between">
+                            <span class="text-xl font-semibold text-gray-900">$${p.price} <span class="text-xs text-gray-500 font-normal">MXN</span></span>
+                            ${colorsHtml}
+                        </div>
+                    </div>
+                    <div>
+                        <button onclick="addDynamicToCart('${p.name}', ${p.price}, '${prodId}')" class="mt-4 w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
+                            Añadir al Carrito
+                        </button>
+                        ${adminDeleteBtn}
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function shareProduct(name, price, imageUrl) {
+            const shareData = {
+                title: `${name} | AMIS Boutique`,
+                text: `¡Mira este increíble producto en AMIS Boutique! ${name} por solo $${price} MXN.`,
+                url: window.location.href
+            };
+            if (navigator.share) {
+                navigator.share(shareData).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(`${shareData.text} - ${window.location.href}`);
+                showToast("¡Enlace del producto copiado al portapapeles!");
+            }
+        }
+
         function addColorRow() {
             const container = document.getElementById('color-rows-container');
             const row = document.createElement('div');
@@ -863,6 +995,7 @@
                 document.getElementById('new-prod-desc').value = '';
                 document.getElementById('new-prod-price').value = '';
                 toggleMobileMenu();
+                preloadAllProducts();
                 loadCategoryProducts(category);
             } catch (e) {
                 console.error(e);
@@ -895,6 +1028,7 @@
         async function loadCategoryProducts(categoryKey, event) {
             if (event) event.preventDefault();
             document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('search-results-view').classList.add('hidden');
             const dynView = document.getElementById('dynamic-category-view');
             dynView.classList.remove('hidden');
 
@@ -937,47 +1071,7 @@
 
                 let html = '';
                 matchingProducts.forEach((p) => {
-                    const prodId = p.id;
-                    const defaultImg = p.images && p.images.length > 0 ? p.images[0] : '';
-                    
-                    let colorsHtml = '';
-                    if (p.colors && p.colors.length > 0) {
-                        colorsHtml = `<div class="flex items-center space-x-2">`;
-                        p.colors.forEach((c, idx) => {
-                            const borderClass = idx === 0 ? 'border-black' : 'border-transparent';
-                            colorsHtml += `<button onclick="changeDynamicColor('${prodId}', '${c.image}', '${c.name}', this)" class="w-6 h-6 rounded-full border-2 ${borderClass} focus:outline-none transition transform hover:scale-110 color-btn-${prodId}" style="background-color: ${c.hex};" title="${c.name}"></button>`;
-                        });
-                        colorsHtml += `</div>`;
-                    }
-
-                    let adminDeleteBtn = '';
-                    if (userData && userData.role === 'admin') {
-                        adminDeleteBtn = `<button onclick="eliminarProducto('${prodId}')" class="mt-2 text-red-600 text-[11px] underline font-bold">🗑️ Eliminar Producto</button>`;
-                    }
-
-                    html += `
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
-                        <div class="relative bg-gray-100 h-[450px]">
-                            <img id="product-img-${prodId}" src="${defaultImg}" alt="${p.name}" class="w-full h-full object-cover transition-all duration-300">
-                            <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">${p.category}</span>
-                        </div>
-                        <div class="p-5 flex-1 flex flex-col justify-between">
-                            <div>
-                                <h3 class="font-serif text-lg font-medium text-gray-900">${p.name}</h3>
-                                <p class="text-xs text-gray-500 mt-1">${p.description || ''}</p>
-                                <div class="mt-4 flex items-center justify-between">
-                                    <span class="text-xl font-semibold text-gray-900">$${p.price} <span class="text-xs text-gray-500 font-normal">MXN</span></span>
-                                    ${colorsHtml}
-                                </div>
-                            </div>
-                            <div>
-                                <button onclick="addDynamicToCart('${p.name}', ${p.price}, '${prodId}')" class="mt-4 w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
-                                    Añadir al Carrito
-                                </button>
-                                ${adminDeleteBtn}
-                            </div>
-                        </div>
-                    </div>`;
+                    html += renderProductCard(p);
                 });
 
                 gridEl.innerHTML = html;
@@ -993,6 +1087,7 @@
                 const { doc, deleteDoc } = window.FB_Methods;
                 await deleteDoc(doc(window.FB_Db, "products", prodId));
                 showToast("Producto eliminado");
+                preloadAllProducts();
                 location.reload();
             } catch(e) {
                 showToast("Error al eliminar", "error");
@@ -1326,6 +1421,7 @@
         function showHome(event) {
             if (event) event.preventDefault();
             document.getElementById('home-view').classList.remove('hidden');
+            document.getElementById('search-results-view').classList.add('hidden');
             document.getElementById('dynamic-category-view').classList.add('hidden');
             toggleMobileMenu();
         }
