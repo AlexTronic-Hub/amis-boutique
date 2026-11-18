@@ -93,11 +93,11 @@
         <textarea name="Productos" id="fs-productos"></textarea>
     </form>
 
-    <!-- NOTIFICACIÓN FLOTANTE -->
+    <!-- NOTIFICACIÓN FLOTANTE (TOAST) -->
     <div id="toast-notification" class="fixed top-5 right-5 z-50 transform translate-y-[-200%] transition-transform duration-300">
-        <div id="toast-card" class="bg-black text-white px-5 py-3 rounded-2xl shadow-xl text-xs flex items-center gap-3">
+        <div id="toast-card" class="bg-black text-white px-4 py-2.5 rounded-xl shadow-xl text-xs flex items-center gap-2.5">
             <span id="toast-icon">✨</span>
-            <span id="toast-msg">Mensaje de notificación</span>
+            <span id="toast-msg">¡Agregado al carrito con éxito!</span>
         </div>
     </div>
 
@@ -234,7 +234,7 @@
                         <h2 class="font-serif text-xl font-bold flex items-center gap-2">⚙️ Panel de Administración - Pedidos</h2>
                         <button onclick="toggleAdminModal()" class="p-2 rounded-md hover:bg-gray-100">✕</button>
                     </div>
-                    <p class="text-xs text-gray-500 mb-4">Aquí puedes supervisar los pedidos de los clientes y actualizar su estatus o método de entrega en tiempo real.</p>
+                    <p class="text-xs text-gray-500 mb-4">Aquí puedes supervisar los pedidos y actualizar su estatus en tiempo real.</p>
                     <div id="admin-orders-list" class="space-y-4">
                         <p class="text-gray-400 text-xs italic text-center py-8">Cargando pedidos...</p>
                     </div>
@@ -662,10 +662,10 @@
 
             msg.textContent = message;
             if (type === 'success') {
-                card.className = "bg-black text-white px-5 py-3 rounded-2xl shadow-xl text-xs flex items-center gap-3";
+                card.className = "bg-black text-white px-4 py-2.5 rounded-xl shadow-xl text-xs flex items-center gap-2.5";
                 icon.textContent = "✨";
             } else {
-                card.className = "bg-red-600 text-white px-5 py-3 rounded-2xl shadow-xl text-xs flex items-center gap-3";
+                card.className = "bg-red-600 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs flex items-center gap-2.5";
                 icon.textContent = "⚠️";
             }
 
@@ -675,7 +675,7 @@
             setTimeout(() => {
                 toast.classList.remove('translate-y-0');
                 toast.classList.add('translate-y-[-200%]');
-            }, 3500);
+            }, 3000);
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -902,7 +902,9 @@
             else cart.push({ name, price, color: colorToAdd, quantity: 1 });
             localStorage.setItem('amis_cart', JSON.stringify(cart));
             updateCartUI();
-            showToast("¡Producto agregado al carrito!");
+            
+            // Notificación pequeña y elegante de éxito
+            showToast("¡Agregado al carrito con éxito!");
         }
 
         async function loadUserDataAndOrders(uid) {
@@ -1082,7 +1084,6 @@
                     const id = docSnap.id;
                     const d = docSnap.data();
                     const currentStatus = d.status || 'En proceso';
-                    const currentShipping = d.shipping || 'Envío local en GDL';
 
                     let itemsStr = '';
                     if (d.items) {
@@ -1103,25 +1104,16 @@
                             <span class="text-amber-600">${d.total}</span>
                         </div>
                         <p><strong>Cliente:</strong> ${d.clientName} (${d.clientPhone})</p>
+                        <p><strong>Método de Envío:</strong> ${d.shipping || 'Envío local en GDL'}</p>
                         <p><strong>Dirección/Punto:</strong> ${adminPunto}</p>
                         <p><strong>Pago:</strong> ${d.payment}</p>
                         <div>
                             <strong>Productos:</strong>
                             <ul class="list-disc pl-4 text-gray-600 mt-1">${itemsStr}</ul>
                         </div>
-                        
-                        <!-- MODIFICAR MÉTODO DE ENVÍO DESDE ADMIN -->
-                        <div class="pt-2 border-t border-gray-200 flex items-center justify-between">
-                            <label class="font-bold">Método de Envío:</label>
-                            <select onchange="actualizarEnvioPedido('${id}', this.value)" class="p-1.5 border border-gray-300 rounded-lg text-xs bg-white font-medium focus:outline-none focus:border-black">
-                                <option value="Envío local en GDL" ${currentShipping === 'Envío local en GDL' ? 'selected' : ''}>🛵 Envío local en GDL</option>
-                                <option value="Envío Nacional" ${currentShipping === 'Envío Nacional' ? 'selected' : ''}>📦 Envío Nacional ($149)</option>
-                                <option value="Punto de entrega" ${currentShipping === 'Punto de entrega' ? 'selected' : ''}>📍 Punto de entrega</option>
-                            </select>
-                        </div>
 
                         <!-- MODIFICAR ESTATUS DESDE ADMIN -->
-                        <div class="pt-1 flex items-center justify-between">
+                        <div class="pt-2 border-t border-gray-200 flex items-center justify-between">
                             <label class="font-bold">Estatus:</label>
                             <select onchange="actualizarEstatusPedido('${id}', this.value)" class="p-1.5 border border-gray-300 rounded-lg text-xs bg-white font-medium focus:outline-none focus:border-black">
                                 <option value="En proceso" ${currentStatus === 'En proceso' ? 'selected' : ''}>⏳ En proceso</option>
@@ -1145,22 +1137,10 @@
                 const { doc, updateDoc } = window.FB_Methods;
                 await updateDoc(doc(window.FB_Db, "orders", docId), { status: nuevoEstatus });
                 showToast(`Estatus actualizado a: ${nuevoEstatus}`);
-                await cargarPedidosAdmin(); // Recarga inmediata del panel
+                await cargarPedidosAdmin();
             } catch (e) {
                 console.error(e);
                 showToast("Error al actualizar estatus", "error");
-            }
-        }
-
-        async function actualizarEnvioPedido(docId, nuevoEnvio) {
-            try {
-                const { doc, updateDoc } = window.FB_Methods;
-                await updateDoc(doc(window.FB_Db, "orders", docId), { shipping: nuevoEnvio });
-                showToast(`Método de envío actualizado a: ${nuevoEnvio}`);
-                await cargarPedidosAdmin(); // Recarga inmediata del panel para reflejar el cambio al instante
-            } catch (e) {
-                console.error(e);
-                showToast("Error al actualizar el envío", "error");
             }
         }
 
@@ -1635,36 +1615,6 @@
             } else {
                 bankDetails.classList.add('hidden');
             }
-        }
-
-        async function guardarMisDatos(uid) {
-            const names = document.getElementById('input-names').value.trim();
-            const surnames = document.getElementById('input-surnames').value.trim();
-            const phone = document.getElementById('input-phone').value.trim();
-
-            if (!names) {
-                alert("Por favor ingresa al menos tu nombre.");
-                return;
-            }
-
-            try {
-                const { doc, setDoc } = window.FB_Methods;
-                await setDoc(doc(window.FB_Db, "users", uid), { names, surnames, phone, email: currentUser.email || '' }, { merge: true });
-                showToast("¡Datos guardados con éxito!");
-                loadUserDataAndOrders(uid);
-            } catch (error) {
-                showToast("Error al guardar datos.", "error");
-            }
-        }
-
-        function habilitarEdicionDatos() {
-            document.getElementById('view-data-box').classList.add('hidden');
-            document.getElementById('edit-data-box').classList.remove('hidden');
-        }
-
-        function cancelarEdicionDatos() {
-            document.getElementById('edit-data-box').classList.add('hidden');
-            document.getElementById('view-data-box').classList.remove('hidden');
         }
     </script>
 </body>
