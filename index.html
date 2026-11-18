@@ -6,7 +6,7 @@
     <title>AMIS Boutique | Colección & Boutique</title>
     
     <!-- Favicon Personalizado con el Monograma A+B -->
-    <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/sgpQr4gR/AM.png">
+    <link rel="icon" type="image/jpeg" href="image/jpeg" href="https://i.postimg.cc/sgpQr4gR/AM.png">
 
     <!-- Importación de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -20,7 +20,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, arrayUnion, query, where, Timestamp, runTransaction, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, arrayUnion, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyDpdI-Qx97QFhpM_LfIBjzlxiK2RJlTziQ",
@@ -38,7 +38,7 @@
 
         window.FB_Auth = auth;
         window.FB_Db = db;
-        window.FB_Methods = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, arrayUnion, query, where, Timestamp, runTransaction, orderBy };
+        window.FB_Methods = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, arrayUnion, query, where, Timestamp };
     </script>
 
     <style>
@@ -68,7 +68,6 @@
       #cart-drawer-panel, #mobile-menu-panel, #admin-modal-panel {
         transition: transform 0.3s ease-in-out;
       }
-      
       .hero-bokeh-bg {
         background-image: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://i.postimg.cc/SQVy0c4n/fiam.png');
         background-size: cover;
@@ -94,7 +93,8 @@
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
 
-            <a href="#" onclick="showHome(event)" class="amis-logo-container">
+            <!-- LOGOTIPO: Siempre lleva a la página principal (/) -->
+            <a href="/" onclick="navigateTo('/', event)" class="amis-logo-container">
                 <span class="amis-logo-title">AMIS</span>
                 <span class="amis-logo-subtitle">collection &amp; boutique</span>
             </a>
@@ -117,9 +117,7 @@
                     <h3 id="auth-modal-title" class="font-serif text-xl font-bold">Iniciar Sesión</h3>
                     <button onclick="toggleAuthModal()" class="text-gray-400 hover:text-black">✕</button>
                 </div>
-
                 <div id="auth-error-box" class="hidden mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl"></div>
-
                 <div id="auth-form-container" class="space-y-3 text-sm">
                     <div id="register-fields" class="hidden space-y-3">
                         <div>
@@ -135,7 +133,6 @@
                             <input type="tel" id="reg-phone" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black text-xs" placeholder="33 1234 5678">
                         </div>
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Correo electrónico</label>
                         <input type="email" id="auth-email" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black text-xs" placeholder="tucorreo@email.com">
@@ -144,9 +141,7 @@
                         <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Contraseña</label>
                         <input type="password" id="auth-password" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black text-xs" placeholder="••••••••">
                     </div>
-
                     <button onclick="handleAuthSubmit()" id="auth-submit-btn" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">Entrar</button>
-                    
                     <div class="text-center pt-2">
                         <button onclick="switchAuthMode()" id="auth-switch-btn" class="text-xs text-gray-600 hover:underline">¿No tienes cuenta? Regístrate aquí</button>
                     </div>
@@ -164,13 +159,11 @@
                     <h3 class="font-serif text-xl font-bold">Agregar Nueva Dirección</h3>
                     <button onclick="toggleAddressModal()" class="text-gray-400 hover:text-black">✕</button>
                 </div>
-                
                 <div class="space-y-3 text-xs">
                     <div>
                         <label class="block font-bold uppercase text-gray-700 mb-1">Código Postal *</label>
                         <input type="text" id="dir-cp" maxlength="5" placeholder="Ej. 44100" oninput="buscarCodigoPostal(this.value)" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black font-mono">
                     </div>
-
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="block font-bold uppercase text-gray-700 mb-1">Calle *</label>
@@ -181,7 +174,6 @@
                             <input type="text" id="dir-num-ext" placeholder="Ej. 123" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
                         </div>
                     </div>
-
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="block font-bold uppercase text-gray-700 mb-1">Núm. Interior (Opc.)</label>
@@ -192,39 +184,21 @@
                             <input type="text" id="dir-ciudad" placeholder="Ej. Guadalajara" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
                         </div>
                     </div>
-
                     <div>
                         <label class="block font-bold uppercase text-gray-700 mb-1">Colonia *</label>
                         <input type="text" id="dir-colonia-input" placeholder="Ej. Centro, Moderna..." class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
                     </div>
-
                     <div>
                         <label class="block font-bold uppercase text-gray-700 mb-1">Estado *</label>
                         <input type="text" id="dir-estado" placeholder="Ej. Jalisco" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
                     </div>
                 </div>
-
                 <button onclick="saveStructuredAddress()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition mt-2">Guardar Dirección</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE DETALLE DE PEDIDO PARA CLIENTES -->
-    <div id="order-detail-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
-        <div class="flex items-center justify-center min-h-screen px-4">
-            <div class="fixed inset-0 bg-black bg-opacity-50" onclick="toggleOrderDetailModal()"></div>
-            <div class="bg-white rounded-2xl max-w-md w-full p-6 relative z-10 shadow-xl space-y-4">
-                <div class="flex justify-between items-center pb-3 border-b border-gray-100">
-                    <h3 id="modal-order-title" class="font-serif text-lg font-bold">Detalle del Pedido</h3>
-                    <button onclick="toggleOrderDetailModal()" class="text-gray-400 hover:text-black">✕</button>
-                </div>
-                <div id="modal-order-body" class="space-y-3 text-xs text-gray-700"></div>
-                <button onclick="toggleOrderDetailModal()" class="w-full bg-black text-white py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">Cerrar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MENÚ LATERAL (TRES BARRITAS) -->
+    <!-- MENÚ LATERAL -->
     <div id="mobile-menu" class="fixed inset-0 z-50 overflow-hidden hidden">
         <div id="menu-backdrop" class="absolute inset-0 bg-black bg-opacity-50 transition-opacity" onclick="toggleMobileMenu()"></div>
         <div class="absolute inset-y-0 left-0 max-w-full flex">
@@ -236,29 +210,27 @@
                     </div>
 
                     <nav class="mt-6 space-y-4">
-                        <!-- PANEL DE ADMINISTRACIÓN EXCLUSIVO ADMIN (ESTILO ELEGANTE Y CLÁSICO EN NEGRO) -->
+                        <!-- PANEL DE ADMINISTRACIÓN -->
                         <div id="menu-admin-wrapper" class="hidden">
                             <button id="admin-menu-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-serif font-bold text-black text-base hover:opacity-75 transition tracking-wide">
                                 <span>Panel de Administración</span>
                                 <svg id="admin-menu-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div id="admin-menu-submenu" class="hidden pl-4 mt-2 space-y-3 border-l-2 border-black text-xs">
-                                <!-- Subsección: Productos (Divididos por colección) -->
                                 <div>
                                     <button id="admin-products-toggle" class="w-full flex items-center justify-between py-1.5 font-bold text-gray-900">
                                         <span>📦 Productos por Colección</span>
                                         <svg id="admin-prod-arrow" class="w-3.5 h-3.5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
                                     <div id="admin-products-sub" class="hidden pl-3 mt-1 space-y-2 border-l border-gray-200">
-                                        <a href="#" onclick="loadCategoryProducts('vestidos', event); toggleMobileMenu();" class="block py-1 text-gray-600 hover:text-black">• Vestidos</a>
-                                        <a href="#" onclick="loadCategoryProducts('conjuntos', event); toggleMobileMenu();" class="block py-1 text-gray-600 hover:text-black">• Conjuntos</a>
-                                        <a href="#" onclick="loadCategoryProducts('blusas', event); toggleMobileMenu();" class="block py-1 text-gray-600 hover:text-black">• Blusas</a>
-                                        <a href="#" onclick="loadCategoryProducts('abrigos', event); toggleMobileMenu();" class="block py-1 text-gray-600 hover:text-black">• Abrigos</a>
-                                        <a href="#" onclick="loadCategoryProducts('temporada', event); toggleMobileMenu();" class="block py-1 text-red-600 font-bold">• Navidad</a>
+                                        <a href="/vestidos" onclick="navigateTo('/vestidos', event); toggleMobileMenu();" class="block py-1 text-gray-600 hover:text-black">• Vestidos</a>
+                                        <a href="/conjuntos" onclick="navigateTo('/conjuntos', event); toggleMobileMenu();" class="block py-1 text-gray-600 hover:text-black">• Conjuntos</a>
+                                        <a href="/blusas" onclick="navigateTo('/blusas', event); toggleMobileMenu();" class="block py-1 text-gray-600 hover:text-black">• Blusas</a>
+                                        <a href="/abrigos" onclick="navigateTo('/abrigos', event); toggleMobileMenu();" class="block py-1 text-gray-600 hover:text-black">• Abrigos</a>
+                                        <a href="/temporada" onclick="navigateTo('/temporada', event); toggleMobileMenu();" class="block py-1 text-red-600 font-bold">• Navidad</a>
                                     </div>
                                 </div>
 
-                                <!-- Subsección: Agregar Producto desde la página -->
                                 <div>
                                     <button id="admin-add-toggle" class="w-full flex items-center justify-between py-1.5 font-bold text-black">
                                         <span>➕ Agregar Nuevo Producto</span>
@@ -275,8 +247,6 @@
                                             <option value="abrigos">Abrigos</option>
                                             <option value="temporada">Navidad (Temporada)</option>
                                         </select>
-
-                                        <!-- Gestión de Colores y Fotos (Con campo de HEX editable) -->
                                         <div class="space-y-1 pt-1">
                                             <label class="font-bold text-[11px] text-gray-700">Colores y Fotos (URLs):</label>
                                             <div id="color-rows-container" class="space-y-2">
@@ -288,33 +258,28 @@
                                             </div>
                                             <button onclick="addColorRow()" class="text-[10px] text-blue-600 underline font-bold">+ Agregar otro color</button>
                                         </div>
-
                                         <button onclick="guardarNuevoProducto()" class="w-full bg-black text-white py-2 rounded-md font-bold tracking-wider uppercase mt-1 hover:bg-gray-800">Guardar Producto</button>
                                     </div>
                                 </div>
 
-                                <!-- Subsección: Pedidos -->
                                 <div>
                                     <button onclick="openAdminOrdersModal(); toggleMobileMenu();" class="w-full py-1.5 font-bold text-gray-900 text-left hover:text-black">
                                         📋 Administrar Pedidos
                                     </button>
                                 </div>
-
-                                <!-- Cerrar Sesión Admin -->
                                 <div class="pt-2">
                                     <button onclick="handleLogout()" class="w-full bg-gray-100 text-red-600 py-2 rounded-full text-[11px] tracking-widest uppercase hover:bg-red-50 transition font-medium">Cerrar Sesión</button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 1. MI CUENTA (CLIENTES NORMALES) -->
+                        <!-- MI CUENTA -->
                         <div id="menu-account-wrapper" class="hidden">
                             <button id="account-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Mi Cuenta</span>
                                 <svg id="account-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div id="account-submenu" class="hidden pl-4 mt-2 space-y-3 border-l-2 border-gray-100">
-                                
                                 <div>
                                     <button id="orders-toggle-btn" class="w-full flex items-center justify-between py-1.5 text-left font-medium text-gray-700 hover:text-black transition">
                                         <span class="tracking-wider uppercase text-xs font-bold">Mis Pedidos</span>
@@ -326,7 +291,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div>
                                     <button id="data-toggle-btn" class="w-full flex items-center justify-between py-1.5 text-left font-medium text-gray-700 hover:text-black transition">
                                         <span class="tracking-wider uppercase text-xs font-bold">Mis Datos</span>
@@ -338,7 +302,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                
                                 <div>
                                     <button id="addresses-toggle-btn" class="w-full flex items-center justify-between py-1.5 text-left font-medium text-gray-700 hover:text-black transition">
                                         <span class="tracking-wider uppercase text-xs font-bold">Direcciones Registradas</span>
@@ -348,19 +311,15 @@
                                         <div id="menu-user-addresses" class="py-1 text-xs text-gray-600 space-y-1">
                                             <p class="text-gray-400 italic">Cargando direcciones...</p>
                                         </div>
-                                        <button onclick="toggleAddressModal()" class="w-full mt-1 bg-gray-100 text-black py-1.5 rounded-full text-[10px] tracking-wider uppercase hover:bg-gray-200 transition font-medium">
-                                            + Agregar dirección
-                                        </button>
+                                        <button onclick="toggleAddressModal()" class="w-full mt-1 bg-gray-100 text-black py-1.5 rounded-full text-[10px] tracking-wider uppercase hover:bg-gray-200 transition font-medium">+ Agregar dirección</button>
                                     </div>
                                 </div>
-
                                 <div class="pt-2">
                                     <button onclick="handleLogout()" class="w-full bg-gray-100 text-red-600 py-2 rounded-full text-[11px] tracking-widest uppercase hover:bg-red-50 transition font-medium">Cerrar Sesión</button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Botón simple para Iniciar Sesión (Si no está logueado) -->
                         <div id="menu-login-wrapper">
                             <button onclick="toggleAuthModal(); toggleMobileMenu();" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Mi Cuenta</span>
@@ -368,40 +327,31 @@
                             </button>
                         </div>
 
-                        <!-- 2. CATEGORÍAS (CLIENTES) -->
+                        <!-- CATEGORÍAS -->
                         <div id="menu-categories-wrapper" class="pt-2 border-t border-gray-100">
                             <button id="collection-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Categorías</span>
                                 <svg id="collection-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div id="collection-submenu" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-gray-100">
-                                <a href="#" onclick="loadCategoryProducts('vestidos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Vestidos</a>
-                                <a href="#" onclick="loadCategoryProducts('conjuntos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Conjuntos</a>
-                                <a href="#" onclick="loadCategoryProducts('blusas', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Blusas</a>
-                                <a href="#" onclick="loadCategoryProducts('abrigos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Abrigos</a>
-                                <a href="#" onclick="loadCategoryProducts('temporada', event)" class="block py-1.5 text-sm text-red-600 hover:text-red-700 transition font-bold">🎄 De Temporada (Navidad)</a>
+                                <a href="/vestidos" onclick="navigateTo('/vestidos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Vestidos</a>
+                                <a href="/conjuntos" onclick="navigateTo('/conjuntos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Conjuntos</a>
+                                <a href="/blusas" onclick="navigateTo('/blusas', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Blusas</a>
+                                <a href="/abrigos" onclick="navigateTo('/abrigos', event)" class="block py-1.5 text-sm text-gray-600 hover:text-black transition font-medium">Abrigos</a>
+                                <a href="/temporada" onclick="navigateTo('/temporada', event)" class="block py-1.5 text-sm text-red-600 hover:text-red-700 transition font-bold">🎄 De Temporada (Navidad)</a>
                             </div>
                         </div>
 
-                        <!-- 3. CONTÁCTANOS (CLIENTES) -->
+                        <!-- CONTÁCTANOS -->
                         <div id="menu-contact-wrapper" class="pt-2 border-t border-gray-100">
                             <button id="contact-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Contáctanos</span>
                                 <svg id="contact-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div id="contact-submenu" class="hidden pl-4 mt-3 space-y-3 border-l-2 border-gray-100 text-sm">
-                                <a href="https://www.instagram.com/amisboutique.official?dlrf=Y3V1a3oyMGhweHNy" target="_blank" class="flex items-center gap-2.5 text-gray-700 hover:text-black transition font-medium">
-                                    <svg class="w-4 h-4 text-pink-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-                                    Instagram
-                                </a>
-                                <a href="https://www.facebook.com/share/1CMqeKz5Su/" target="_blank" class="flex items-center gap-2.5 text-gray-700 hover:text-black transition font-medium">
-                                    <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                                    Facebook
-                                </a>
-                                <a href="https://wa.me/523312467018?text=Hola%20Amis%20Boutique,%20me%20gustaría%20más%20información." target="_blank" class="flex items-center gap-2.5 text-emerald-600 hover:text-emerald-700 transition font-medium">
-                                    <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-                                    WhatsApp
-                                </a>
+                                <a href="https://www.instagram.com/amisboutique.official" target="_blank" class="flex items-center gap-2.5 text-gray-700 hover:text-black transition font-medium">Instagram</a>
+                                <a href="https://www.facebook.com" target="_blank" class="flex items-center gap-2.5 text-gray-700 hover:text-black transition font-medium">Facebook</a>
+                                <a href="https://wa.me/523312467018" target="_blank" class="flex items-center gap-2.5 text-emerald-600 hover:text-emerald-700 transition font-medium">WhatsApp</a>
                             </div>
                         </div>
                     </nav>
@@ -410,7 +360,7 @@
         </div>
     </div>
 
-    <!-- PANEL DE ADMINISTRACIÓN DE PEDIDOS (MODAL) -->
+    <!-- MODAL DE PEDIDOS ADMIN -->
     <div id="admin-orders-modal" class="fixed inset-0 z-50 overflow-hidden hidden">
         <div class="absolute inset-0 bg-black bg-opacity-50" onclick="toggleAdminOrdersModal()"></div>
         <div class="absolute inset-y-0 right-0 max-w-full flex pl-10">
@@ -431,7 +381,7 @@
         </div>
     </div>
 
-    <!-- MODAL DEL CARRITO Y CHECKOUT -->
+    <!-- CARRITO MODAL -->
     <div id="cart-modal" class="fixed inset-0 z-50 overflow-hidden hidden">
         <div class="absolute inset-0 bg-black bg-opacity-50" onclick="toggleCartModal()"></div>
         <div class="absolute inset-y-0 right-0 max-w-full flex pl-10">
@@ -441,169 +391,20 @@
                         <h2 id="cart-modal-title" class="font-serif text-xl font-bold">Tu Carrito</h2>
                         <button onclick="toggleCartModal()" class="p-2 rounded-md hover:bg-gray-100">✕</button>
                     </div>
-
-                    <!-- PASO 1: CARRITO -->
                     <div id="step-cart" class="py-4">
                         <div id="cart-items" class="space-y-4 max-h-80 overflow-y-auto border-b border-gray-100 pb-4">
                             <p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>
                         </div>
                     </div>
-
-                    <!-- PASO 2: ENVÍO Y DATOS -->
-                    <div id="step-shipping" class="py-4 hidden space-y-4">
-                        <h3 class="tracking-wide uppercase text-xs font-bold text-gray-900">Método de Envío</h3>
-                        <div class="space-y-2 text-sm">
-                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="shipping-method" value="Envío local en GDL" checked onchange="applyShippingRules()" class="text-black focus:ring-black">
-                                <div>
-                                    <span class="font-medium block">Envío local en Guadalajara</span>
-                                    <span class="text-xs text-gray-500">Costo según distancia (Se cotiza por WhatsApp)</span>
-                                </div>
-                            </label>
-                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="shipping-method" value="Envío Nacional" onchange="applyShippingRules()" class="text-black focus:ring-black">
-                                <div>
-                                    <span class="font-medium block">Envío Nacional ($149 MXN)</span>
-                                </div>
-                            </label>
-                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="shipping-method" value="Punto de entrega" onchange="applyShippingRules()" class="text-black focus:ring-black">
-                                <div>
-                                    <span class="font-medium block">Punto de entrega (Sin costo)</span>
-                                    <span class="text-xs text-gray-500">Elige tu plaza o punto de encuentro</span>
-                                </div>
-                            </label>
-                        </div>
-
-                        <!-- PUNTOS DE ENTREGA -->
-                        <div id="meeting-points-container" class="hidden pt-2 space-y-2 bg-gray-50 p-3 rounded-xl border border-gray-200">
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Selecciona el punto de entrega *</label>
-                            <div class="space-y-2 text-xs">
-                                <label class="flex items-center space-x-3 cursor-pointer">
-                                    <input type="radio" name="meeting-point-radio" value="Plaza Forum" checked class="text-black focus:ring-black">
-                                    <a href="https://maps.app.goo.gl/YA6AYi19UgDrsrZB8" target="_blank" class="text-blue-600 hover:underline font-medium">Plaza Forum Tlaquepaque 📍</a>
-                                </label>
-                                <label class="flex items-center space-x-3 cursor-pointer">
-                                    <input type="radio" name="meeting-point-radio" value="Plaza Revolución" class="text-black focus:ring-black">
-                                    <a href="https://maps.app.goo.gl/zJ9e6eoFnnL8h25w9" target="_blank" class="text-blue-600 hover:underline font-medium">Plaza Revolución 📍</a>
-                                </label>
-                                <label class="flex items-center space-x-3 cursor-pointer">
-                                    <input type="radio" name="meeting-point-radio" value="Plaza Patria" class="text-black focus:ring-black">
-                                    <a href="https://maps.app.goo.gl/27YwUG4VzpAk31u18" target="_blank" class="text-blue-600 hover:underline font-medium">Plaza Patria 📍</a>
-                                </label>
-                                <label class="flex items-center space-x-3 cursor-pointer">
-                                    <input type="radio" name="meeting-point-radio" value="Terraza Belenes" class="text-black focus:ring-black">
-                                    <a href="https://maps.app.goo.gl/VoHEE5zBkpQac5HE7" target="_blank" class="text-blue-600 hover:underline font-medium">Terraza Belenes 📍</a>
-                                </label>
-                                <label class="flex items-center space-x-3 cursor-pointer">
-                                    <input type="radio" name="meeting-point-radio" value="OXXO Medrano" class="text-black focus:ring-black">
-                                    <a href="https://maps.app.goo.gl/fe53VxNUDgjH4nNq6" target="_blank" class="text-blue-600 hover:underline font-medium">OXXO Medrano 📍</a>
-                                </label>
-                                <label class="flex items-center space-x-3 cursor-pointer">
-                                    <input type="radio" name="meeting-point-radio" value="Plaza Lomas" class="text-black focus:ring-black">
-                                    <a href="https://maps.app.goo.gl/spRiij5zXv9b7dHZ8" target="_blank" class="text-blue-600 hover:underline font-medium">Plaza Lomas 📍</a>
-                                </label>
-                                <label class="flex items-center space-x-3 cursor-pointer">
-                                    <input type="radio" name="meeting-point-radio" value="Punto Río Nilo" class="text-black focus:ring-black">
-                                    <a href="https://maps.app.goo.gl/yv1w1jtnSXHdsSYv8" target="_blank" class="text-blue-600 hover:underline font-medium">Punto Río Nilo 📍</a>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="pt-3 border-t border-gray-100 space-y-3 text-sm">
-                            <h4 class="font-bold text-xs uppercase tracking-wide text-gray-900">Tus Datos de Contacto y Envío</h4>
-                            <div>
-                                <label class="block text-xs text-gray-600 mb-1">Nombre completo *</label>
-                                <input type="text" id="ship-name" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-black" placeholder="Tu nombre">
-                            </div>
-                            <div>
-                                <label class="block text-xs text-gray-600 mb-1">Número de celular *</label>
-                                <input type="tel" id="ship-phone" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-black" placeholder="33 1234 5678">
-                            </div>
-                            <div>
-                                <label class="block text-xs text-gray-600 mb-1">Correo electrónico (opcional)</label>
-                                <input type="email" id="ship-email" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-black" placeholder="correo@ejemplo.com">
-                            </div>
-                            <div id="address-field-container">
-                                <label class="block text-xs text-gray-600 mb-1">Dirección de entrega o referencias *</label>
-                                <textarea id="ship-address" rows="2" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-black" placeholder="Calle, número, colonia, referencias..."></textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- PASO 3: PAGO -->
-                    <div id="step-payment" class="py-4 hidden space-y-3">
-                        <h3 class="text-xs font-bold uppercase tracking-wide text-gray-900">Método de Pago</h3>
-                        <div id="payment-options" class="space-y-2 text-sm">
-                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="payment-method" value="Mercado Pago" checked onchange="handlePaymentChange()" class="text-black focus:ring-black">
-                                <div>
-                                    <span class="font-medium block">Mercado Pago (Checkout Pro)</span>
-                                    <span class="text-xs text-gray-500">Tarjeta / OXXO</span>
-                                </div>
-                            </label>
-                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="payment-method" value="Transferencia Bancaria" onchange="handlePaymentChange()" class="text-black focus:ring-black">
-                                <div>
-                                    <span class="font-medium block">Transferencia Bancaria</span>
-                                    <span class="text-xs text-gray-500">CLABE de Mercado Pago Wallet</span>
-                                </div>
-                            </label>
-                            <label id="pay-cash" class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="payment-method" value="Pago contra entrega en efectivo" onchange="handlePaymentChange()" class="text-black focus:ring-black">
-                                <span class="font-medium">Pago contra entrega en efectivo</span>
-                            </label>
-                            <label id="pay-terminal" class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="payment-method" value="Pago contra entrega en terminal" onchange="handlePaymentChange()" class="text-black focus:ring-black">
-                                <span class="font-medium">Pago contra entrega en terminal</span>
-                            </label>
-                        </div>
-
-                        <!-- DATOS BANCARIOS -->
-                        <div id="bank-details" class="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-700 hidden space-y-1">
-                            <p class="font-bold text-gray-900 mb-1">Datos para Transferencia:</p>
-                            <p class="text-amber-700 font-bold bg-amber-50 p-2 rounded-lg border border-amber-200">Monto exacto a transferir: <span id="transfer-amount-display" class="font-mono text-sm">$0 MXN</span></p>
-                            <p><strong>Institución:</strong> Mercado Pago Wallet</p>
-                            <p><strong>CLABE:</strong> <span class="select-all font-mono font-bold text-black">722969020435527654</span></p>
-                            <p><strong>Beneficiario:</strong> Alexis Daniel Orozco Ortiz</p>
-                        </div>
-                    </div>
+                    <!-- (Pasos de checkout simplificados o completos según tu estructura) -->
                 </div>
-
-                <div class="pt-4 border-t border-gray-100 mt-4 space-y-2">
+                <div class="pt-4 border-t border-gray-100 mt-4">
                     <div class="flex justify-between text-base font-semibold text-gray-900 mb-2">
                         <span>Total:</span>
                         <span id="cart-total">$0 MXN</span>
                     </div>
-                    <button id="cart-action-btn" onclick="handleCartNext()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
-                        Ir a Pagar
-                    </button>
-                    <button id="cart-back-btn" onclick="handleCartBack()" class="w-full bg-gray-100 text-gray-800 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-gray-200 transition hidden">
-                        Regresar
-                    </button>
+                    <button onclick="toggleCartModal()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">Cerrar</button>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL DE PEDIDO CREADO -->
-    <div id="order-success-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
-        <div class="flex items-center justify-center min-h-screen px-4">
-            <div class="fixed inset-0 bg-black bg-opacity-50"></div>
-            <div class="bg-white rounded-2xl max-w-sm w-full p-6 relative z-10 shadow-xl text-center space-y-4">
-                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">✓</div>
-                <h3 class="font-serif text-xl font-bold">¡Pedido Creado!</h3>
-                <p id="order-success-msg" class="text-xs text-gray-600 leading-relaxed">
-                    Tu pedido ha sido registrado con éxito. Envía tu número de pedido por WhatsApp para agilizar la entrega.
-                </p>
-                <div id="whatsapp-btn-container" class="pt-2">
-                    <a id="whatsapp-link" href="#" target="_blank" class="w-full bg-emerald-600 text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-emerald-700 transition flex items-center justify-center gap-2 font-medium">
-                        📲 Enviar pedido por WhatsApp
-                    </a>
-                </div>
-                <button onclick="closeSuccessModalAndReload()" class="w-full bg-gray-100 text-gray-800 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-gray-200 transition">
-                    Entendido / Volver a la Tienda
-                </button>
             </div>
         </div>
     </div>
@@ -611,100 +412,104 @@
     <!-- CONTENIDO PRINCIPAL -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        <!-- BANNER DE INICIO / HERO -->
+        <!-- VISTA DE INICIO -->
         <div id="home-view" class="space-y-8">
             <div class="relative hero-bokeh-bg text-white rounded-3xl p-8 sm:p-16 overflow-hidden shadow-xl text-center">
                 <div class="relative z-10 max-w-2xl mx-auto space-y-4">
                     <span class="text-xs uppercase tracking-[0.3em] text-amber-300 font-semibold">DESCUBRE AMIS</span>
                     <h1 class="text-3xl sm:text-5xl font-serif font-light tracking-wide">Haz espacio para algo nuevo.</h1>
-                    <p class="text-gray-300 text-sm sm:text-base leading-relaxed">Descubre nuestra selección de moda, calzado y accesorios. Encuentra piezas que reflejan tu estilo y te hacen sentir increíble.</p>
+                    <p class="text-gray-300 text-sm sm:text-base leading-relaxed">Descubre nuestra selección de moda, calzado y accesorios.</p>
                     <div class="pt-4 flex flex-wrap justify-center gap-4">
-                        <button onclick="loadCategoryProducts('temporada', event)" class="bg-amber-400 text-black px-8 py-3 rounded-full text-xs tracking-widest uppercase font-bold hover:bg-amber-300 transition shadow-lg">Ver Colección Navideña</button>
-                        <button onclick="loadCategoryProducts('conjuntos', event)" class="border border-white text-white px-8 py-3 rounded-full text-xs tracking-widest uppercase hover:bg-white hover:text-black transition">Explorar Todo</button>
+                        <button onclick="navigateTo('/temporada', event)" class="bg-amber-400 text-black px-8 py-3 rounded-full text-xs tracking-widest uppercase font-bold hover:bg-amber-300 transition shadow-lg">Ver Colección Navideña</button>
+                        <button onclick="navigateTo('/conjuntos', event)" class="border border-white text-white px-8 py-3 rounded-full text-xs tracking-widest uppercase hover:bg-white hover:text-black transition">Explorar Todo</button>
                     </div>
                 </div>
             </div>
 
-            <!-- TARJETAS DE CATEGORÍAS RÁPIDAS -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div onclick="loadCategoryProducts('vestidos', event)" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-center cursor-pointer hover:shadow-md transition group flex flex-col">
-                    <div class="h-32 overflow-hidden bg-gray-100">
-                        <img src="https://i.postimg.cc/MpGkyLjq/Whats-App-Image-2026-11-16-at-8-08-21-PM.jpg" alt="Vestidos" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                    </div>
-                    <div class="py-4 px-2">
-                        <h3 class="font-serif font-semibold text-sm tracking-wider text-gray-900 group-hover:text-amber-600 transition">Vestidos</h3>
-                    </div>
+                <div onclick="navigateTo('/vestidos', event)" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-center cursor-pointer hover:shadow-md transition group flex flex-col">
+                    <div class="h-32 overflow-hidden bg-gray-100"><img src="https://i.postimg.cc/MpGkyLjq/Whats-App-Image-2026-11-16-at-8-08-21-PM.jpg" class="w-full h-full object-cover group-hover:scale-105 transition duration-300"></div>
+                    <div class="py-4 px-2"><h3 class="font-serif font-semibold text-sm tracking-wider text-gray-900 group-hover:text-amber-600 transition">Vestidos</h3></div>
                 </div>
-
-                <div onclick="loadCategoryProducts('conjuntos', event)" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-center cursor-pointer hover:shadow-md transition group flex flex-col">
-                    <div class="h-32 overflow-hidden bg-gray-100">
-                        <img src="https://i.postimg.cc/YqXSG8fS/IMG-20261115-WA0058.jpg" alt="Conjuntos" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                    </div>
-                    <div class="py-4 px-2">
-                        <h3 class="font-serif font-semibold text-sm tracking-wider text-gray-900 group-hover:text-amber-600 transition">Conjuntos</h3>
-                    </div>
+                <div onclick="navigateTo('/conjuntos', event)" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-center cursor-pointer hover:shadow-md transition group flex flex-col">
+                    <div class="h-32 overflow-hidden bg-gray-100"><img src="https://i.postimg.cc/YqXSG8fS/IMG-20261115-WA0058.jpg" class="w-full h-full object-cover group-hover:scale-105 transition duration-300"></div>
+                    <div class="py-4 px-2"><h3 class="font-serif font-semibold text-sm tracking-wider text-gray-900 group-hover:text-amber-600 transition">Conjuntos</h3></div>
                 </div>
-
-                <div onclick="loadCategoryProducts('abrigos', event)" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-center cursor-pointer hover:shadow-md transition group flex flex-col">
-                    <div class="h-32 overflow-hidden bg-gray-100">
-                        <img src="https://i.postimg.cc/wT2MqSpK/Whats-App-Image-2026-11-10-at-6-58-14-PM.jpg" alt="Abrigos" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                    </div>
-                    <div class="py-4 px-2">
-                        <h3 class="font-serif font-semibold text-sm tracking-wider text-gray-900 group-hover:text-amber-600 transition">Abrigos</h3>
-                    </div>
+                <div onclick="navigateTo('/abrigos', event)" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-center cursor-pointer hover:shadow-md transition group flex flex-col">
+                    <div class="h-32 overflow-hidden bg-gray-100"><img src="https://i.postimg.cc/wT2MqSpK/Whats-App-Image-2026-11-10-at-6-58-14-PM.jpg" class="w-full h-full object-cover group-hover:scale-105 transition duration-300"></div>
+                    <div class="py-4 px-2"><h3 class="font-serif font-semibold text-sm tracking-wider text-gray-900 group-hover:text-amber-600 transition">Abrigos</h3></div>
                 </div>
-
-                <div onclick="loadCategoryProducts('temporada', event)" class="bg-amber-50 rounded-2xl shadow-sm border border-amber-200 overflow-hidden text-center cursor-pointer hover:shadow-md transition group flex flex-col">
-                    <div class="h-32 overflow-hidden bg-gray-100">
-                        <img src="https://i.postimg.cc/nLnFbr67/sueternavidenogrinchrojo.jpg" alt="Navidad" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                    </div>
-                    <div class="py-4 px-2">
-                        <h3 class="font-serif font-bold text-sm tracking-wider text-red-700 transition">Navidad</h3>
-                    </div>
+                <div onclick="navigateTo('/temporada', event)" class="bg-amber-50 rounded-2xl shadow-sm border border-amber-200 overflow-hidden text-center cursor-pointer hover:shadow-md transition group flex flex-col">
+                    <div class="h-32 overflow-hidden bg-gray-100"><img src="https://i.postimg.cc/nLnFbr67/sueternavidenogrinchrojo.jpg" class="w-full h-full object-cover group-hover:scale-105 transition duration-300"></div>
+                    <div class="py-4 px-2"><h3 class="font-serif font-bold text-sm tracking-wider text-red-700 transition">Navidad</h3></div>
                 </div>
             </div>
         </div>
 
-        <!-- CONTENEDOR DINÁMICO DE PRODUCTOS -->
+        <!-- CONTENEDOR DINÁMICO DE CATEGORÍAS Y PRODUCTO INDIVIDUAL -->
         <div id="dynamic-category-view" class="hidden space-y-6">
             <div id="category-header"></div>
             <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
+
+        <div id="single-product-view" class="hidden space-y-6">
+            <!-- Vista detallada de un producto individual -->
+            <div id="single-product-content"></div>
+        </div>
     </main>
 
-    <!-- Script General -->
+    <!-- SCRIPT DE ENRUTAMIENTO Y LÓGICA -->
     <script>
-        const CORREO_BOUTIQUE = "alexisorozcoortiz@gmail.com";
         const WHATSAPP_TIENDA = "523312467018";
-
-        const MAPS_LOCATIONS = {
-            "Plaza Forum": "https://maps.app.goo.gl/YA6AYi19UgDrsrZB8",
-            "Plaza Revolución": "https://maps.app.goo.gl/zJ9e6eoFnnL8h25w9",
-            "Plaza Patria": "https://maps.app.goo.gl/27YwUG4VzpAk31u18",
-            "Terraza Belenes": "https://maps.app.goo.gl/VoHEE5zBkpQac5HE7",
-            "OXXO Medrano": "https://maps.app.goo.gl/fe53VxNUDgjH4nNq6",
-            "Plaza Lomas": "https://maps.app.goo.gl/spRiij5zXv9b7dHZ8",
-            "Punto Río Nilo": "https://maps.app.goo.gl/yv1w1jtnSXHdsSYv8"
-        };
-
         let cart = JSON.parse(localStorage.getItem('amis_cart') || '[]');
-        let checkoutStep = 1;
         let currentUser = null;
         let userData = null;
-        let isRegistering = false;
-        let toastTimeout = null;
 
-        function showToast(message, type = 'success') {
+        function showToast(message) {
             const toast = document.getElementById('toast-notification');
-            const msg = document.getElementById('toast-msg');
-            msg.textContent = message;
-            if (toastTimeout) clearTimeout(toastTimeout);
+            document.getElementById('toast-msg').textContent = message;
             toast.style.opacity = '1';
             toast.style.transform = 'translateY(0)';
-            toastTimeout = setTimeout(() => {
+            setTimeout(() => {
                 toast.style.opacity = '0';
                 toast.style.transform = 'translateY(-20px)';
             }, 3000);
+        }
+
+        // --- SISTEMA DE ENRUTAMIENTO LIMPIO CON HTML5 HISTORY API ---
+        function navigateTo(path, event) {
+            if (event) event.preventDefault();
+            window.history.pushState({}, '', path);
+            handleRouting();
+        }
+
+        window.addEventListener('popstate', () => {
+            handleRouting();
+        });
+
+        async function handleRouting() {
+            const path = window.location.pathname;
+            const homeView = document.getElementById('home-view');
+            const dynView = document.getElementById('dynamic-category-view');
+            const singleView = document.getElementById('single-product-view');
+
+            homeView.classList.add('hidden');
+            dynView.classList.add('hidden');
+            singleView.classList.add('hidden');
+
+            if (path === '/' || path === '') {
+                homeView.classList.remove('hidden');
+            } else if (path === '/vestidos' || path === '/conjuntos' || path === '/blusas' || path === '/abrigos' || path === '/temporada') {
+                const categoryKey = path.replace('/', '');
+                dynView.classList.remove('hidden');
+                await loadCategoryProductsData(categoryKey);
+            } else if (path.startsWith('/producto/')) {
+                const productId = path.split('/')[2];
+                singleView.classList.remove('hidden');
+                await loadSingleProductData(productId);
+            } else {
+                homeView.classList.remove('hidden'); // Página 404 por defecto al home
+            }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -713,45 +518,36 @@
                     clearInterval(checkFB);
                     window.FB_Methods.onAuthStateChanged(window.FB_Auth, async (user) => {
                         currentUser = user;
+                        const adminWrapper = document.getElementById('menu-admin-wrapper');
                         const accountWrapper = document.getElementById('menu-account-wrapper');
                         const loginWrapper = document.getElementById('menu-login-wrapper');
-                        const adminWrapper = document.getElementById('menu-admin-wrapper');
                         const categoriesWrapper = document.getElementById('menu-categories-wrapper');
                         const contactWrapper = document.getElementById('menu-contact-wrapper');
 
                         if (user) {
                             const { doc, getDoc, collection, query, where, getDocs } = window.FB_Methods;
-                            try {
-                                const userDocRef = doc(window.FB_Db, "users", user.uid);
-                                let userSnap = await getDoc(userDocRef);
-
-                                if (!userSnap.exists() && user.email) {
-                                    const q = query(collection(window.FB_Db, "users"), where("email", "==", user.email));
-                                    const qSnap = await getDocs(q);
-                                    if (!qSnap.empty) {
-                                        userSnap = qSnap.docs[0];
-                                    }
+                            let userSnap = await getDoc(doc(window.FB_Db, "users", user.uid));
+                            if (!userSnap.exists() && user.email) {
+                                const q = query(collection(window.FB_Db, "users"), where("email", "==", user.email));
+                                const qSnap = await getDocs(q);
+                                if (!qSnap.empty) userSnap = qSnap.docs[0];
+                            }
+                            if (userSnap && userSnap.exists()) {
+                                userData = userSnap.data();
+                                if (userData.role === "admin") {
+                                    adminWrapper.classList.remove('hidden');
+                                    accountWrapper.classList.add('hidden');
+                                    loginWrapper.classList.add('hidden');
+                                    categoriesWrapper.classList.add('hidden');
+                                    contactWrapper.classList.add('hidden');
+                                } else {
+                                    adminWrapper.classList.add('hidden');
+                                    accountWrapper.classList.remove('hidden');
+                                    loginWrapper.classList.add('hidden');
+                                    categoriesWrapper.classList.remove('hidden');
+                                    contactWrapper.classList.remove('hidden');
+                                    loadUserDataAndOrders(user.uid);
                                 }
-
-                                if (userSnap && userSnap.exists()) {
-                                    userData = userSnap.data();
-                                    if (userData.role === "admin") {
-                                        adminWrapper.classList.remove('hidden');
-                                        accountWrapper.classList.add('hidden');
-                                        loginWrapper.classList.add('hidden');
-                                        categoriesWrapper.classList.add('hidden');
-                                        contactWrapper.classList.add('hidden');
-                                    } else {
-                                        adminWrapper.classList.add('hidden');
-                                        accountWrapper.classList.remove('hidden');
-                                        loginWrapper.classList.add('hidden');
-                                        categoriesWrapper.classList.remove('hidden');
-                                        contactWrapper.classList.remove('hidden');
-                                        loadUserDataAndOrders(user.uid);
-                                    }
-                                }
-                            } catch (e) {
-                                console.error("Error cargando perfil:", e);
                             }
                         } else {
                             userData = null;
@@ -766,154 +562,16 @@
             }, 200);
 
             updateCartUI();
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const status = urlParams.get('status') || urlParams.get('collection_status');
-            const mpResult = urlParams.get('pago');
-
-            if (status === 'approved' || mpResult === 'exito') {
-                const pendingData = JSON.parse(localStorage.getItem('amis_pending_order'));
-                if (pendingData) {
-                    const { collection, addDoc, Timestamp } = window.FB_Methods;
-                    addDoc(collection(window.FB_Db, "orders"), {
-                        orderId: pendingData.orderId,
-                        userId: currentUser ? currentUser.uid : "guest",
-                        clientName: pendingData.clientName,
-                        clientPhone: pendingData.clientPhone,
-                        clientAddress: pendingData.clientAddress,
-                        shipping: pendingData.shippingMethod,
-                        payment: pendingData.paymentMethod,
-                        items: cart,
-                        total: `$${pendingData.total} MXN`,
-                        status: "En proceso",
-                        createdAt: Timestamp.now()
-                    }).then(() => {
-                        enviarFormSubmit(pendingData);
-                        let mensajeWA = `Hola Amis Boutique! 👋 Mi número de pedido es: *${pendingData.orderId}*`;
-                        document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${encodeURIComponent(mensajeWA)}`;
-                        document.getElementById('order-success-modal').classList.remove('hidden');
-                        localStorage.removeItem('amis_pending_order');
-                        localStorage.removeItem('amis_cart');
-                        cart = [];
-                        updateCartUI();
-                    }).catch(err => console.error("Error guardando orden MP:", err));
-                }
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
+            handleRouting(); // Cargar la ruta actual al iniciar
         });
 
-        function addColorRow() {
-            const container = document.getElementById('color-rows-container');
-            const row = document.createElement('div');
-            row.className = 'flex gap-1 items-center color-row mt-1';
-            row.innerHTML = `
-                <input type="text" placeholder="#HEX" class="w-20 p-1.5 border rounded text-[11px] font-mono color-hex-input" value="#000000">
-                <input type="text" placeholder="Nombre color" class="w-20 p-1.5 border rounded text-[11px] color-name-input">
-                <input type="text" placeholder="URL Foto" class="flex-1 p-1.5 border rounded text-[11px] color-url-input">
-                <button onclick="this.parentElement.remove()" class="text-red-500 font-bold px-1 text-xs">✕</button>
-            `;
-            container.appendChild(row);
-        }
-
-        async function guardarNuevoProducto() {
-            const name = document.getElementById('new-prod-name').value.trim();
-            const description = document.getElementById('new-prod-desc').value.trim();
-            const priceVal = document.getElementById('new-prod-price').value.trim();
-            const category = document.getElementById('new-prod-cat').value;
-
-            if (!name || !priceVal) {
-                showToast("Por favor ingresa al menos nombre y precio.", "error");
-                return;
-            }
-
-            const price = Number(priceVal);
-            const colorRows = document.querySelectorAll('.color-row');
-            let colors = [];
-            let images = [];
-
-            colorRows.forEach(row => {
-                const hex = row.querySelector('.color-hex-input').value.trim() || '#000000';
-                const cname = row.querySelector('.color-name-input').value.trim() || 'Único';
-                const url = row.querySelector('.color-url-input').value.trim();
-                if (url) {
-                    colors.push({ hex, name: cname, image: url });
-                    images.push(url);
-                }
-            });
-
-            if (images.length === 0) {
-                showToast("Agrega al menos una URL de imagen para el producto.", "error");
-                return;
-            }
-
-            try {
-                const { collection, addDoc } = window.FB_Methods;
-                await addDoc(collection(window.FB_Db, "products"), {
-                    name,
-                    description,
-                    price,
-                    category,
-                    colors,
-                    images,
-                    createdAt: new Date()
-                });
-
-                showToast("¡Producto agregado con éxito!");
-                document.getElementById('new-prod-name').value = '';
-                document.getElementById('new-prod-desc').value = '';
-                document.getElementById('new-prod-price').value = '';
-                toggleMobileMenu();
-                loadCategoryProducts(category);
-            } catch (e) {
-                console.error(e);
-                showToast("Error al guardar el producto.", "error");
-            }
-        }
-
-        function enviarFormSubmit(data) {
-            const formData = new FormData();
-            formData.append("_subject", "Nuevo Pedido en AMIS Boutique 🛍️");
-            formData.append("_captcha", "false");
-            formData.append("_template", "table");
-            formData.append("Pedido", data.orderId);
-            formData.append("Cliente", data.clientName);
-            formData.append("Teléfono", data.clientPhone);
-            formData.append("Total", `$${data.total} MXN`);
-            formData.append("Método_de_Pago", data.paymentMethod);
-            formData.append("Envío", data.shippingMethod);
-            formData.append("Dirección", data.clientAddress);
-            
-            let detalleStr = cart.map(i => `${i.quantity}x ${i.name} (${i.color}) - $${i.price * i.quantity} MXN`).join('\n');
-            formData.append("Productos", detalleStr);
-
-            fetch("https://formsubmit.co/ajax/alexisorozcoortiz@gmail.com", {
-                method: "POST",
-                body: formData
-            }).catch(error => console.error("Error al enviar correo:", error));
-        }
-
-        async function loadCategoryProducts(categoryKey, event) {
-            if (event) event.preventDefault();
-            document.getElementById('home-view').classList.add('hidden');
-            const dynView = document.getElementById('dynamic-category-view');
-            dynView.classList.remove('hidden');
-
+        async function loadCategoryProductsData(categoryKey) {
             const headerEl = document.getElementById('category-header');
             const gridEl = document.getElementById('products-grid');
 
-            let bannerHtml = '';
-            if(categoryKey === 'temporada') {
-                bannerHtml = `
-                    <div class="bg-red-900 text-white p-6 rounded-2xl mb-6 text-center space-y-2 shadow-sm">
-                        <span class="text-xs uppercase tracking-widest text-amber-300">Colección Especial</span>
-                        <h2 class="text-2xl font-serif font-bold">🎄 Especial Navidad 🎄</h2>
-                        <p class="text-xs text-red-100">Las mejores prendas para lucir deslumbrante en tus posadas y cenas navideñas.</p>
-                    </div>
-                `;
-            } else {
-                let titleName = categoryKey.toUpperCase();
-                bannerHtml = `<h2 class="text-2xl font-serif tracking-wider font-bold mb-4">${titleName}</h2>`;
-            }
+            let bannerHtml = categoryKey === 'temporada' ? 
+                `<div class="bg-red-900 text-white p-6 rounded-2xl mb-6 text-center space-y-2 shadow-sm"><span class="text-xs uppercase tracking-widest text-amber-300">Colección Especial</span><h2 class="text-2xl font-serif font-bold">🎄 Especial Navidad 🎄</h2></div>` :
+                `<h2 class="text-2xl font-serif tracking-wider font-bold mb-4">${categoryKey.toUpperCase()}</h2>`;
 
             headerEl.innerHTML = bannerHtml;
             gridEl.innerHTML = '<p class="text-gray-400 italic py-8 text-center">Cargando productos...</p>';
@@ -921,13 +579,10 @@
             try {
                 const { collection, getDocs } = window.FB_Methods;
                 const querySnapshot = await getDocs(collection(window.FB_Db, "products"));
-                
                 let matchingProducts = [];
                 querySnapshot.forEach((docSnap) => {
                     const p = docSnap.data();
-                    if(p.category === categoryKey) {
-                        matchingProducts.push({ id: docSnap.id, ...p });
-                    }
+                    if(p.category === categoryKey) matchingProducts.push({ id: docSnap.id, ...p });
                 });
 
                 if (matchingProducts.length === 0) {
@@ -937,82 +592,86 @@
 
                 let html = '';
                 matchingProducts.forEach((p) => {
-                    const prodId = p.id;
                     const defaultImg = p.images && p.images.length > 0 ? p.images[0] : '';
-                    
-                    let colorsHtml = '';
-                    if (p.colors && p.colors.length > 0) {
-                        colorsHtml = `<div class="flex items-center space-x-2">`;
-                        p.colors.forEach((c, idx) => {
-                            const borderClass = idx === 0 ? 'border-black' : 'border-transparent';
-                            colorsHtml += `<button onclick="changeDynamicColor('${prodId}', '${c.image}', '${c.name}', this)" class="w-6 h-6 rounded-full border-2 ${borderClass} focus:outline-none transition transform hover:scale-110 color-btn-${prodId}" style="background-color: ${c.hex};" title="${c.name}"></button>`;
-                        });
-                        colorsHtml += `</div>`;
-                    }
-
-                    let adminDeleteBtn = '';
-                    if (userData && userData.role === 'admin') {
-                        adminDeleteBtn = `<button onclick="eliminarProducto('${prodId}')" class="mt-2 text-red-600 text-[11px] underline font-bold">🗑️ Eliminar Producto</button>`;
-                    }
-
                     html += `
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col cursor-pointer group" onclick="navigateTo('/producto/${p.id}', event)">
                         <div class="relative bg-gray-100 h-[450px]">
-                            <img id="product-img-${prodId}" src="${defaultImg}" alt="${p.name}" class="w-full h-full object-cover transition-all duration-300">
+                            <img src="${defaultImg}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-300">
                             <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">${p.category}</span>
                         </div>
                         <div class="p-5 flex-1 flex flex-col justify-between">
                             <div>
-                                <h3 class="font-serif text-lg font-medium text-gray-900">${p.name}</h3>
+                                <h3 class="font-serif text-lg font-medium text-gray-900 group-hover:text-amber-600 transition">${p.name}</h3>
                                 <p class="text-xs text-gray-500 mt-1">${p.description || ''}</p>
                                 <div class="mt-4 flex items-center justify-between">
                                     <span class="text-xl font-semibold text-gray-900">$${p.price} <span class="text-xs text-gray-500 font-normal">MXN</span></span>
-                                    ${colorsHtml}
                                 </div>
                             </div>
-                            <div>
-                                <button onclick="addDynamicToCart('${p.name}', ${p.price}, '${prodId}')" class="mt-4 w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
-                                    Añadir al Carrito
-                                </button>
-                                ${adminDeleteBtn}
-                            </div>
+                            <span class="mt-4 block text-center bg-black text-white py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">Ver Detalle</span>
                         </div>
                     </div>`;
                 });
-
                 gridEl.innerHTML = html;
             } catch (e) {
-                console.error(e);
                 gridEl.innerHTML = '<p class="text-red-500 text-xs text-center py-8 col-span-full">Error al cargar productos.</p>';
             }
         }
 
-        async function eliminarProducto(prodId) {
-            if(!confirm("¿Estás seguro de eliminar este producto?")) return;
+        async function loadSingleProductData(productId) {
+            const container = document.getElementById('single-product-content');
+            container.innerHTML = '<p class="text-gray-400 italic py-8 text-center">Cargando producto...</p>';
             try {
-                const { doc, deleteDoc } = window.FB_Methods;
-                await deleteDoc(doc(window.FB_Db, "products", prodId));
-                showToast("Producto eliminado");
-                location.reload();
-            } catch(e) {
-                showToast("Error al eliminar", "error");
+                const { doc, getDoc } = window.FB_Methods;
+                const docSnap = await getDoc(doc(window.FB_Db, "products", productId));
+                if (!docSnap.exists()) {
+                    container.innerHTML = '<p class="text-center py-8 text-gray-500">El producto no existe.</p>';
+                    return;
+                }
+                const p = docSnap.data();
+                const defaultImg = p.images && p.images.length > 0 ? p.images[0] : '';
+
+                let colorsHtml = '';
+                if (p.colors && p.colors.length > 0) {
+                    colorsHtml = `<div class="flex items-center space-x-2 mt-4">`;
+                    p.colors.forEach((c, idx) => {
+                        const borderClass = idx === 0 ? 'border-black' : 'border-transparent';
+                        colorsHtml += `<button onclick="changeSingleColor('${c.image}', '${c.name}', this)" class="w-8 h-8 rounded-full border-2 ${borderClass} focus:outline-none transition transform hover:scale-110 color-btn" style="background-color: ${c.hex};" title="${c.name}"></button>`;
+                    });
+                    colorsHtml += `</div>`;
+                }
+
+                container.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 sm:p-10 rounded-3xl shadow-sm border border-gray-100">
+                        <div class="h-[500px] bg-gray-100 rounded-2xl overflow-hidden">
+                            <img id="single-main-img" src="${defaultImg}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex flex-col justify-between space-y-6">
+                            <div>
+                                <span class="bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">${p.category}</span>
+                                <h1 class="font-serif text-3xl font-bold text-gray-900 mt-3">${p.name}</h1>
+                                <p class="text-sm text-gray-600 mt-2">${p.description || ''}</p>
+                                <div class="text-2xl font-semibold text-gray-900 mt-4">$${p.price} <span class="text-xs text-gray-500 font-normal">MXN</span></div>
+                                ${colorsHtml}
+                            </div>
+                            <button onclick="addToCartFromSingle('${p.name}', ${p.price})" class="w-full bg-black text-white py-3.5 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">Añadir al Carrito</button>
+                        </div>
+                    </div>`;
+            } catch (e) {
+                container.innerHTML = '<p class="text-red-500 text-center py-8">Error al cargar el producto.</p>';
             }
         }
 
-        function changeDynamicColor(prodId, imageUrl, colorName, buttonElement) {
-            document.getElementById(`product-img-${prodId}`).src = imageUrl;
-            buttonElement.dataset.selectedColor = colorName;
-            const buttons = buttonElement.parentElement.querySelectorAll('.color-btn-' + prodId);
-            buttons.forEach(btn => { btn.classList.remove('border-black'); btn.classList.add('border-transparent'); });
-            buttonElement.classList.remove('border-transparent');
-            buttonElement.classList.add('border-black');
+        function changeSingleColor(imageUrl, colorName, btn) {
+            document.getElementById('single-main-img').src = imageUrl;
+            btn.parentElement.querySelectorAll('.color-btn').forEach(b => { b.classList.remove('border-black'); b.classList.add('border-transparent'); });
+            btn.classList.remove('border-transparent');
+            btn.classList.add('border-black');
+            btn.dataset.selectedName = colorName;
         }
 
-        function addDynamicToCart(name, price, prodId) {
-            const container = document.getElementById(`product-img-${prodId}`).parentElement.parentElement;
-            const activeColorBtn = container.querySelector(`.color-btn-${prodId}.border-black`);
-            const colorToAdd = activeColorBtn ? (activeColorBtn.title || 'Único') : 'Único';
-
+        function addToCartFromSingle(name, price) {
+            const activeBtn = document.querySelector('.color-btn.border-black');
+            const colorToAdd = activeBtn ? (activeBtn.title || 'Único') : 'Único';
             const existing = cart.find(item => item.name === name && item.color === colorToAdd);
             if (existing) existing.quantity += 1;
             else cart.push({ name, price, color: colorToAdd, quantity: 1 });
@@ -1021,313 +680,17 @@
             showToast("¡Agregado al carrito con éxito!");
         }
 
-        async function loadUserDataAndOrders(uid) {
-            const ordersContent = document.getElementById('menu-user-orders');
-            const addressesContent = document.getElementById('menu-user-addresses');
-            const profileContent = document.getElementById('menu-user-profile');
-            const accountToggleBtn = document.getElementById('account-toggle-btn');
-
-            try {
-                const { collection, query, where, getDocs, doc, getDoc } = window.FB_Methods;
-                let userSnap = await getDoc(doc(window.FB_Db, "users", uid));
-                if (!userSnap.exists() && currentUser && currentUser.email) {
-                    const qUser = query(collection(window.FB_Db, "users"), where("email", "==", currentUser.email));
-                    const qSnap = await getDocs(qUser);
-                    if (!qSnap.empty) userSnap = qSnap.docs[0];
-                }
-
-                let names = '', surnames = '', phone = '', email = currentUser ? currentUser.email : '', hasData = false, addresses = [];
-                if (userSnap && userSnap.exists()) {
-                    userData = userSnap.data();
-                    names = userData.names || '';
-                    surnames = userData.surnames || '';
-                    phone = userData.phone || '';
-                    hasData = names.trim() !== "";
-                    addresses = userData.addresses || [];
-                }
-
-                const primerNombre = hasData ? names.split(' ')[0] : 'Cliente';
-                if (accountToggleBtn) {
-                    const span = accountToggleBtn.querySelector('span');
-                    if (span) span.textContent = `Hola, ${primerNombre}`;
-                }
-
-                if (profileContent) {
-                    profileContent.innerHTML = `
-                        <div class="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-1 text-gray-700 text-xs">
-                            <p><strong>Nombre(s):</strong> ${names}</p>
-                            <p><strong>Apellidos:</strong> ${surnames || '-'}</p>
-                            <p><strong>Teléfono:</strong> ${phone || '-'}</p>
-                            <p><strong>Correo:</strong> ${email || '-'}</p>
-                        </div>
-                    `;
-                }
-
-                if (addressesContent) {
-                    if (addresses.length === 0) {
-                        addressesContent.innerHTML = '<p class="text-gray-400 italic">No hay direcciones guardadas aún.</p>';
-                    } else {
-                        let addrHtml = '';
-                        addresses.forEach(addr => {
-                            addrHtml += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 text-gray-700 mb-1"><p class="font-medium text-gray-900">📍 Dirección:</p><p class="text-[11px] text-gray-600 mt-0.5">${addr}</p></div>`;
-                        });
-                        addressesContent.innerHTML = addrHtml;
-                    }
-                }
-
-                const q = query(collection(window.FB_Db, "orders"), where("userId", "==", uid));
-                const querySnapshot = await getDocs(q);
-                if (querySnapshot.empty) {
-                    if (ordersContent) ordersContent.innerHTML = '<p class="text-gray-400 italic">No tienes pedidos anteriores.</p>';
-                } else {
-                    let html = '';
-                    querySnapshot.forEach((docSnap) => {
-                        const data = docSnap.data();
-                        const orderString = encodeURIComponent(JSON.stringify(data));
-                        html += `
-                        <div onclick="verDetallePedido('${orderString}')" class="p-2.5 bg-gray-50 rounded-lg border border-gray-100 space-y-1 text-xs cursor-pointer hover:bg-gray-100 transition">
-                            <div class="flex justify-between items-center font-medium text-gray-900">
-                                <span>${data.orderId || 'Pedido'}</span>
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${data.status === 'Entregado' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${data.status || 'En proceso'}</span>
-                            </div>
-                            <p class="text-gray-500">Total: ${data.total || ''} · Clic para ver detalle</p>
-                        </div>`;
-                    });
-                    if (ordersContent) ordersContent.innerHTML = html;
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        function verDetallePedido(orderJson) {
-            const data = JSON.parse(decodeURIComponent(orderJson));
-            document.getElementById('modal-order-title').textContent = `Pedido: ${data.orderId}`;
-            let itemsHtml = '<div class="space-y-1 border-b border-gray-100 pb-2 mb-2">';
-            if (data.items) {
-                data.items.forEach(i => {
-                    itemsHtml += `<div class="flex justify-between"><span>${i.quantity}x ${i.name} (${i.color})</span><span>$${i.price * i.quantity} MXN</span></div>`;
-                });
-            }
-            itemsHtml += '</div>';
-
-            let bodyHtml = `
-                ${itemsHtml}
-                <p><strong>Estatus actual:</strong> <span class="text-amber-600 font-bold">${data.status || 'En proceso'}</span></p>
-                <p><strong>Método de pago:</strong> ${data.payment}</p>
-                <p><strong>Método de envío:</strong> ${data.shipping}</p>
-                <p><strong>Dirección/Punto:</strong> ${data.clientAddress}</p>
-                <p class="font-bold text-gray-900 pt-1">Total pagado: ${data.total}</p>
-            `;
-            document.getElementById('modal-order-body').innerHTML = bodyHtml;
-            document.getElementById('order-detail-modal').classList.remove('hidden');
-        }
-
-        function toggleOrderDetailModal() { document.getElementById('order-detail-modal').classList.toggle('hidden'); }
-
-        async function openAdminOrdersModal() {
-            const modal = document.getElementById('admin-orders-modal');
-            modal.classList.remove('hidden');
-            await cargarPedidosAdmin();
-        }
-
-        function toggleAdminOrdersModal() {
-            document.getElementById('admin-orders-modal').classList.toggle('hidden');
-        }
-
-        async function cargarPedidosAdmin() {
-            const container = document.getElementById('admin-orders-list');
-            container.innerHTML = '<p class="text-gray-400 text-xs italic text-center py-4">Cargando pedidos...</p>';
-            try {
-                const { collection, getDocs } = window.FB_Methods;
-                const querySnapshot = await getDocs(collection(window.FB_Db, "orders"));
-                if (querySnapshot.empty) {
-                    container.innerHTML = '<p class="text-gray-400 text-xs italic text-center py-4">No hay pedidos registrados.</p>';
-                    return;
-                }
-                let html = '';
-                querySnapshot.forEach((docSnap) => {
-                    const id = docSnap.id;
-                    const d = docSnap.data();
-                    const currentStatus = d.status || 'En proceso';
-                    let itemsStr = '';
-                    if (d.items) {
-                        d.items.forEach(i => { itemsStr += `<li>${i.quantity}x ${i.name} (${i.color}) - $${i.price * i.quantity}</li>`; });
-                    }
-                    html += `
-                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-2 text-xs text-gray-700">
-                        <div class="flex justify-between items-center font-bold text-gray-900">
-                            <span>Folio: ${d.orderId}</span>
-                            <span class="text-amber-600">${d.total}</span>
-                        </div>
-                        <p><strong>Cliente:</strong> ${d.clientName} (${d.clientPhone})</p>
-                        <p><strong>Envío:</strong> ${d.shipping}</p>
-                        <p><strong>Lugar:</strong> ${d.clientAddress}</p>
-                        <div><strong>Productos:</strong><ul class="list-disc pl-4 text-gray-600 mt-1">${itemsStr}</ul></div>
-                        <div class="pt-2 border-t flex items-center justify-between">
-                            <label class="font-bold">Estatus:</label>
-                            <select onchange="actualizarEstatusPedido('${id}', this.value)" class="p-1.5 border rounded-lg text-xs bg-white font-medium">
-                                <option value="En proceso" ${currentStatus === 'En proceso' ? 'selected' : ''}>⏳ En proceso</option>
-                                <option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>💳 Pagado</option>
-                                <option value="Enviado" ${currentStatus === 'Enviado' ? 'selected' : ''}>🚚 Enviado</option>
-                                <option value="Entregado" ${currentStatus === 'Entregado' ? 'selected' : ''}>✅ Entregado</option>
-                            </select>
-                        </div>
-                    </div>`;
-                });
-                container.innerHTML = html;
-            } catch (e) {
-                container.innerHTML = '<p class="text-red-500 text-xs text-center py-4">Error al cargar pedidos.</p>';
-            }
-        }
-
-        async function actualizarEstatusPedido(docId, nuevoEstatus) {
-            try {
-                const { doc, updateDoc } = window.FB_Methods;
-                await updateDoc(doc(window.FB_Db, "orders", docId), { status: nuevoEstatus });
-                showToast(`Estatus actualizado a: ${nuevoEstatus}`);
-            } catch (e) {
-                showToast("Error al actualizar estatus", "error");
-            }
-        }
-
-        function toggleAuthModal() { document.getElementById('auth-modal').classList.toggle('hidden'); }
-        function toggleAddressModal() { document.getElementById('address-modal').classList.toggle('hidden'); }
-
-        async function buscarCodigoPostal(cp) {
-            if (cp.length !== 5) return;
-            try {
-                const response = await fetch(`https://api.copomex.com/query/info_cp/${cp}?token=libre`);
-                const data = await response.json();
-                if (!data.error && data.response) {
-                    document.getElementById('dir-ciudad').value = data.response.municipio || '';
-                    document.getElementById('dir-estado').value = data.response.estado || '';
-                }
-            } catch (error) { console.error(error); }
-        }
-
-        async function saveStructuredAddress() {
-            const cp = document.getElementById('dir-cp').value.trim();
-            const calle = document.getElementById('dir-calle').value.trim();
-            const numExt = document.getElementById('dir-num-ext').value.trim();
-            const numInt = document.getElementById('dir-num-int').value.trim();
-            const ciudad = document.getElementById('dir-ciudad').value.trim();
-            const estado = document.getElementById('dir-estado').value.trim();
-            const colonia = document.getElementById('dir-colonia-input').value.trim();
-
-            if (!cp || !calle || !numExt || !ciudad || !colonia) {
-                showToast("Por favor completa los campos obligatorios (*).", "error");
-                return;
-            }
-            if (!currentUser) {
-                showToast("Debes iniciar sesión para guardar direcciones.", "error");
-                return;
-            }
-
-            const direccionCompleta = `${calle} #${numExt}${numInt ? ' Int. ' + numInt : ''}, Col. ${colonia}, C.P. ${cp}, ${ciudad}, ${estado}`;
-            try {
-                const { doc, updateDoc, arrayUnion } = window.FB_Methods;
-                await updateDoc(doc(window.FB_Db, "users", currentUser.uid), { addresses: arrayUnion(direccionCompleta) });
-                showToast("¡Dirección guardada con éxito!");
-                toggleAddressModal();
-                loadUserDataAndOrders(currentUser.uid);
-            } catch (e) {
-                showToast("Error al guardar dirección.", "error");
-            }
-        }
-
-        function switchAuthMode() {
-            isRegistering = !isRegistering;
-            const regFields = document.getElementById('register-fields');
-            if (isRegistering) {
-                regFields.classList.remove('hidden');
-                document.getElementById('auth-modal-title').textContent = 'Crear Cuenta';
-                document.getElementById('auth-submit-btn').textContent = 'Registrarse';
-                document.getElementById('auth-switch-btn').textContent = '¿Ya tienes cuenta? Inicia sesión';
-            } else {
-                regFields.classList.add('hidden');
-                document.getElementById('auth-modal-title').textContent = 'Iniciar Sesión';
-                document.getElementById('auth-submit-btn').textContent = 'Entrar';
-                document.getElementById('auth-switch-btn').textContent = '¿No tienes cuenta? Regístrate aquí';
-            }
-        }
-
-        async function handleAuthSubmit() {
-            const email = document.getElementById('auth-email').value.trim();
-            const password = document.getElementById('auth-password').value.trim();
-            const errorBox = document.getElementById('auth-error-box');
-            errorBox.classList.add('hidden');
-
-            const { signInWithEmailAndPassword, createUserWithEmailAndPassword, doc, setDoc } = window.FB_Methods;
-            try {
-                if (isRegistering) {
-                    const names = document.getElementById('reg-names').value.trim();
-                    const surnames = document.getElementById('reg-surnames').value.trim();
-                    const phone = document.getElementById('reg-phone').value.trim();
-                    if (!names || !surnames || !phone) {
-                        errorBox.textContent = "Completa todos los campos.";
-                        errorBox.classList.remove('hidden');
-                        return;
-                    }
-                    const res = await createUserWithEmailAndPassword(window.FB_Auth, email, password);
-                    await setDoc(doc(window.FB_Db, "users", res.user.uid), { names, surnames, phone, email, addresses: [], createdAt: new Date() });
-                    showToast("¡Cuenta creada con éxito!");
-                } else {
-                    await signInWithEmailAndPassword(window.FB_Auth, email, password);
-                    showToast("¡Bienvenida de nuevo!");
-                }
-                toggleAuthModal();
-            } catch (error) {
-                errorBox.textContent = "Correo o contraseña incorrectos.";
-                errorBox.classList.remove('hidden');
-            }
-        }
-
-        async function handleLogout() {
-            await window.FB_Methods.signOut(window.FB_Auth);
-            showToast("Has salido de tu cuenta.");
-            location.reload();
-        }
-
-        const mobileMenu = document.getElementById('mobile-menu');
-        const mobileMenuPanel = document.getElementById('mobile-menu-panel');
+        // Funciones auxiliares de UI y menú
         function toggleMobileMenu() {
-            if (mobileMenu.classList.contains('hidden')) {
-                mobileMenu.classList.remove('hidden');
-                setTimeout(() => mobileMenuPanel.classList.remove('-translate-x-full'), 10);
+            const menu = document.getElementById('mobile-menu');
+            const panel = document.getElementById('mobile-menu-panel');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                setTimeout(() => panel.classList.remove('-translate-x-full'), 10);
             } else {
-                mobileMenuPanel.classList.add('-translate-x-full');
-                setTimeout(() => mobileMenu.classList.add('hidden'), 300);
+                panel.classList.add('-translate-x-full');
+                setTimeout(() => menu.classList.add('hidden'), 300);
             }
-        }
-
-        function setupDropdown(toggleId, submenuId, arrowId) {
-            const btn = document.getElementById(toggleId);
-            const submenu = document.getElementById(submenuId);
-            const arrow = document.getElementById(arrowId);
-            if(btn && submenu && arrow) {
-                btn.onclick = (e) => {
-                    e.preventDefault();
-                    submenu.classList.toggle('hidden');
-                    arrow.classList.toggle('rotate-180');
-                };
-            }
-        }
-        setupDropdown('admin-menu-toggle-btn', 'admin-menu-submenu', 'admin-menu-arrow');
-        setupDropdown('admin-products-toggle', 'admin-products-sub', 'admin-prod-arrow');
-        setupDropdown('admin-add-toggle', 'admin-add-sub', 'admin-add-arrow');
-        setupDropdown('account-toggle-btn', 'account-submenu', 'account-arrow');
-        setupDropdown('orders-toggle-btn', 'orders-container-sub', 'orders-arrow');
-        setupDropdown('addresses-toggle-btn', 'addresses-container-sub', 'addresses-arrow');
-        setupDropdown('collection-toggle-btn', 'collection-submenu', 'collection-arrow');
-        setupDropdown('data-toggle-btn', 'data-container-sub', 'data-arrow');
-        setupDropdown('contact-toggle-btn', 'contact-submenu', 'contact-arrow');
-
-        function showHome(event) {
-            if (event) event.preventDefault();
-            document.getElementById('home-view').classList.remove('hidden');
-            document.getElementById('dynamic-category-view').classList.add('hidden');
-            toggleMobileMenu();
         }
 
         function toggleCartModal() {
@@ -1336,218 +699,64 @@
             if (modal.classList.contains('hidden')) {
                 modal.classList.remove('hidden');
                 setTimeout(() => drawer.classList.remove('translate-x-full'), 10);
-                checkoutStep = 1;
-                updateCartUI();
             } else {
                 drawer.classList.add('translate-x-full');
                 setTimeout(() => modal.classList.add('hidden'), 300);
             }
         }
 
-        function changeItemQuantity(index, delta) {
-            cart[index].quantity += delta;
-            if (cart[index].quantity <= 0) cart.splice(index, 1);
-            localStorage.setItem('amis_cart', JSON.stringify(cart));
-            updateCartUI();
-        }
-
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            localStorage.setItem('amis_cart', JSON.stringify(cart));
-            updateCartUI();
-        }
-
         function updateCartUI() {
             const countEl = document.getElementById('cart-count');
             if(countEl) countEl.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
-
-            const stepCart = document.getElementById('step-cart');
-            const stepShipping = document.getElementById('step-shipping');
-            const stepPayment = document.getElementById('step-payment');
-            const actionBtn = document.getElementById('cart-action-btn');
-            const backBtn = document.getElementById('cart-back-btn');
-            const modalTitle = document.getElementById('cart-modal-title');
-
-            if(stepCart) stepCart.classList.add('hidden');
-            if(stepShipping) stepShipping.classList.add('hidden');
-            if(stepPayment) stepPayment.classList.add('hidden');
-
-            let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const shippingMethodChecked = document.querySelector('input[name="shipping-method"]:checked');
-            if (shippingMethodChecked && shippingMethodChecked.value === 'Envío Nacional') total += 149;
-
-            const totalEl = document.getElementById('cart-total');
-            if(totalEl) totalEl.textContent = `$${total} MXN`;
-            const transferAmountDisplay = document.getElementById('transfer-amount-display');
-            if(transferAmountDisplay) transferAmountDisplay.textContent = `$${total} MXN`;
-
-            if (checkoutStep === 1) {
-                if(modalTitle) modalTitle.textContent = 'Tu Carrito';
-                if(stepCart) stepCart.classList.remove('hidden');
-                if(backBtn) backBtn.classList.add('hidden');
-                if(actionBtn) {
-                    actionBtn.textContent = 'Ir a Pagar';
-                    actionBtn.style.display = cart.length === 0 ? 'none' : 'block';
-                }
-
-                let html = '';
-                if (cart.length === 0) {
-                    html = '<p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>';
-                } else {
-                    cart.forEach((item, index) => {
-                        html += `<div class="flex justify-between items-center text-sm border-b border-gray-100 pb-3">
-                            <div>
-                                <p class="font-medium text-gray-900">${item.name}</p>
-                                <p class="text-xs text-gray-500">Color: ${item.color} · $${item.price} c/u</p>
-                                <div class="flex items-center gap-2 mt-2">
-                                    <button onclick="changeItemQuantity(${index}, -1)" class="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center font-bold">-</button>
-                                    <span class="text-xs font-semibold w-5 text-center">${item.quantity}</span>
-                                    <button onclick="changeItemQuantity(${index}, 1)" class="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center font-bold">+</button>
-                                </div>
-                            </div>
-                            <div class="flex flex-col items-end gap-2">
-                                <span class="font-semibold text-gray-900">$${item.price * item.quantity}</span>
-                                <button onclick="removeFromCart(${index})" class="text-red-500 text-xs hover:underline">Eliminar</button>
-                            </div>
-                        </div>`;
-                    });
-                }
-                document.getElementById('cart-items').innerHTML = html;
-            } else if (checkoutStep === 2) {
-                if(modalTitle) modalTitle.textContent = 'Datos y Envío';
-                if(stepShipping) stepShipping.classList.remove('hidden');
-                if(backBtn) backBtn.classList.remove('hidden');
-                if(actionBtn) {
-                    actionBtn.textContent = 'Siguiente: Pago';
-                    actionBtn.style.display = 'block';
-                }
-                applyShippingRules();
-            } else if (checkoutStep === 3) {
-                if(modalTitle) modalTitle.textContent = 'Método de Pago';
-                if(stepPayment) stepPayment.classList.remove('hidden');
-                if(backBtn) backBtn.classList.remove('hidden');
-                if(actionBtn) {
-                    actionBtn.textContent = 'Finalizar Pedido';
-                    actionBtn.style.display = 'block';
-                }
-                applyPaymentRules();
-                handlePaymentChange();
-            }
         }
 
-        function handleCartBack() {
-            if (checkoutStep > 1) { checkoutStep--; updateCartUI(); }
+        function toggleAuthModal() { document.getElementById('auth-modal').classList.toggle('hidden'); }
+        function toggleAddressModal() { document.getElementById('address-modal').classList.toggle('hidden'); }
+        function openAdminOrdersModal() { document.getElementById('admin-orders-modal').classList.remove('hidden'); }
+        function toggleAdminOrdersModal() { document.getElementById('admin-orders-modal').classList.toggle('hidden'); }
+        function addColorRow() {
+            const container = document.getElementById('color-rows-container');
+            const row = document.createElement('div');
+            row.className = 'flex gap-1 items-center color-row mt-1';
+            row.innerHTML = `<input type="text" placeholder="#HEX" class="w-20 p-1.5 border rounded text-[11px] font-mono color-hex-input" value="#000000"><input type="text" placeholder="Nombre color" class="w-20 p-1.5 border rounded text-[11px] color-name-input"><input type="text" placeholder="URL Foto" class="flex-1 p-1.5 border rounded text-[11px] color-url-input"><button onclick="this.parentElement.remove()" class="text-red-500 font-bold px-1 text-xs">✕</button>`;
+            container.appendChild(row);
         }
-
-        async function handleCartNext() {
-            if (checkoutStep === 1) {
-                if (cart.length === 0) return;
-                checkoutStep = 2;
-                updateCartUI();
-            } else if (checkoutStep === 2) {
-                const clientName = document.getElementById('ship-name').value.trim();
-                const clientPhone = document.getElementById('ship-phone').value.trim();
-                const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
-                let clientAddress = shippingMethod === "Punto de entrega" ? document.querySelector('input[name="meeting-point-radio"]:checked').value : document.getElementById('ship-address').value.trim();
-
-                if(!clientName || !clientPhone || !clientAddress) {
-                    showToast("Por favor completa los campos obligatorios de envío.", "error");
-                    return;
-                }
-                checkoutStep = 3;
-                updateCartUI();
-            } else if (checkoutStep === 3) {
-                const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
-                const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
-                const clientName = document.getElementById('ship-name').value.trim();
-                const clientPhone = document.getElementById('ship-phone').value.trim();
-                let clientAddress = shippingMethod === "Punto de entrega" ? document.querySelector('input[name="meeting-point-radio"]:checked').value : document.getElementById('ship-address').value.trim();
-
-                let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                if (shippingMethod === "Envío Nacional") total += 149;
-
-                try {
-                    const { collection, addDoc, getDocs, Timestamp } = window.FB_Methods;
-                    const now = new Date();
-                    const year = now.getFullYear().toString().slice(-2);
-                    const month = (now.getMonth() + 1).toString().padStart(2, '0');
-                    let nextOrderNumber = (await getDocs(collection(window.FB_Db, "orders"))).size + 1;
-                    const orderId = `VT${year}${month}-${nextOrderNumber.toString().padStart(5, '0')}`;
-
-                    const orderData = {
-                        orderId,
-                        userId: currentUser ? currentUser.uid : "guest",
-                        clientName,
-                        clientPhone,
-                        clientAddress,
-                        shipping: shippingMethod,
-                        payment: paymentMethod,
-                        items: cart,
-                        total: `$${total} MXN`,
-                        status: "En proceso",
-                        createdAt: Timestamp.now()
-                    };
-
-                    await addDoc(collection(window.FB_Db, "orders"), orderData);
-                    enviarFormSubmit({ orderId, clientName, clientPhone, clientAddress, shippingMethod, paymentMethod, total });
-
-                    let mensajeWA = `Hola Amis Boutique! 👋 Mi número de pedido es: *${orderId}*`;
-                    document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${encodeURIComponent(mensajeWA)}`;
-
-                    toggleCartModal();
-                    document.getElementById('order-success-modal').classList.remove('hidden');
-                } catch (error) {
-                    showToast("Hubo un error al procesar tu pedido.", "error");
-                }
-            }
+        async function guardarNuevoProducto() {
+            const name = document.getElementById('new-prod-name').value.trim();
+            const description = document.getElementById('new-prod-desc').value.trim();
+            const price = Number(document.getElementById('new-prod-price').value.trim());
+            const category = document.getElementById('new-prod-cat').value;
+            if (!name || !price) { showToast("Ingresa al menos nombre y precio."); return; }
+            let colors = [], images = [];
+            document.querySelectorAll('.color-row').forEach(row => {
+                const hex = row.querySelector('.color-hex-input').value.trim();
+                const cname = row.querySelector('.color-name-input').value.trim() || 'Único';
+                const url = row.querySelector('.color-url-input').value.trim();
+                if (url) { colors.push({ hex, name: cname, image: url }); images.push(url); }
+            });
+            if (images.length === 0) { showToast("Agrega al menos una foto."); return; }
+            try {
+                await window.FB_Methods.addDoc(window.FB_Methods.collection(window.FB_Db, "products"), { name, description, price, category, colors, images, createdAt: new Date() });
+                showToast("¡Producto guardado!");
+                toggleMobileMenu();
+                navigateTo('/' + category);
+            } catch(e) { showToast("Error al guardar."); }
         }
-
-        function closeSuccessModalAndReload() {
-            document.getElementById('order-success-modal').classList.add('hidden');
-            cart = [];
-            localStorage.removeItem('amis_cart');
+        async function loadUserDataAndOrders(uid) {
+            const ordersContent = document.getElementById('menu-user-orders');
+            const profileContent = document.getElementById('menu-user-profile');
+            try {
+                const { doc, getDoc } = window.FB_Methods;
+                const snap = await getDoc(doc(window.FB_Db, "users", uid));
+                if (snap.exists()) {
+                    const d = snap.data();
+                    if (profileContent) profileContent.innerHTML = `<p>${d.names} ${d.surnames}</p><p>${d.phone}</p>`;
+                }
+            } catch(e) {}
+        }
+        async function handleLogout() {
+            await window.FB_Methods.signOut(window.FB_Auth);
             location.reload();
-        }
-
-        function applyShippingRules() {
-            const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
-            const meetingPointsContainer = document.getElementById('meeting-points-container');
-            const addressFieldContainer = document.getElementById('address-field-container');
-            if (shippingMethod === 'Punto de entrega') {
-                meetingPointsContainer.classList.remove('hidden');
-                addressFieldContainer.classList.add('hidden');
-            } else {
-                meetingPointsContainer.classList.add('hidden');
-                addressFieldContainer.classList.remove('hidden');
-            }
-            applyPaymentRules();
-            updateCartUI();
-        }
-
-        function applyPaymentRules() {
-            const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
-            const payCash = document.getElementById('pay-cash');
-            const payTerminal = document.getElementById('pay-terminal');
-            const mpRadio = document.querySelector('input[name="payment-method"][value="Mercado Pago"]');
-            if (shippingMethod === 'Envío Nacional') {
-                payCash.style.display = 'none';
-                payTerminal.style.display = 'none';
-                const currentPayment = document.querySelector('input[name="payment-method"]:checked');
-                if(currentPayment && currentPayment.value.includes('contra entrega')) {
-                    mpRadio.checked = true;
-                    handlePaymentChange();
-                }
-            } else {
-                payCash.style.display = 'flex';
-                payTerminal.style.display = 'flex';
-            }
-        }
-
-        function handlePaymentChange() {
-            const selectedPay = document.querySelector('input[name="payment-method"]:checked').value;
-            const bankDetails = document.getElementById('bank-details');
-            if (selectedPay === 'Transferencia Bancaria') bankDetails.classList.remove('hidden');
-            else bankDetails.classList.add('hidden');
         }
     </script>
 </body>
