@@ -1385,23 +1385,27 @@
 
                 applyShippingRules();
 
-                if (userData && currentUser) {
-                    const shipName = document.getElementById('ship-name');
-                    const shipPhone = document.getElementById('ship-phone');
-                    const shipEmail = document.getElementById('ship-email');
-                    const shipAddress = document.getElementById('ship-address');
+                // AUTORRELLENADO AUTOMÁTICO DE DATOS Y DIRECCIÓN GUARDADA
+                const shipName = document.getElementById('ship-name');
+                const shipPhone = document.getElementById('ship-phone');
+                const shipEmail = document.getElementById('ship-email');
+                const shipAddress = document.getElementById('ship-address');
 
+                if (userData) {
                     if(shipName) shipName.value = `${userData.names || ''} ${userData.surnames || ''}`.trim();
                     if(shipPhone) shipPhone.value = userData.phone || '';
-                    if(shipEmail) shipEmail.value = currentUser.email || '';
                     if(userData.addresses && userData.addresses.length > 0 && shipAddress) {
                         shipAddress.value = userData.addresses[0];
                     }
                 }
+                if (currentUser && shipEmail) {
+                    shipEmail.value = currentUser.email || '';
+                }
+
             } else if (checkoutStep === 3) {
                 if(modalTitle) modalTitle.textContent = 'Método de Pago';
                 if(stepPayment) stepPayment.classList.remove('hidden');
-                if(backBtn) stepPayment.classList.remove('hidden');
+                if(backBtn) backBtn.classList.remove('hidden');
                 if(actionBtn) {
                     actionBtn.textContent = 'Finalizar Pedido';
                     actionBtn.style.display = 'block';
