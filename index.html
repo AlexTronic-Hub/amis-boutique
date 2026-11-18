@@ -234,7 +234,7 @@
                         <h2 class="font-serif text-xl font-bold flex items-center gap-2">⚙️ Panel de Administración - Pedidos</h2>
                         <button onclick="toggleAdminModal()" class="p-2 rounded-md hover:bg-gray-100">✕</button>
                     </div>
-                    <p class="text-xs text-gray-500 mb-4">Aquí puedes supervisar los pedidos de los clientes y actualizar su estatus en tiempo real.</p>
+                    <p class="text-xs text-gray-500 mb-4">Aquí puedes supervisar los pedidos de los clientes y actualizar su estatus o método de entrega en tiempo real.</p>
                     <div id="admin-orders-list" class="space-y-4">
                         <p class="text-gray-400 text-xs italic text-center py-8">Cargando pedidos...</p>
                     </div>
@@ -415,20 +415,20 @@
                                 <input type="radio" name="shipping-method" value="Envío local en GDL" checked onchange="applyShippingRules()" class="text-black focus:ring-black">
                                 <div>
                                     <span class="font-medium block">Envío local en Guadalajara</span>
-                                    <span class="text-xs text-gray-500">Pago contra entrega disponible</span>
+                                    <span class="text-xs text-gray-500">Costo según distancia (Se cotiza por WhatsApp)</span>
                                 </div>
                             </label>
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
                                 <input type="radio" name="shipping-method" value="Envío Nacional" onchange="applyShippingRules()" class="text-black focus:ring-black">
                                 <div>
-                                    <span class="font-medium block">Envío Nacional</span>
+                                    <span class="font-medium block">Envío Nacional ($149 MXN)</span>
                                     <span class="text-xs text-gray-500">Pago por transferencia o Mercado Pago</span>
                                 </div>
                             </label>
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
                                 <input type="radio" name="shipping-method" value="Punto de entrega" onchange="applyShippingRules()" class="text-black focus:ring-black">
                                 <div>
-                                    <span class="font-medium block">Punto de entrega</span>
+                                    <span class="font-medium block">Punto de entrega (Sin costo)</span>
                                     <span class="text-xs text-gray-500">Elige tu plaza o punto de encuentro</span>
                                 </div>
                             </label>
@@ -458,6 +458,14 @@
                                 <label class="flex items-center space-x-3 cursor-pointer">
                                     <input type="radio" name="meeting-point-radio" value="OXXO Medrano" class="text-black focus:ring-black">
                                     <a href="https://maps.app.goo.gl/fe53VxNUDgjH4nNq6" target="_blank" class="text-blue-600 hover:underline font-medium">OXXO Medrano 📍</a>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="radio" name="meeting-point-radio" value="Plaza Lomas" class="text-black focus:ring-black">
+                                    <a href="https://maps.app.goo.gl/spRiij5zXv9b7dHZ8" target="_blank" class="text-blue-600 hover:underline font-medium">Plaza Lomas 📍</a>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="radio" name="meeting-point-radio" value="Punto Río Nilo" class="text-black focus:ring-black">
+                                    <a href="https://maps.app.goo.gl/yv1w1jtnSXHdsSYv8" target="_blank" class="text-blue-600 hover:underline font-medium">Punto Río Nilo 📍</a>
                                 </label>
                             </div>
                         </div>
@@ -629,13 +637,15 @@
         const CORREO_BOUTIQUE = "alexisorozcoortiz@gmail.com";
         const WHATSAPP_TIENDA = "523312467018";
 
-        // MAPA DE ENLACES OFICIALES DE GOOGLE MAPS PROPORCIONADOS POR ALEXIS
+        // MAPA DE ENLACES OFICIALES DE GOOGLE MAPS PARA LOS PUNTOS DE ENTREGA Y ENVÍOS NACIONALES
         const MAPS_LOCATIONS = {
             "Plaza Forum": "https://maps.app.goo.gl/YA6AYi19UgDrsrZB8",
             "Plaza Revolución": "https://maps.app.goo.gl/zJ9e6eoFnnL8h25w9",
             "Plaza Patria": "https://maps.app.goo.gl/27YwUG4VzpAk31u18",
             "Terraza Belenes": "https://maps.app.goo.gl/VoHEE5zBkpQac5HE7",
-            "OXXO Medrano": "https://maps.app.goo.gl/fe53VxNUDgjH4nNq6"
+            "OXXO Medrano": "https://maps.app.goo.gl/fe53VxNUDgjH4nNq6",
+            "Plaza Lomas": "https://maps.app.goo.gl/spRiij5zXv9b7dHZ8",
+            "Punto Río Nilo": "https://maps.app.goo.gl/yv1w1jtnSXHdsSYv8"
         };
 
         let cart = JSON.parse(localStorage.getItem('amis_cart') || '[]');
@@ -1010,7 +1020,7 @@
                 <p><strong>Estatus actual:</strong> <span class="text-amber-600 font-bold">${data.status || 'En proceso'}</span></p>
                 <p><strong>Método de pago:</strong> ${data.payment}</p>
                 <p><strong>Método de envío:</strong> ${envioInfo}</p>
-                <p><strong>Punto seleccionado:</strong> ${puntoOpcionHtml}</p>
+                <p><strong>Punto o Dirección:</strong> ${puntoOpcionHtml}</p>
                 <p class="font-bold text-gray-900 pt-1">Total pagado: ${data.total}</p>
             `;
 
@@ -1055,17 +1065,13 @@
                     const id = docSnap.id;
                     const d = docSnap.data();
                     const currentStatus = d.status || 'En proceso';
+                    const currentShipping = d.shipping || 'Envío local en GDL';
 
                     let itemsStr = '';
                     if (d.items) {
                         d.items.forEach(i => {
                             itemsStr += `<li>${i.quantity}x ${i.name} (${i.color}) - $${i.price * i.quantity}</li>`;
                         });
-                    }
-
-                    let adminEnvio = d.shipping;
-                    if (MAPS_LOCATIONS[d.shipping]) {
-                        adminEnvio = `Punto de Entrega: <strong>${d.shipping}</strong>`;
                     }
 
                     let adminPunto = d.clientAddress;
@@ -1080,14 +1086,25 @@
                             <span class="text-amber-600">${d.total}</span>
                         </div>
                         <p><strong>Cliente:</strong> ${d.clientName} (${d.clientPhone})</p>
-                        <p><strong>Envío:</strong> ${adminEnvio}</p>
-                        <p><strong>Punto / Ubicación:</strong> ${adminPunto}</p>
+                        <p><strong>Dirección/Punto:</strong> ${adminPunto}</p>
                         <p><strong>Pago:</strong> ${d.payment}</p>
                         <div>
                             <strong>Productos:</strong>
                             <ul class="list-disc pl-4 text-gray-600 mt-1">${itemsStr}</ul>
                         </div>
+                        
+                        <!-- MODIFICAR MÉTODO DE ENVÍO DESDE ADMIN -->
                         <div class="pt-2 border-t border-gray-200 flex items-center justify-between">
+                            <label class="font-bold">Método de Envío:</label>
+                            <select onchange="actualizarEnvioPedido('${id}', this.value)" class="p-1.5 border border-gray-300 rounded-lg text-xs bg-white font-medium focus:outline-none focus:border-black">
+                                <option value="Envío local en GDL" ${currentShipping === 'Envío local en GDL' ? 'selected' : ''}>🛵 Envío local en GDL</option>
+                                <option value="Envío Nacional" ${currentShipping === 'Envío Nacional' ? 'selected' : ''}>📦 Envío Nacional ($149)</option>
+                                <option value="Punto de entrega" ${currentShipping === 'Punto de entrega' ? 'selected' : ''}>📍 Punto de entrega</option>
+                            </select>
+                        </div>
+
+                        <!-- MODIFICAR ESTATUS DESDE ADMIN -->
+                        <div class="pt-1 flex items-center justify-between">
                             <label class="font-bold">Estatus:</label>
                             <select onchange="actualizarEstatusPedido('${id}', this.value)" class="p-1.5 border border-gray-300 rounded-lg text-xs bg-white font-medium focus:outline-none focus:border-black">
                                 <option value="En proceso" ${currentStatus === 'En proceso' ? 'selected' : ''}>⏳ En proceso</option>
@@ -1114,6 +1131,17 @@
             } catch (e) {
                 console.error(e);
                 showToast("Error al actualizar estatus", "error");
+            }
+        }
+
+        async function actualizarEnvioPedido(docId, nuevoEnvio) {
+            try {
+                const { doc, updateDoc } = window.FB_Methods;
+                await updateDoc(doc(window.FB_Db, "orders", docId), { shipping: nuevoEnvio });
+                showToast(`Método de envío actualizado a: ${nuevoEnvio}`);
+            } catch (e) {
+                console.error(e);
+                showToast("Error al actualizar el envío", "error");
             }
         }
 
@@ -1296,6 +1324,13 @@
             if(stepPayment) stepPayment.classList.add('hidden');
 
             let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            // Si el cliente selecciona Envío Nacional, sumamos los $149 fijos
+            const shippingMethodChecked = document.querySelector('input[name="shipping-method"]:checked');
+            if (shippingMethodChecked && shippingMethodChecked.value === 'Envío Nacional') {
+                total += 149;
+            }
+
             const totalEl = document.getElementById('cart-total');
             if(totalEl) totalEl.textContent = `$${total} MXN`;
 
@@ -1360,7 +1395,7 @@
             } else if (checkoutStep === 3) {
                 if(modalTitle) modalTitle.textContent = 'Método de Pago';
                 if(stepPayment) stepPayment.classList.remove('hidden');
-                if(backBtn) backBtn.classList.remove('hidden');
+                if(backBtn) stepPayment.classList.remove('hidden');
                 if(actionBtn) {
                     actionBtn.textContent = 'Finalizar Pedido';
                     actionBtn.style.display = 'block';
@@ -1417,6 +1452,9 @@
                 }
 
                 let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                if (shippingMethod === "Envío Nacional") {
+                    total += 149;
+                }
 
                 const actionBtn = document.getElementById('cart-action-btn');
                 actionBtn.disabled = true;
@@ -1441,16 +1479,24 @@
                     const orderId = `${prefix}${nextOrderNumber.toString().padStart(5, '0')}`;
 
                     if (paymentMethod === "Mercado Pago") {
+                        const itemsMp = cart.map(item => ({
+                            title: `${item.name} (${item.color})`,
+                            unit_price: Number(item.price),
+                            quantity: item.quantity
+                        }));
+
+                        if (shippingMethod === "Envío Nacional") {
+                            itemsMp.push({
+                                title: "Envío Nacional",
+                                unit_price: 149,
+                                quantity: 1
+                            });
+                        }
+
                         const respMP = await fetch('/api/crear-preferencia', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ 
-                                items: cart.map(item => ({
-                                    title: `${item.name} (${item.color})`,
-                                    unit_price: Number(item.price),
-                                    quantity: item.quantity
-                                }))
-                            })
+                            body: JSON.stringify({ items: itemsMp })
                         });
                         const dataMP = await respMP.json();
                         if (dataMP && dataMP.init_point) {
@@ -1519,6 +1565,7 @@
                 addressFieldContainer.classList.remove('hidden');
             }
             applyPaymentRules();
+            updateCartUI();
         }
 
         function applyPaymentRules() {
