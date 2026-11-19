@@ -8,21 +8,21 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { items } = req.body;
+    const { items, backUrl } = req.body;
 
     const preference = new Preference(client);
     const result = await preference.create({
       body: {
         items: items.map(item => ({
           title: String(item.title),
-          unit_price: Number(item.unit_price), // <--- Forzamos que sea número
+          unit_price: Number(item.unit_price),
           quantity: Number(item.quantity || 1),
           currency_id: 'MXN'
         })),
         back_urls: {
-          success: 'https://amisboutique.com',
-          failure: 'https://amisboutique.com',
-          pending: 'https://amisboutique.com'
+          success: backUrl || 'https://amisboutique.com',
+          failure: backUrl || 'https://amisboutique.com',
+          pending: backUrl || 'https://amisboutique.com'
         },
         auto_return: 'approved',
       }
