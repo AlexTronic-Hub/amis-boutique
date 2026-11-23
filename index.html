@@ -1596,10 +1596,8 @@
                         createdAt: Timestamp.now()
                     };
 
-                    // GUARDAR RESPALDO EN FIREBASE ANTES DE IR A MERCADO PAGO
-                    await addDoc(collection(window.FB_Db, "orders"), orderData);
-
-                    // SI ELIGE MERCADO PAGO, LLAMAMOS AL ENDPOINT SEGURO EN VERCEL (/api/crear-preferencia)
+                    // SI ELIGE MERCADO PAGO: NO guardamos en Firebase todavía. 
+                    // Lo mandamos directo a la pasarela y dejamos que el Webhook (o el éxito) lo registre.
                     if (isMP) {
                         localStorage.setItem('amis_pending_order', JSON.stringify({
                             ...orderData,
@@ -1645,7 +1643,9 @@
                         }
                     }
 
-                    // PARA OTROS MÉTODOS DE PAGO (Transferencia, efectivo, terminal)
+                    // PARA OTROS MÉTODOS DE PAGO (Transferencia, efectivo, terminal): SÍ se guarda de inmediato
+                    await addDoc(collection(window.FB_Db, "orders"), orderData);
+
                     enviarFormSubmit({ orderId, clientName, clientPhone, clientAddress, shippingMethod, paymentMethod, total, items: cart });
 
                     let mensajeWA = `Hola Amis Boutique! 👋 Mi número de pedido es: *${orderId}*`;
@@ -1657,9 +1657,6 @@
                     console.error("Error en checkout:", error);
                     showToast("Hubo un error al procesar tu pedido.", "error");
                 }
-            }
-        }
-
         function closeSuccessModalAndReload() {
             document.getElementById('order-success-modal').classList.add('hidden');
             cart = [];
