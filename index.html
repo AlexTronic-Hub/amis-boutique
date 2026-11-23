@@ -774,67 +774,70 @@
         });
 
         async function procesarRetornoMercadoPago() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const status = urlParams.get('status') || urlParams.get('collection_status');
-            const mpResult = urlParams.get('pago');
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status') || urlParams.get('collection_status');
+    const mpResult = urlParams.get('pago');
 
-            if (status === 'approved' || mpResult === 'exito') {
-                const pendingData = JSON.parse(localStorage.getItem('amis_pending_order'));
-                if (pendingData) {
-                    const { collection, query, where, getDocs, doc, updateDoc, addDoc, Timestamp } = window.FB_Methods;
-                    try {
-                        const q = query(collection(window.FB_Db, "orders"), where("orderId", "==", pendingData.orderId));
-                        const snap = await getDocs(q);
+    // SOLO si Mercado Pago dice explícitamente que fue aprobado
+    if (status === 'approved' || mpResult === 'exito') {
+        const pendingData = JSON.parse(localStorage.getItem('amis_pending_order'));
+        if (pendingData) {
+            const { collection, query, where, getDocs, doc, updateDoc, addDoc, Timestamp } = window.FB_Methods;
+            try {
+                const q = query(collection(window.FB_Db, "orders"), where("orderId", "==", pendingData.orderId));
+                const snap = await getDocs(q);
 
-                        if (!snap.empty) {
-                            const docRef = doc(window.FB_Db, "orders", snap.docs[0].id);
-                            await updateDoc(docRef, { status: "Pagado" });
-                        } else {
-                            await addDoc(collection(window.FB_Db, "orders"), {
-                                orderId: pendingData.orderId,
-                                userId: pendingData.userId || "guest",
-                                clientName: pendingData.clientName,
-                                clientPhone: pendingData.clientPhone,
-                                clientAddress: pendingData.clientAddress,
-                                shipping: pendingData.shipping,
-                                payment: pendingData.payment,
-                                items: pendingData.items || [],
-                                total: pendingData.total,
-                                status: "Pagado",
-                                createdAt: Timestamp.now()
-                            });
-                        }
-
-                        enviarFormSubmit({
-                            orderId: pendingData.orderId,
-                            clientName: pendingData.clientName,
-                            clientPhone: pendingData.clientPhone,
-                            clientAddress: pendingData.clientAddress,
-                            shippingMethod: pendingData.shipping,
-                            paymentMethod: pendingData.payment,
-                            total: pendingData.numericTotal || pendingData.total.replace(/[^0-9.]/g, ''),
-                            items: pendingData.items
-                        });
-
-                        let mensajeWA = `Hola Amis Boutique! 👋 Ya realicé mi pago por Mercado Pago. Mi número de pedido es: *${pendingData.orderId}*`;
-                        document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${encodeURIComponent(mensajeWA)}`;
-                        document.getElementById('order-success-modal').classList.remove('hidden');
-
-                        localStorage.removeItem('amis_pending_order');
-                        localStorage.removeItem('amis_cart');
-                        cart = [];
-                        updateCartUI();
-                    } catch (err) {
-                        console.error("Error confirmando orden de MP:", err);
-                    }
+                if (!snap.empty) {
+                    const docRef = doc(window.FB_Db, "orders", snap.docs[0].id);
+                    await updateDoc(docRef, { status: "Pagado" });
+                } else {
+                    await addDoc(collection(window.FB_Db, "orders"), {
+                        orderId: pendingData.orderId,
+                        userId: pendingData.userId || "guest",
+                        clientName: pendingData.clientName,
+                        clientPhone: pendingData.clientPhone,
+                        clientAddress: pendingData.clientAddress,
+                        shipping: pendingData.shipping,
+                        payment: pendingData.payment,
+                        items: pendingData.items || [],
+                        total: pendingData.total,
+                        status: "Pagado",
+                        createdAt: Timestamp.now()
+                    });
                 }
-                window.history.replaceState({}, document.title, window.location.pathname);
-            } else if (mpResult === 'fallo') {
-                showToast("El pago en Mercado Pago no se completó o fue rechazado.", "error");
-                window.history.replaceState({}, document.title, window.location.pathname);
+
+                enviarFormSubmit({
+                    orderId: pendingData.orderId,
+                    clientName: pendingData.clientName,
+                    clientPhone: pendingData.clientPhone,
+                    clientAddress: pendingData.clientAddress,
+                    shippingMethod: pendingData.shipping,
+                    paymentMethod: pendingData.payment,
+                    total: pendingData.numericTotal || pendingData.total.replace(/[^0-9.]/g, ''),
+                    items: pendingData.items
+                });
+
+                let mensajeWA = `Hola Amis Boutique! 👋 Ya realicé mi pago por Mercado Pago. Mi número de pedido es: *${pendingData.orderId}*`;
+                document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${encodeURIComponent(mensajeWA)}`;
+                document.getElementById('order-success-modal').classList.remove('hidden');
+
+                localStorage.removeItem('amis_pending_order');
+                localStorage.removeItem('amis_cart');
+                cart = [];
+                updateCartUI();
+            } catch (err) {
+                console.error("Error confirmando orden de MP:", err);
             }
         }
-
+        window.history.replaceState({}, document.title, window.location.pathname);
+    } else {
+        // Si el usuario canceló, regresó o hubo fallo, limpiamos el pedido pendiente para que no salte el modal por error
+        localStorage.removeItem('amis_pending_order');
+        if (status || mpResult) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }
+}
         async function checkURLParametersAndLoad() {
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('producto');
