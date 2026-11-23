@@ -780,7 +780,6 @@
             const status = urlParams.get('status') || urlParams.get('collection_status') || mpResult;
             const paymentId = urlParams.get('payment_id') || urlParams.get('collection_id');
 
-            // Acepta tanto pagos aprobados (tarjeta) como pendientes (OXXO / SPEI)
             if ((status === 'approved' || status === 'pending' || status === 'in_process') && paymentId) {
                 const pendingData = JSON.parse(localStorage.getItem('amis_pending_order'));
                 
@@ -842,6 +841,7 @@
                 }
             }
         }
+
         async function checkURLParametersAndLoad() {
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('producto');
@@ -1120,10 +1120,8 @@
             showToast("¡Agregado al carrito con éxito!");
         }
 
-       // Variable global para retener los datos del perfil cargados de Firebase
         let globalUserProfile = { names: '', surnames: '', phone: '', email: '', address: '' };
 
-        // 1. Modifica tu función loadUserDataAndOrders para que guarde los datos globalmente:
         async function loadUserDataAndOrders(uid) {
             const ordersContent = document.getElementById('menu-user-orders');
             const addressesContent = document.getElementById('menu-user-addresses');
@@ -1153,7 +1151,6 @@
                     addresses = userData.addresses || [];
                 }
 
-                // Guardamos en la variable global para usarlo cuando se abra el checkout
                 globalUserProfile = {
                     names,
                     surnames,
@@ -1217,8 +1214,6 @@
             }
         }
 
-        // 2. Modifica la función updateCartUI o handleCartNext para inyectar los datos cuando se pasa al Paso 2 (Datos y Envío):
-        // Busca tu función updateCartUI y en la sección donde dice `else if (checkoutStep === 2)` agrega esto:
         function verDetallePedido(orderJson) {
             const data = JSON.parse(decodeURIComponent(orderJson));
             document.getElementById('modal-order-title').textContent = `Pedido: ${data.orderId}`;
@@ -1302,6 +1297,7 @@
                 container.innerHTML = '<p class="text-red-500 text-xs text-center py-4">Error al cargar pedidos.</p>';
             }
         }
+
         async function actualizarEstatusPedido(docId, nuevoEstatus) {
             try {
                 const { doc, updateDoc } = window.FB_Methods;
@@ -1400,7 +1396,7 @@
                 toggleAuthModal();
             } catch (error) {
                 errorBox.textContent = "Correo o contraseña incorrectos.";
-                errorBox.classList.add('hidden');
+                errorBox.classList.remove('hidden');
             }
         }
 
@@ -1458,42 +1454,21 @@
         function toggleCartModal() {
             const modal = document.getElementById('cart-modal');
             const drawer = document.getElementById('cart-drawer-panel');
+            const modalTitle = document.getElementById('cart-modal-title');
+            const stepShipping = document.getElementById('step-shipping');
+            const backBtn = document.getElementById('cart-back-btn');
+            const actionBtn = document.getElementById('cart-action-btn');
+
             if (modal.classList.contains('hidden')) {
                 modal.classList.remove('hidden');
                 setTimeout(() => drawer.classList.remove('translate-x-full'), 10);
                 checkoutStep = 1;
                 updateCartUI();
-           } else if (checkoutStep === 2) {
-                if(modalTitle) modalTitle.textContent = 'Datos y Envío';
-                if(stepShipping) stepShipping.classList.remove('hidden');
-                if(backBtn) backBtn.classList.remove('hidden');
-                if(actionBtn) {
-                    actionBtn.textContent = 'Siguiente: Pago';
-                    actionBtn.style.display = 'block';
-                }
-                
-                // --- INYECTAR DATOS DEL USUARIO LOGUEADO AL LLEGAR AL PASO 2 ---
-                const nameInput = document.getElementById('ship-name');
-                const phoneInput = document.getElementById('ship-phone');
-                const emailInput = document.getElementById('ship-email');
-                const addressInput = document.getElementById('ship-address');
-
-                if (nameInput && !nameInput.value && globalUserProfile.fullName) {
-                    nameInput.value = globalUserProfile.fullName;
-                }
-                if (phoneInput && !phoneInput.value && globalUserProfile.phone) {
-                    phoneInput.value = globalUserProfile.phone;
-                }
-                if (emailInput && !emailInput.value) {
-                    emailInput.value = currentUser ? currentUser.email : globalUserProfile.email;
-                }
-                if (addressInput && !addressInput.value && globalUserProfile.address) {
-                    addressInput.value = globalUserProfile.address;
-                }
-                // -------------------------------------------------------------
-
-                applyShippingRules();
+            } else {
+                drawer.classList.add('translate-x-full');
+                setTimeout(() => modal.classList.add('hidden'), 300);
             }
+        }
 
         function changeItemQuantity(index, delta) {
             cart[index].quantity += delta;
@@ -1572,6 +1547,26 @@
                     actionBtn.textContent = 'Siguiente: Pago';
                     actionBtn.style.display = 'block';
                 }
+                
+                // Inyectar datos del usuario logueado
+                const nameInput = document.getElementById('ship-name');
+                const phoneInput = document.getElementById('ship-phone');
+                const emailInput = document.getElementById('ship-email');
+                const addressInput = document.getElementById('ship-address');
+
+                if (nameInput && !nameInput.value && globalUserProfile.fullName) {
+                    nameInput.value = globalUserProfile.fullName;
+                }
+                if (phoneInput && !phoneInput.value && globalUserProfile.phone) {
+                    phoneInput.value = globalUserProfile.phone;
+                }
+                if (emailInput && !emailInput.value) {
+                    emailInput.value = currentUser ? currentUser.email : globalUserProfile.email;
+                }
+                if (addressInput && !addressInput.value && globalUserProfile.address) {
+                    addressInput.value = globalUserProfile.address;
+                }
+
                 applyShippingRules();
             } else if (checkoutStep === 3) {
                 if(modalTitle) modalTitle.textContent = 'Método de Pago';
@@ -1630,9 +1625,6 @@
                 const orderId = `VT${year}${month}-${nextOrderNumber.toString().padStart(5, '0')}`;
                 const isMP = paymentMethod === 'Mercado Pago';
 
-                // ==========================================
-                // CASO 1: MERCADO PAGO (ESTRICTO)
-                // ==========================================
                 if (isMP) {
                     const orderData = {
                         orderId,
@@ -1647,7 +1639,6 @@
                         createdAt: Timestamp.now()
                     };
 
-                    // Guardamos únicamente en localStorage. NO se toca Firebase aquí.
                     localStorage.setItem('amis_pending_order', JSON.stringify({
                         ...orderData,
                         numericTotal: total
@@ -1690,15 +1681,11 @@
                     } catch (mpError) {
                         console.error("Error conectando con MP:", mpError);
                         showToast("Error: No se pudo conectar con el servidor de pagos.", "error");
-                        // ELIMINAMOS EL RESPALDO PARA QUE NO QUEDE RASTRO
                         localStorage.removeItem('amis_pending_order');
-                        return; // <--- CORTA AQUÍ Y NUNCA ESCRIBE EN FIREBASE
+                        return;
                     }
                 }
 
-                // ==========================================
-                // CASO 2: OTROS MÉTODOS (OXXO, Transferencia, etc.)
-                // ==========================================
                 try {
                     let estatusInicial = "En proceso";
                     if (paymentMethod === "Transferencia Bancaria") {
@@ -1723,7 +1710,6 @@
                         createdAt: Timestamp.now()
                     };
 
-                    // Estos sí se guardan de inmediato porque no dependen de pasarela online
                     await addDoc(collection(window.FB_Db, "orders"), orderData);
                     enviarFormSubmit({ orderId, clientName, clientPhone, clientAddress, shippingMethod, paymentMethod, total, items: cart });
 
