@@ -1548,8 +1548,13 @@
                 const emailInput = document.getElementById('ship-email');
                 const addressInput = document.getElementById('ship-address');
 
+                // Rellenar nombre uniendo 'names' y 'surnames' de Firestore
+                const dbNames = userData?.names || userData?.name || userData?.nombre || '';
+                const dbSurnames = userData?.surnames || userData?.apellido || userData?.apellidos || '';
+                const nombreCompletoFirestore = `${dbNames} ${dbSurnames}`.trim();
+
                 if (nameInput) {
-                    nameInput.value = globalUserProfile.fullName || userData?.names || userData?.name || userData?.nombre || '';
+                nameInput.value = globalUserProfile.fullName || nombreCompletoFirestore || '';
                 }
                 if (phoneInput) {
                     phoneInput.value = globalUserProfile.phone || userData?.phone || userData?.telefono || userData?.celular || '';
