@@ -1657,6 +1657,9 @@
                     console.error("Error en checkout:", error);
                     showToast("Hubo un error al procesar tu pedido.", "error");
                 }
+            }  // <--- ¡Esta llave cerraba el "else if (checkoutStep === 3)"!
+        }      // <--- ¡Y esta llave faltaba para cerrar por completo "handleCartNext()!"
+
         function closeSuccessModalAndReload() {
             document.getElementById('order-success-modal').classList.add('hidden');
             cart = [];
