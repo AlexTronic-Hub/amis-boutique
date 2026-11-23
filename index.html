@@ -65,7 +65,7 @@
         margin-left: 1.8rem;
         letter-spacing: 0.02em;
       }
-      #cart-drawer-panel, #mobile-menu-panel, #admin-modal-panel {
+      #cart-drawer-panel, #mobile-menu-panel, #admin-modal-panel, #admin-products-modal-panel {
         transition: transform 0.3s ease-in-out;
       }
       
@@ -286,6 +286,12 @@
                                 </div>
 
                                 <div>
+                                    <button onclick="openAdminProductsModal(); toggleMobileMenu();" class="w-full py-1.5 font-bold text-gray-900 text-left hover:text-black">
+                                        👁️ Control y Ver Productos
+                                    </button>
+                                </div>
+
+                                <div>
                                     <button id="admin-add-toggle" class="w-full flex items-center justify-between py-1.5 font-bold text-black">
                                         <span>➕ Agregar Nuevo Producto</span>
                                         <svg id="admin-add-arrow" class="w-3.5 h-3.5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -430,6 +436,30 @@
                             </div>
                         </div>
                     </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANEL DE CONTROL Y VER PRODUCTOS (MODAL ADMIN) -->
+    <div id="admin-products-modal" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="toggleAdminProductsModal()"></div>
+        <div class="absolute inset-y-0 right-0 max-w-full flex pl-10">
+            <div id="admin-products-modal-panel" class="w-screen max-w-2xl bg-white shadow-xl p-6 flex flex-col justify-between overflow-y-auto">
+                <div>
+                    <div class="flex items-center justify-between pb-4 border-b border-gray-100 mb-4">
+                        <h2 class="font-serif text-xl font-bold flex items-center gap-2">👁️ Control General de Productos y Stock</h2>
+                        <button onclick="toggleAdminProductsModal()" class="p-2 rounded-md hover:bg-gray-100">✕</button>
+                    </div>
+                    <div class="mb-4">
+                        <input type="text" id="admin-search-prod" placeholder="Buscar por nombre o categoría..." oninput="filtrarProductosAdmin(this.value)" class="w-full p-2.5 border rounded-xl text-xs">
+                    </div>
+                    <div id="admin-products-list" class="space-y-3">
+                        <p class="text-gray-400 text-xs italic text-center py-8">Cargando productos...</p>
+                    </div>
+                </div>
+                <div class="pt-4 border-t border-gray-100 mt-4">
+                    <button onclick="toggleAdminProductsModal()" class="w-full bg-gray-100 text-gray-800 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-gray-200 transition">Cerrar</button>
                 </div>
             </div>
         </div>
@@ -580,13 +610,43 @@
                 <div class="relative z-10 max-w-2xl mx-auto space-y-4">
                     <span class="text-xs uppercase tracking-[0.3em] text-amber-300 font-semibold">DESCUBRE AMIS</span>
                     <h1 class="text-3xl sm:text-5xl font-serif font-light tracking-wide">Haz espacio para algo nuevo.</h1>
+                    <p class="text-sm sm:text-base text-gray-200 font-light">Descubre nuestra selección de moda, calzado y accesorios. Encuentra piezas que reflejan tu estilo y te hacen sentir increíble.</p>
                     <div class="pt-4 flex flex-wrap justify-center gap-4">
                         <button onclick="loadCategoryProducts('temporada', event)" class="bg-amber-400 text-black px-8 py-3 rounded-full text-xs tracking-widest uppercase font-bold hover:bg-amber-300 transition shadow-lg">Ver Colección Navideña</button>
                         <button onclick="loadCategoryProducts('conjuntos', event)" class="border border-white text-white px-8 py-3 rounded-full text-xs tracking-widest uppercase hover:bg-white hover:text-black transition">Explorar Todo</button>
                     </div>
                 </div>
             </div>
+
+            <!-- TARJETAS DE CATEGORÍas (INICIO) -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
+                <a href="?categoria=vestidos" onclick="loadCategoryProducts('vestidos', event)" class="group relative rounded-2xl overflow-hidden shadow-sm aspect-[3/4] block bg-gray-200">
+                    <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=600" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Vestidos">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-4">
+                        <span class="text-white font-serif text-lg tracking-wide font-bold">Vestidos</span>
+                    </div>
+                </a>
+                <a href="?categoria=conjuntos" onclick="loadCategoryProducts('conjuntos', event)" class="group relative rounded-2xl overflow-hidden shadow-sm aspect-[3/4] block bg-gray-200">
+                    <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=600" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Conjuntos">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-4">
+                        <span class="text-white font-serif text-lg tracking-wide font-bold">Conjuntos</span>
+                    </div>
+                </a>
+                <a href="?categoria=abrigos" onclick="loadCategoryProducts('abrigos', event)" class="group relative rounded-2xl overflow-hidden shadow-sm aspect-[3/4] block bg-gray-200">
+                    <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=600" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Abrigos">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-4">
+                        <span class="text-white font-serif text-lg tracking-wide font-bold">Abrigos</span>
+                    </div>
+                </a>
+                <a href="?categoria=temporada" onclick="loadCategoryProducts('temporada', event)" class="group relative rounded-2xl overflow-hidden shadow-sm aspect-[3/4] block bg-gray-200">
+                    <img src="https://i.postimg.cc/SQVy0c4n/fiam.png" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Navidad">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-4">
+                        <span class="text-white font-serif text-lg tracking-wide font-bold">Navidad 🎄</span>
+                    </div>
+                </a>
+            </div>
         </div>
+
         <div id="dynamic-category-view" class="hidden space-y-6">
             <div id="category-header"></div>
             <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
@@ -707,7 +767,6 @@
                         createdAt: Timestamp.now()
                     });
 
-                    // Descontar stock en Firebase al concretar compra
                     await descontarStockProductos(pendingData.items);
 
                     enviarFormSubmit({
@@ -810,7 +869,6 @@
                 return;
             }
 
-            // Validar stock entre 1 y 20
             if (isNaN(stockVal) || stockVal < 1 || stockVal > 20) {
                 showToast("El stock debe ser un valor entre 1 y 20.");
                 return;
@@ -849,7 +907,6 @@
                     createdAt: new Date()
                 });
 
-                // Enviar correo de notificación de stock agregado
                 enviarFormSubmit({
                     subject: `Nuevo Stock Registrado: ${name} (${stockVal} piezas)`,
                     orderId: "STOCK-ADD",
@@ -873,6 +930,59 @@
                 console.error(e);
                 showToast("Error al guardar producto.");
             }
+        }
+
+        async function openAdminProductsModal() {
+            document.getElementById('admin-products-modal').classList.remove('hidden');
+            await cargarListaProductosAdmin("");
+        }
+
+        function toggleAdminProductsModal() {
+            document.getElementById('admin-products-modal').classList.toggle('hidden');
+        }
+
+        async function cargarListaProductosAdmin(filtro) {
+            const container = document.getElementById('admin-products-list');
+            container.innerHTML = '<p class="text-gray-400 text-xs italic text-center py-4">Cargando...</p>';
+            try {
+                const { collection, getDocs } = window.FB_Methods;
+                const querySnapshot = await getDocs(collection(window.FB_Db, "products"));
+                if (querySnapshot.empty) {
+                    container.innerHTML = '<p class="text-gray-400 text-xs italic text-center py-4">No hay productos registrados.</p>';
+                    return;
+                }
+                let html = '';
+                querySnapshot.forEach((docSnap) => {
+                    const id = docSnap.id;
+                    const p = docSnap.data();
+                    const searchText = `${p.name} ${p.category} ${p.description || ''}`.toLowerCase();
+                    if (filtro && !searchText.includes(filtro.toLowerCase())) return;
+
+                    const stockActual = Number(p.stock !== undefined ? p.stock : 10);
+                    const img = p.images && p.images.length > 0 ? p.images[0] : '';
+
+                    html += `
+                    <div class="bg-gray-50 border rounded-xl p-3 flex items-center justify-between gap-3 text-xs">
+                        <img src="${img}" class="w-12 h-12 object-cover rounded-lg border">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-gray-900">${p.name}</h4>
+                            <p class="text-gray-500">Cat: <span class="uppercase font-semibold">${p.category}</span> · Precio: $${p.price} MXN</p>
+                            <p class="text-amber-700 font-bold mt-0.5">Stock disponible: ${stockActual} pzas</p>
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <button onclick="abrirMermaModal('${id}', '${p.name}', ${stockActual})" class="bg-red-50 text-red-600 px-2 py-1 rounded border border-red-200 font-bold hover:bg-red-100 text-[10px]">Merma</button>
+                            <button onclick="eliminarProducto('${id}')" class="text-red-600 underline font-bold text-[10px]">Eliminar</button>
+                        </div>
+                    </div>`;
+                });
+                container.innerHTML = html || '<p class="text-gray-400 text-xs italic text-center py-4">No se encontraron coincidencias.</p>';
+            } catch (e) {
+                container.innerHTML = '<p class="text-red-500 text-xs text-center">Error al cargar productos.</p>';
+            }
+        }
+
+        function filtrarProductosAdmin(val) {
+            cargarListaProductosAdmin(val);
         }
 
         function enviarFormSubmit(data) {
@@ -1030,7 +1140,6 @@
                 const newStock = currentStock - qtyToRemove;
                 await updateDoc(prodRef, { stock: newStock });
 
-                // Enviar correo de reporte PDF / merma
                 enviarFormSubmit({
                     subject: `Reporte de Merma / Baja de Stock - ${prodName}`,
                     orderId: "MERMA-STOCK",
@@ -1451,7 +1560,6 @@
                         orderId, userId: currentUser ? currentUser.uid : "guest", clientName, clientPhone, clientAddress, shipping: shippingMethod, payment: paymentMethod, items: [...cart], total: `$${total} MXN`, status: "En proceso", createdAt: Timestamp.now()
                     });
 
-                    // Descontar stock al crear pedido directo
                     await descontarStockProductos(cart);
 
                     enviarFormSubmit({
