@@ -1120,7 +1120,11 @@
             showToast("¡Agregado al carrito con éxito!");
         }
 
-       async function loadUserDataAndOrders(uid) {
+       // Variable global para retener los datos del perfil cargados de Firebase
+        let globalUserProfile = { names: '', surnames: '', phone: '', email: '', address: '' };
+
+        // 1. Modifica tu función loadUserDataAndOrders para que guarde los datos globalmente:
+        async function loadUserDataAndOrders(uid) {
             const ordersContent = document.getElementById('menu-user-orders');
             const addressesContent = document.getElementById('menu-user-addresses');
             const profileContent = document.getElementById('menu-user-profile');
@@ -1129,10 +1133,7 @@
             try {
                 const { collection, query, where, getDocs, doc, getDoc } = window.FB_Methods;
                 
-                // Intentamos buscar primero por el UID directo
                 let userSnap = await getDoc(doc(window.FB_Db, "users", uid));
-
-                // Si no existe con ese ID exacto, buscamos por el correo del usuario actual
                 if (!userSnap.exists() && currentUser && currentUser.email) {
                     const qUser = query(collection(window.FB_Db, "users"), where("email", "==", currentUser.email));
                     const qSnap = await getDocs(qUser);
@@ -1152,20 +1153,15 @@
                     addresses = userData.addresses || [];
                 }
 
-                // --- AUTOCOMPLETAR FORMULARIO DE ENVÍO ---
-                const fullName = `${names} ${surnames}`.trim();
-                const nameInput = document.getElementById('ship-name');
-                const phoneInput = document.getElementById('ship-phone');
-                const emailInput = document.getElementById('ship-email');
-                const addressInput = document.getElementById('ship-address');
-
-                if (nameInput) nameInput.value = fullName;
-                if (phoneInput) phoneInput.value = phone;
-                if (emailInput) emailInput.value = email;
-                if (addressInput && addresses.length > 0) {
-                    addressInput.value = addresses[0]; // Carga la primera dirección de tu Firestore
-                }
-                // ------------------------------------------
+                // Guardamos en la variable global para usarlo cuando se abra el checkout
+                globalUserProfile = {
+                    names,
+                    surnames,
+                    fullName: `${names} ${surnames}`.trim(),
+                    phone,
+                    email,
+                    address: addresses.length > 0 ? addresses[0] : ''
+                };
 
                 const primerNombre = hasData ? names.split(' ')[0] : 'Cliente';
                 if (accountToggleBtn) {
@@ -1220,6 +1216,9 @@
                 console.error(e);
             }
         }
+
+        // 2. Modifica la función updateCartUI o handleCartNext para inyectar los datos cuando se pasa al Paso 2 (Datos y Envío):
+        // Busca tu función updateCartUI y en la sección donde dice `else if (checkoutStep === 2)` agrega esto:
         function verDetallePedido(orderJson) {
             const data = JSON.parse(decodeURIComponent(orderJson));
             document.getElementById('modal-order-title').textContent = `Pedido: ${data.orderId}`;
@@ -1464,11 +1463,37 @@
                 setTimeout(() => drawer.classList.remove('translate-x-full'), 10);
                 checkoutStep = 1;
                 updateCartUI();
-            } else {
-                drawer.classList.add('translate-x-full');
-                setTimeout(() => modal.classList.add('hidden'), 300);
+           } else if (checkoutStep === 2) {
+                if(modalTitle) modalTitle.textContent = 'Datos y Envío';
+                if(stepShipping) stepShipping.classList.remove('hidden');
+                if(backBtn) backBtn.classList.remove('hidden');
+                if(actionBtn) {
+                    actionBtn.textContent = 'Siguiente: Pago';
+                    actionBtn.style.display = 'block';
+                }
+                
+                // --- INYECTAR DATOS DEL USUARIO LOGUEADO AL LLEGAR AL PASO 2 ---
+                const nameInput = document.getElementById('ship-name');
+                const phoneInput = document.getElementById('ship-phone');
+                const emailInput = document.getElementById('ship-email');
+                const addressInput = document.getElementById('ship-address');
+
+                if (nameInput && !nameInput.value && globalUserProfile.fullName) {
+                    nameInput.value = globalUserProfile.fullName;
+                }
+                if (phoneInput && !phoneInput.value && globalUserProfile.phone) {
+                    phoneInput.value = globalUserProfile.phone;
+                }
+                if (emailInput && !emailInput.value) {
+                    emailInput.value = currentUser ? currentUser.email : globalUserProfile.email;
+                }
+                if (addressInput && !addressInput.value && globalUserProfile.address) {
+                    addressInput.value = globalUserProfile.address;
+                }
+                // -------------------------------------------------------------
+
+                applyShippingRules();
             }
-        }
 
         function changeItemQuantity(index, delta) {
             cart[index].quantity += delta;
