@@ -1128,14 +1128,21 @@
 
             try {
                 const { collection, query, where, getDocs, doc, getDoc } = window.FB_Methods;
+                
+                // Intentamos buscar primero por el UID directo
                 let userSnap = await getDoc(doc(window.FB_Db, "users", uid));
+
+                // Si no existe con ese ID exacto, buscamos por el correo del usuario actual
                 if (!userSnap.exists() && currentUser && currentUser.email) {
                     const qUser = query(collection(window.FB_Db, "users"), where("email", "==", currentUser.email));
                     const qSnap = await getDocs(qUser);
-                    if (!qSnap.empty) userSnap = qSnap.docs[0];
+                    if (!qSnap.empty) {
+                        userSnap = qSnap.docs[0];
+                    }
                 }
 
                 let names = '', surnames = '', phone = '', email = currentUser ? currentUser.email : '', hasData = false, addresses = [];
+                
                 if (userSnap && userSnap.exists()) {
                     userData = userSnap.data();
                     names = userData.names || '';
@@ -1145,20 +1152,20 @@
                     addresses = userData.addresses || [];
                 }
 
-                // --- AUTOCOMPLETAR FORMULARIO DE ENVÍO AUTOMÁTICAMENTE ---
+                // --- AUTOCOMPLETAR FORMULARIO DE ENVÍO ---
                 const fullName = `${names} ${surnames}`.trim();
                 const nameInput = document.getElementById('ship-name');
                 const phoneInput = document.getElementById('ship-phone');
                 const emailInput = document.getElementById('ship-email');
                 const addressInput = document.getElementById('ship-address');
 
-                if (nameInput && fullName) nameInput.value = fullName;
-                if (phoneInput && phone) phoneInput.value = phone;
-                if (emailInput && email) emailInput.value = email;
+                if (nameInput) nameInput.value = fullName;
+                if (phoneInput) phoneInput.value = phone;
+                if (emailInput) emailInput.value = email;
                 if (addressInput && addresses.length > 0) {
-                    addressInput.value = addresses[0]; // Rellena con la primera dirección guardada
+                    addressInput.value = addresses[0]; // Carga la primera dirección de tu Firestore
                 }
-                // ---------------------------------------------------------
+                // ------------------------------------------
 
                 const primerNombre = hasData ? names.split(' ')[0] : 'Cliente';
                 if (accountToggleBtn) {
