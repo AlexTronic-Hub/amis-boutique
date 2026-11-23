@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { items, backUrl } = req.body;
+    const { items, backUrl, orderId } = req.body;
 
     const preference = new Preference(client);
     const result = await preference.create({
@@ -19,6 +19,7 @@ export default async function handler(req, res) {
           quantity: Number(item.quantity || 1),
           currency_id: 'MXN'
         })),
+        external_reference: orderId || '',
         back_urls: {
           success: backUrl || 'https://amisboutique.com',
           failure: backUrl || 'https://amisboutique.com',
