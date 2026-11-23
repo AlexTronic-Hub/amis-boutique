@@ -1267,6 +1267,7 @@
                             <label class="font-bold">Estatus:</label>
                             <select onchange="actualizarEstatusPedido('${id}', this.value)" class="p-1.5 border rounded-lg text-xs bg-white font-medium">
                                 <option value="Pendiente de pago (MP)" ${currentStatus === 'Pendiente de pago (MP)' ? 'selected' : ''}>🟡 Pendiente de pago (MP)</option>
+                                <option value="Falta de Pago vía OXXO" ${currentStatus === 'Falta de Pago vía OXXO' ? 'selected' : ''}>🏪 Falta de Pago vía OXXO</option>
                                 <option value="En proceso" ${currentStatus === 'En proceso' ? 'selected' : ''}>⏳ En proceso</option>
                                 <option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>💳 Pagado</option>
                                 <option value="Enviado" ${currentStatus === 'Enviado' ? 'selected' : ''}>🚚 Enviado</option>
@@ -1280,7 +1281,6 @@
                 container.innerHTML = '<p class="text-red-500 text-xs text-center py-4">Error al cargar pedidos.</p>';
             }
         }
-
         async function actualizarEstatusPedido(docId, nuevoEstatus) {
             try {
                 const { doc, updateDoc } = window.FB_Methods;
