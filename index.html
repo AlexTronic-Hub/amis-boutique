@@ -775,11 +775,12 @@
 
         async function procesarRetornoMercadoPago() {
             const urlParams = new URLSearchParams(window.location.search);
-            const status = urlParams.get('status') || urlParams.get('collection_status');
-            const paymentId = urlParams.get('payment_id');
+            const mpResult = urlParams.get('mp_result');
+            const status = urlParams.get('status') || urlParams.get('collection_status') || mpResult;
+            const paymentId = urlParams.get('payment_id') || urlParams.get('collection_id');
 
-            // VERIFICACIÓN ULTRA ESTRICTA: Solo si Mercado Pago regresa un pago aprobado con ID real de pasarela
-            if (status === 'approved' && paymentId) {
+            // Acepta tanto pagos aprobados (tarjeta) como pendientes (OXXO / SPEI)
+            if ((status === 'approved' || status === 'pending' || status === 'in_process') && paymentId) {
                 const pendingData = JSON.parse(localStorage.getItem('amis_pending_order'));
                 
                 if (!pendingData) {
@@ -787,9 +788,11 @@
                     return;
                 }
 
+                const isPendingOxxo = (status === 'pending' || status === 'in_process' || mpResult === 'pending');
+                const estatusFinal = isPendingOxxo ? "Falta de Pago vía OXXO" : "Pagado";
+
                 const { collection, addDoc, Timestamp } = window.FB_Methods;
                 try {
-                    // Aquí es donde realmente se guarda en Firebase POR PRIMERA VEZ, solo cuando el pago está aprobado por MP
                     await addDoc(collection(window.FB_Db, "orders"), {
                         orderId: pendingData.orderId,
                         userId: pendingData.userId || "guest",
@@ -800,7 +803,7 @@
                         payment: pendingData.payment,
                         items: pendingData.items || [],
                         total: pendingData.total,
-                        status: "Pagado",
+                        status: estatusFinal,
                         paymentId: paymentId,
                         createdAt: Timestamp.now()
                     });
@@ -811,12 +814,15 @@
                         clientPhone: pendingData.clientPhone,
                         clientAddress: pendingData.clientAddress,
                         shippingMethod: pendingData.shipping,
-                        paymentMethod: pendingData.payment,
+                        paymentMethod: `${pendingData.payment} (${estatusFinal})`,
                         total: pendingData.numericTotal || pendingData.total.replace(/[^0-9.]/g, ''),
                         items: pendingData.items
                     });
 
-                    let mensajeWA = `Hola Amis Boutique! 👋 Ya realicé mi pago por Mercado Pago. Mi número de pedido es: *${pendingData.orderId}*`;
+                    let mensajeWA = isPendingOxxo 
+                        ? `Hola Amis Boutique! 👋 Ya generé mi ficha de pago en OXXO. Mi número de pedido es: *${pendingData.orderId}*`
+                        : `Hola Amis Boutique! 👋 Ya realicé mi pago por Mercado Pago. Mi número de pedido es: *${pendingData.orderId}*`;
+
                     document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${encodeURIComponent(mensajeWA)}`;
                     document.getElementById('order-success-modal').classList.remove('hidden');
 
@@ -825,13 +831,12 @@
                     cart = [];
                     updateCartUI();
                 } catch (err) {
-                    console.error("Error guardando orden aprobada de MP:", err);
+                    console.error("Error guardando orden de MP:", err);
                 }
                 window.history.replaceState({}, document.title, window.location.pathname);
             } else {
-                // Si no viene de un pago real aprobado, limpiamos cualquier parámetro falso
                 localStorage.removeItem('amis_pending_order');
-                if (urlParams.has('status') || urlParams.has('pago')) {
+                if (urlParams.has('status') || urlParams.has('mp_result') || urlParams.has('pago')) {
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
             }
