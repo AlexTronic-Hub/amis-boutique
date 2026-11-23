@@ -1572,59 +1572,63 @@
                 let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                 if (shippingMethod === "Envío Nacional") total += 149;
 
+                const { collection, addDoc, getDocs, Timestamp } = window.FB_Methods;
+                const now = new Date();
+                const year = now.getFullYear().toString().slice(-2);
+                const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                
+                let nextOrderNumber = 1;
                 try {
-                    const { collection, addDoc, getDocs, Timestamp } = window.FB_Methods;
-                    const now = new Date();
-                    const year = now.getFullYear().toString().slice(-2);
-                    const month = (now.getMonth() + 1).toString().padStart(2, '0');
-                    let nextOrderNumber = (await getDocs(collection(window.FB_Db, "orders"))).size + 1;
-                    const orderId = `VT${year}${month}-${nextOrderNumber.toString().padStart(5, '0')}`;
+                    nextOrderNumber = (await getDocs(collection(window.FB_Db, "orders"))).size + 1;
+                } catch(e) {}
 
-                    const isMP = paymentMethod === 'Mercado Pago';
+                const orderId = `VT${year}${month}-${nextOrderNumber.toString().padStart(5, '0')}`;
+                const isMP = paymentMethod === 'Mercado Pago';
 
-                    // 1. SI ES MERCADO PAGO: NO guardamos en Firebase ni enviamos correo todavía.
-                    // Lo guardamos temporalmente en localStorage y redirigimos a la pasarela.
-                    if (isMP) {
-                        const orderData = {
-                            orderId,
-                            userId: currentUser ? currentUser.uid : "guest",
-                            clientName,
-                            clientPhone,
-                            clientAddress,
-                            shipping: shippingMethod,
-                            payment: paymentMethod,
-                            items: [...cart],
-                            total: `$${total} MXN`,
-                            status: "Pendiente de pago (MP)",
-                            createdAt: Timestamp.now()
-                        };
+                // ==========================================
+                // CASO 1: MERCADO PAGO (ESTRICTO)
+                // ==========================================
+                if (isMP) {
+                    const orderData = {
+                        orderId,
+                        userId: currentUser ? currentUser.uid : "guest",
+                        clientName,
+                        clientPhone,
+                        clientAddress,
+                        shipping: shippingMethod,
+                        payment: paymentMethod,
+                        items: [...cart],
+                        total: `$${total} MXN`,
+                        status: "Pendiente de pago (MP)",
+                        createdAt: Timestamp.now()
+                    };
 
-                        localStorage.setItem('amis_pending_order', JSON.stringify({
-                            ...orderData,
-                            numericTotal: total
-                        }));
-                        
-                        showToast("Conectando con Mercado Pago...", "success");
+                    // Guardamos temporalmente los datos en localStorage (NUNCA en Firebase todavía)
+                    localStorage.setItem('amis_pending_order', JSON.stringify({
+                        ...orderData,
+                        numericTotal: total
+                    }));
+                    
+                    showToast("Conectando con Mercado Pago...", "success");
 
-                        const mpItems = cart.map(i => ({
-                            title: `${i.name} (${i.color})`,
-                            quantity: Number(i.quantity),
-                            unit_price: Number(i.price)
-                        }));
+                    const mpItems = cart.map(i => ({
+                        title: `${i.name} (${i.color})`,
+                        quantity: Number(i.quantity),
+                        unit_price: Number(i.price)
+                    }));
 
-                        if (shippingMethod === "Envío Nacional") {
-                            mpItems.push({
-                                title: "Envío Nacional",
-                                quantity: 1,
-                                unit_price: 149
-                            });
-                        }
+                    if (shippingMethod === "Envío Nacional") {
+                        mpItems.push({
+                            title: "Envío Nacional",
+                            quantity: 1,
+                            unit_price: 149
+                        });
+                    }
 
+                    try {
                         const response = await fetch("/api/crear-preferencia", {
                             method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
+                            headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
                                 items: mpItems,
                                 backUrl: window.location.origin + window.location.pathname + "?pago=exito",
@@ -1637,13 +1641,20 @@
                             window.location.href = mpData.init_point;
                             return;
                         } else {
-                            console.error("Error al generar preferencia:", mpData);
-                            showToast("Error al conectar con Mercado Pago.", "error");
-                            return;
+                            throw new Error("No se generó el punto de inicio de MP");
                         }
+                    } catch (mpError) {
+                        console.error("Error conectando con MP:", mpError);
+                        showToast("Error al conectar con Mercado Pago. Intenta de nuevo.", "error");
+                        // IMPORTANTE: Aquí cortamos la ejecución para que BAJO NINGUNA CIRCUNSTANCIA se guarde en Firebase
+                        return; 
                     }
+                }
 
-                    // 2. PARA OTROS MÉTODOS (OXXO/Transferencia/Efectivo/Terminal): SÍ se crea el pedido de inmediato
+                // ==========================================
+                // CASO 2: OTROS MÉTODOS (OXXO, Transferencia, etc.)
+                // ==========================================
+                try {
                     let estatusInicial = "En proceso";
                     if (paymentMethod === "Transferencia Bancaria") {
                         estatusInicial = "Falta de pago vía Transferencia";
@@ -1667,9 +1678,8 @@
                         createdAt: Timestamp.now()
                     };
 
+                    // Estos sí se guardan de inmediato porque no dependen de pasarela online
                     await addDoc(collection(window.FB_Db, "orders"), orderData);
-
-                    // Enviamos el correo de notificación del pedido creado
                     enviarFormSubmit({ orderId, clientName, clientPhone, clientAddress, shippingMethod, paymentMethod, total, items: cart });
 
                     let mensajeWA = `Hola Amis Boutique! 👋 Mi número de pedido es: *${orderId}* (${paymentMethod})`;
@@ -1678,8 +1688,8 @@
                     toggleCartModal();
                     document.getElementById('order-success-modal').classList.remove('hidden');
                 } catch (error) {
-                    console.error("Error en checkout:", error);
-                    showToast("Hubo un error al procesar tu pedido.", "error");
+                    console.error("Error guardando orden en Firebase:", error);
+                    showToast("Hubo un error al registrar tu pedido.", "error");
                 }
             }
         }
