@@ -1582,23 +1582,23 @@
 
                     const isMP = paymentMethod === 'Mercado Pago';
 
-                    const orderData = {
-                        orderId,
-                        userId: currentUser ? currentUser.uid : "guest",
-                        clientName,
-                        clientPhone,
-                        clientAddress,
-                        shipping: shippingMethod,
-                        payment: paymentMethod,
-                        items: [...cart],
-                        total: `$${total} MXN`,
-                        status: isMP ? "Pendiente de pago (MP)" : "En proceso",
-                        createdAt: Timestamp.now()
-                    };
-
-                    // SI ELIGE MERCADO PAGO: NO guardamos en Firebase todavía. 
-                    // Lo mandamos directo a la pasarela y dejamos que el Webhook (o el éxito) lo registre.
+                    // 1. SI ES MERCADO PAGO: NO guardamos en Firebase ni enviamos correo todavía.
+                    // Lo guardamos temporalmente en localStorage y redirigimos a la pasarela.
                     if (isMP) {
+                        const orderData = {
+                            orderId,
+                            userId: currentUser ? currentUser.uid : "guest",
+                            clientName,
+                            clientPhone,
+                            clientAddress,
+                            shipping: shippingMethod,
+                            payment: paymentMethod,
+                            items: [...cart],
+                            total: `$${total} MXN`,
+                            status: "Pendiente de pago (MP)",
+                            createdAt: Timestamp.now()
+                        };
+
                         localStorage.setItem('amis_pending_order', JSON.stringify({
                             ...orderData,
                             numericTotal: total
@@ -1643,12 +1643,36 @@
                         }
                     }
 
-                    // PARA OTROS MÉTODOS DE PAGO (Transferencia, efectivo, terminal): SÍ se guarda de inmediato
+                    // 2. PARA OTROS MÉTODOS (OXXO/Transferencia/Efectivo/Terminal): SÍ se crea el pedido de inmediato
+                    let estatusInicial = "En proceso";
+                    if (paymentMethod === "Transferencia Bancaria") {
+                        estatusInicial = "Falta de pago vía Transferencia";
+                    } else if (paymentMethod.includes("contra entrega")) {
+                        estatusInicial = "Pago contra entrega (Pendiente)";
+                    } else {
+                        estatusInicial = "Falta de pago vía OXXO / Externo";
+                    }
+
+                    const orderData = {
+                        orderId,
+                        userId: currentUser ? currentUser.uid : "guest",
+                        clientName,
+                        clientPhone,
+                        clientAddress,
+                        shipping: shippingMethod,
+                        payment: paymentMethod,
+                        items: [...cart],
+                        total: `$${total} MXN`,
+                        status: estatusInicial,
+                        createdAt: Timestamp.now()
+                    };
+
                     await addDoc(collection(window.FB_Db, "orders"), orderData);
 
+                    // Enviamos el correo de notificación del pedido creado
                     enviarFormSubmit({ orderId, clientName, clientPhone, clientAddress, shippingMethod, paymentMethod, total, items: cart });
 
-                    let mensajeWA = `Hola Amis Boutique! 👋 Mi número de pedido es: *${orderId}*`;
+                    let mensajeWA = `Hola Amis Boutique! 👋 Mi número de pedido es: *${orderId}* (${paymentMethod})`;
                     document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${encodeURIComponent(mensajeWA)}`;
 
                     toggleCartModal();
@@ -1657,8 +1681,8 @@
                     console.error("Error en checkout:", error);
                     showToast("Hubo un error al procesar tu pedido.", "error");
                 }
-            }  // <--- ¡Esta llave cerraba el "else if (checkoutStep === 3)"!
-        }      // <--- ¡Y esta llave faltaba para cerrar por completo "handleCartNext()!"
+            }
+        }
 
         function closeSuccessModalAndReload() {
             document.getElementById('order-success-modal').classList.add('hidden');
