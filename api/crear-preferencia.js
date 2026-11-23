@@ -21,9 +21,9 @@ export default async function handler(req, res) {
         })),
         external_reference: orderId || '',
         back_urls: {
-          success: backUrl || 'https://amisboutique.com',
-          failure: backUrl || 'https://amisboutique.com',
-          pending: backUrl || 'https://amisboutique.com'
+          success: `${backUrl || 'https://amisboutique.com'}?mp_result=approved`,
+          pending: `${backUrl || 'https://amisboutique.com'}?mp_result=pending`,
+          failure: `${backUrl || 'https://amisboutique.com'}?mp_result=failure`
         },
         auto_return: 'approved',
       }
