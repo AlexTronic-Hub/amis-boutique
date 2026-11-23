@@ -692,7 +692,7 @@
         let checkoutStep = 1;
         let currentUser = null;
         let userData = null;
-        let currentUserProfile = null;
+        let globalUserProfile = { names: '', surnames: '', fullName: '', phone: '', email: '', address: '' };
         let isRegistering = false;
         let toastTimeout = null;
 
@@ -1120,8 +1120,6 @@
             showToast("¡Agregado al carrito con éxito!");
         }
 
-        let globalUserProfile = { names: '', surnames: '', phone: '', email: '', address: '' };
-
         async function loadUserDataAndOrders(uid) {
             const ordersContent = document.getElementById('menu-user-orders');
             const addressesContent = document.getElementById('menu-user-addresses');
@@ -1144,11 +1142,12 @@
                 
                 if (userSnap && userSnap.exists()) {
                     userData = userSnap.data();
-                    names = userData.names || '';
-                    surnames = userData.surnames || '';
-                    phone = userData.phone || '';
+                    // Buscamos con múltiples variantes por si los campos en Firebase tienen otros nombres
+                    names = userData.names || userData.name || userData.nombre || '';
+                    surnames = userData.surnames || userData.apellido || userData.apellidos || '';
+                    phone = userData.phone || userData.telefono || userData.celular || '';
                     hasData = names.trim() !== "";
-                    addresses = userData.addresses || [];
+                    addresses = userData.addresses || userData.direcciones || [];
                 }
 
                 globalUserProfile = {
@@ -1396,7 +1395,7 @@
                 toggleAuthModal();
             } catch (error) {
                 errorBox.textContent = "Correo o contraseña incorrectos.";
-                errorBox.classList.remove('hidden');
+                errorBox.classList.add('hidden');
             }
         }
 
@@ -1454,11 +1453,6 @@
         function toggleCartModal() {
             const modal = document.getElementById('cart-modal');
             const drawer = document.getElementById('cart-drawer-panel');
-            const modalTitle = document.getElementById('cart-modal-title');
-            const stepShipping = document.getElementById('step-shipping');
-            const backBtn = document.getElementById('cart-back-btn');
-            const actionBtn = document.getElementById('cart-action-btn');
-
             if (modal.classList.contains('hidden')) {
                 modal.classList.remove('hidden');
                 setTimeout(() => drawer.classList.remove('translate-x-full'), 10);
@@ -1548,23 +1542,23 @@
                     actionBtn.style.display = 'block';
                 }
                 
-                // Inyectar datos del usuario logueado
+                // Inyectar datos del usuario logueado con respaldo automático
                 const nameInput = document.getElementById('ship-name');
                 const phoneInput = document.getElementById('ship-phone');
                 const emailInput = document.getElementById('ship-email');
                 const addressInput = document.getElementById('ship-address');
 
-                if (nameInput && !nameInput.value && globalUserProfile.fullName) {
-                    nameInput.value = globalUserProfile.fullName;
+                if (nameInput) {
+                    nameInput.value = globalUserProfile.fullName || userData?.names || userData?.name || userData?.nombre || '';
                 }
-                if (phoneInput && !phoneInput.value && globalUserProfile.phone) {
-                    phoneInput.value = globalUserProfile.phone;
+                if (phoneInput) {
+                    phoneInput.value = globalUserProfile.phone || userData?.phone || userData?.telefono || userData?.celular || '';
                 }
-                if (emailInput && !emailInput.value) {
-                    emailInput.value = currentUser ? currentUser.email : globalUserProfile.email;
+                if (emailInput) {
+                    emailInput.value = currentUser ? currentUser.email : (globalUserProfile.email || userData?.email || '');
                 }
-                if (addressInput && !addressInput.value && globalUserProfile.address) {
-                    addressInput.value = globalUserProfile.address;
+                if (addressInput) {
+                    addressInput.value = globalUserProfile.address || (userData?.addresses && userData.addresses[0]) || '';
                 }
 
                 applyShippingRules();
