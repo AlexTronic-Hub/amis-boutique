@@ -692,6 +692,7 @@
         let checkoutStep = 1;
         let currentUser = null;
         let userData = null;
+        let currentUserProfile = null;
         let isRegistering = false;
         let toastTimeout = null;
 
@@ -1119,7 +1120,7 @@
             showToast("¡Agregado al carrito con éxito!");
         }
 
-        async function loadUserDataAndOrders(uid) {
+       async function loadUserDataAndOrders(uid) {
             const ordersContent = document.getElementById('menu-user-orders');
             const addressesContent = document.getElementById('menu-user-addresses');
             const profileContent = document.getElementById('menu-user-profile');
@@ -1142,6 +1143,22 @@
                     phone = userData.phone || '';
                     hasData = names.trim() !== "";
                     addresses = userData.addresses || [];
+                }
+
+                // Autocompletar campos del carrito si el usuario tiene datos registrados
+                if (hasData) {
+                    const fullName = `${names} ${surnames}`.trim();
+                    const nameInput = document.getElementById('ship-name');
+                    const phoneInput = document.getElementById('ship-phone');
+                    const emailInput = document.getElementById('ship-email');
+                    const addressInput = document.getElementById('ship-address');
+
+                    if (nameInput && !nameInput.value) nameInput.value = fullName;
+                    if (phoneInput && !phoneInput.value) phoneInput.value = phone;
+                    if (emailInput && !emailInput.value) emailInput.value = email;
+                    if (addressInput && !addressInput.value && addresses.length > 0) {
+                        addressInput.value = addresses[0];
+                    }
                 }
 
                 const primerNombre = hasData ? names.split(' ')[0] : 'Cliente';
@@ -1197,7 +1214,6 @@
                 console.error(e);
             }
         }
-
         function verDetallePedido(orderJson) {
             const data = JSON.parse(decodeURIComponent(orderJson));
             document.getElementById('modal-order-title').textContent = `Pedido: ${data.orderId}`;
