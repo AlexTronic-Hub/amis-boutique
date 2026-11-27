@@ -1354,92 +1354,108 @@
             document.getElementById('pdf-items-tbody').innerHTML = (d.items || []).map(i => `<tr><td style="padding:10px;border:1px solid #ddd;">${i.quantity}</td><td style="padding:10px;border:1px solid #ddd;">${i.name}</td><td style="padding:10px;border:1px solid #ddd;">${i.color}</td><td style="padding:10px;border:1px solid #ddd;text-align:right;">$${i.price}</td><td style="padding:10px;border:1px solid #ddd;text-align:right;">$${i.price * i.quantity}</td></tr>`).join('');
         }
 
-        // --- FUNCIÓN LIMPIA DE IMPRESIÓN 58MM CON CORTE AUTOMÁTICO ---
-        function imprimirTicket58mm(orderJson) {
-            const d = JSON.parse(decodeURIComponent(orderJson));
-            const ventanaImpresion = window.open('', '_blank', 'width=350,height=600');
+        // --- FUNCIÓN CORREGIDA PARA TICKET POS-58 (IDÉNTICO A SRVENTA) ---
+function imprimirTicket58mm(orderJson) {
+    const d = JSON.parse(decodeURIComponent(orderJson));
+    
+    // Usamos un iframe oculto en lugar de window.open para evitar bloqueos y márgenes basura del navegador
+    let iframe = document.getElementById('print-iframe');
+    if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'print-iframe';
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = 'none';
+        document.body.appendChild(iframe);
+    }
+
+    const docContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Ticket ${d.orderId}</title>
+            <style>
+                @page {
+                    size: 58mm auto;
+                    margin: 0mm;
+                }
+                body {
+                    width: 48mm;
+                    margin: 0;
+                    padding: 0;
+                    font-family: 'Courier New', Courier, monospace;
+                    font-size: 10px;
+                    color: #000;
+                    background: #fff;
+                }
+                .text-center { text-align: center; }
+                .bold { font-weight: bold; }
+                .dashed { border-bottom: 1px dashed #000; margin: 4px 0; }
+            </style>
+        </head>
+        <body>
+            <div class="text-center" style="padding-top: 2px;">
+                <div style="font-family: 'Times New Roman', serif; font-size: 15px; font-weight: bold; letter-spacing: 1px;">AMIS</div>
+                <div style="font-family: 'Brush Script MT', cursive; font-size: 12px; margin-top: -3px;">collection &amp; boutique</div>
+                <p style="margin: 2px 0 0 0; font-size: 8px;">Guadalajara, Jalisco</p>
+            </div>
             
-            const htmlTicket = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Ticket ${d.orderId}</title>
-                    <style>
-                        @page {
-                            size: 58mm auto;
-                            margin: 0;
-                        }
-                        body {
-                            width: 48mm;
-                            margin: 0 auto;
-                            padding: 2mm 0;
-                            font-family: 'Courier New', Courier, monospace;
-                            font-size: 10px;
-                            color: #000;
-                            background: #fff;
-                            line-height: 1.2;
-                        }
-                        .text-center { text-align: center; }
-                        .bold { font-weight: bold; }
-                        .dashed { border-bottom: 1px dashed #000; margin: 6px 0; }
-                        .flex-between { display: flex; justify-content: space-between; }
-                    </style>
-                </head>
-                <body>
-                    <div class="text-center" style="margin-bottom: 8px;">
-                        <div style="font-family: 'Times New Roman', serif; font-size: 16px; font-weight: bold; letter-spacing: 2px; line-height: 1;">AMIS</div>
-                        <div style="font-family: 'Brush Script MT', cursive; font-size: 13px; margin-top: -2px; margin-left: 10px; color: #222;">collection &amp; boutique</div>
-                        <p style="margin: 4px 0 0 0; font-size: 8.5px; color: #333;">Guadalajara, Jalisco</p>
+            <div class="dashed"></div>
+            
+            <div style="font-size: 8.5px; line-height: 1.1;">
+                <b>Folio:</b> ${d.orderId}<br>
+                <b>Cliente:</b> ${d.clientName}<br>
+                <b>Tel:</b> ${d.clientPhone}<br>
+                <b>Entrega:</b> ${d.shipping}
+            </div>
+            
+            <div class="dashed"></div>
+            
+            <div style="font-size: 8.5px; font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 1px; margin-bottom: 3px; display: flex; justify-content: space-between;">
+                <span>CANT / DESCRIPCIÓN</span>
+                <span>IMP.</span>
+            </div>
+            
+            <div style="font-size: 8.5px; line-height: 1.1;">
+                ${(d.items || []).map(i => `
+                    <div style="margin-bottom: 3px;">
+                        <b>${i.quantity}x ${i.name}</b> (${i.color})<br>
+                        <span style="float: right;">$${i.price * i.quantity}</span>
                     </div>
-                    
-                    <div class="dashed"></div>
-                    
-                    <div style="font-size: 9px; margin-bottom: 6px;">
-                        <strong>Folio:</strong> ${d.orderId}<br>
-                        <strong>Cliente:</strong> ${d.clientName}<br>
-                        <strong>Tel:</strong> ${d.clientPhone}<br>
-                        <strong>Entrega:</strong> ${d.shipping}
-                    </div>
-                    
-                    <div class="dashed"></div>
-                    
-                    <div class="flex-between bold" style="border-bottom: 1px solid #000; padding-bottom: 2px; margin-bottom: 4px; font-size: 8.5px;">
-                        <span>CANT / DESCRIPCIÓN</span>
-                        <span>IMP.</span>
-                    </div>
-                    
-                    <div style="font-size: 9px; margin-bottom: 6px;">
-                        ${(d.items || []).map(i => `<div style="margin-bottom: 3px;"><b>${i.quantity}x ${i.name}</b> (${i.color})<br><span style="float: right;">$${i.price * i.quantity}</span></div>`).join('')}
-                    </div>
-                    
-                    <div class="dashed"></div>
-                    
-                    <div style="text-align: right; font-size: 10px; font-weight: bold; margin-bottom: 8px;">
-                        TOTAL: ${d.total}
-                    </div>
-                    
-                    <div class="dashed"></div>
-                    
-                    <div class="text-center" style="font-size: 8.5px;">
-                        <p class="bold" style="margin: 0;">¡Gracias por tu compra!</p>
-                        <p style="margin: 2px 0;">¡Vuelva Pronto!</p>
-                        <p style="margin: 0;">IG: @amisboutique.official</p>
-                    </div>
+                `).join('')}
+            </div>
+            
+            <div class="dashed"></div>
+            
+            <div style="text-align: right; font-size: 9.5px; font-weight: bold; margin-bottom: 4px;">
+                TOTAL: ${d.total}
+            </div>
+            
+            <div class="dashed"></div>
+            
+            <div class="text-center" style="font-size: 8px; line-height: 1;">
+                <p class="bold" style="margin: 0;">¡Gracias por tu compra!</p>
+                <p style="margin: 2px 0;">¡Vuelva Pronto!</p>
+                <p style="margin: 0;">IG: @amisboutique.official</p>
+            </div>
+        </body>
+        </html>
+    `;
 
-                    <script>
-                        window.onload = function() {
-                            window.print();
-                            setTimeout(() => { window.close(); }, 500);
-                        }
-                    <\/script>
-                </body>
-                </html>
-            `;
+    const winDoc = iframe.contentWindow.document;
+    winDoc.open();
+    winDoc.write(docContent);
+    winDoc.close();
 
-            ventanaImpresion.document.write(htmlTicket);
-            ventanaImpresion.document.close();
-        }
+    setTimeout(() => {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+    }, 250);
+}
 
         function descargarPDFCarta(orderJson) {
             const d = JSON.parse(decodeURIComponent(orderJson));
