@@ -772,14 +772,25 @@
             }
         }
 
-        // --- POLÍGONO DE COBERTURA GDL (PERIFÉRICO + AV. TONALTECAS -> ALDAMA -> ZALATITÁN) ---
-        function estaDentroDePoligonoGDL(cp) {
+       function estaDentroDePoligonoGDL(cp) {
             const cpNum = parseInt(cp.trim(), 10);
             if (isNaN(cpNum) || cp.trim().length !== 5) return false;
 
+            // 1. Guadalajara completo (44100 - 44999)
             const esGDL = (cpNum >= 44100 && cpNum <= 44999);
-            const esZapopanInt = (cpNum >= 45010 && cpNum <= 45199 && cpNum !== 45019);
+
+            // 2. Zapopan INTERNO dentro de Periférico (Excluyendo Tesistán, Valle Imperial y zonas exteriores norte/poniente)
+            // Los C.P. de Zapopan dentro de Periférico van estrictamente del 45010 al 45090 y algunas secciones específicas.
+            // Todo lo que sea 45110 al 45199 o 45200+ queda fuera (Tesistán, Cañadas, etc.)
+            const esZapopanInt = (
+                (cpNum >= 45010 && cpNum <= 45099 && cpNum !== 45019) || 
+                (cpNum >= 45110 && cpNum <= 45130) // Excluye explícitamente 45134 y superiores hacia Tesistán
+            );
+
+            // 3. Tlaquepaque interno (norte/poniente de Periférico Sur y Carr. Chapala)
             const esTlaquepaqueInt = (cpNum >= 45500 && cpNum <= 45579);
+
+            // 4. Tonalá trazado Av. Tonaltecas -> Calle Aldama -> Av. Zalatitán -> Periférico
             const esTonalaPoligono = (cpNum >= 45400 && cpNum <= 45419 && cpNum !== 45409);
 
             return (esGDL || esZapopanInt || esTlaquepaqueInt || esTonalaPoligono);
