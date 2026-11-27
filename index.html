@@ -6,7 +6,7 @@
     <title>AMIS Boutique | Colección & Boutique</title>
     
     <!-- Favicon Personalizado con el Monograma A+B -->
-    <link rel="icon" type="image/jpeg" href="https://postimg.cc/sQ6XzXfb">
+    <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/1XjgNKzh/AMIS-NAVIDAD.png">
 
     <!-- Importación de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,11 +16,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Pinyon+Script&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDKs -->
+    <!-- Firebase SDKs (Auth, Firestore y Storage) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, arrayUnion, query, where, Timestamp, runTransaction, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyDpdI-Qx97QFhpM_LfIBjzlxiK2RJlTziQ",
@@ -35,10 +36,12 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const storage = getStorage(app);
 
         window.FB_Auth = auth;
         window.FB_Db = db;
-        window.FB_Methods = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, arrayUnion, query, where, Timestamp, runTransaction, orderBy };
+        window.FB_Storage = storage;
+        window.FB_Methods = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, arrayUnion, query, where, Timestamp, runTransaction, orderBy, ref, uploadBytes, getDownloadURL };
     </script>
 
     <style>
@@ -308,18 +311,25 @@
                                         </select>
 
                                         <div class="space-y-1 pt-1">
-                                            <label class="font-bold text-[11px] text-gray-700">Colores y Fotos (URLs):</label>
+                                            <label class="font-bold text-[11px] text-gray-700">Colores y Fotos (Subir Archivo):</label>
                                             <div id="color-rows-container" class="space-y-2">
-                                                <div class="flex gap-1 items-center color-row">
-                                                    <input type="text" placeholder="#HEX" class="w-20 p-1.5 border rounded text-[11px] font-mono color-hex-input" value="#000000">
-                                                    <input type="text" placeholder="Nombre color" class="w-20 p-1.5 border rounded text-[11px] color-name-input">
-                                                    <input type="text" placeholder="URL Foto" class="flex-1 p-1.5 border rounded text-[11px] color-url-input">
+                                                <div class="p-2 border rounded bg-gray-50 color-row space-y-2">
+                                                    <div class="flex items-center gap-2">
+                                                        <label class="text-[10px] font-bold">Color:</label>
+                                                        <input type="color" value="#000000" oninput="syncColorHex(this)" class="w-8 h-7 rounded border cursor-pointer color-picker-input">
+                                                        <input type="text" placeholder="#HEX" class="w-20 p-1 border rounded text-[10px] font-mono color-hex-input" value="#000000">
+                                                        <input type="text" placeholder="Nombre" class="flex-1 p-1 border rounded text-[10px] color-name-input">
+                                                    </div>
+                                                    <div>
+                                                        <label class="text-[10px] font-bold text-gray-600 block mb-0.5">Seleccionar Foto:</label>
+                                                        <input type="file" accept="image/*" class="w-full text-[10px] file-input-prod">
+                                                    </div>
                                                 </div>
                                             </div>
                                             <button onclick="addColorRow()" class="text-[10px] text-blue-600 underline font-bold">+ Agregar otro color</button>
                                         </div>
 
-                                        <button onclick="guardarNuevoProducto()" class="w-full bg-black text-white py-2 rounded-md font-bold tracking-wider uppercase mt-1 hover:bg-gray-800">Guardar Producto</button>
+                                        <button onclick="guardarNuevoProducto()" class="w-full bg-black text-white py-2 rounded-md font-bold tracking-wider uppercase mt-1 hover:bg-gray-800">Subir y Guardar Producto</button>
                                     </div>
                                 </div>
 
@@ -769,6 +779,33 @@
             }, 3000);
         }
 
+        // --- SINCRONIZAR COLOR PICKER CON HEX ---
+        function syncColorHex(colorPicker) {
+            const row = colorPicker.closest('.color-row');
+            const hexInput = row.querySelector('.color-hex-input');
+            hexInput.value = colorPicker.value.toUpperCase();
+        }
+
+        function addColorRow() {
+            const container = document.getElementById('color-rows-container');
+            const row = document.createElement('div');
+            row.className = 'p-2 border rounded bg-gray-50 color-row space-y-2 mt-2';
+            row.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <label class="text-[10px] font-bold">Color:</label>
+                    <input type="color" value="#000000" oninput="syncColorHex(this)" class="w-8 h-7 rounded border cursor-pointer color-picker-input">
+                    <input type="text" placeholder="#HEX" class="w-20 p-1 border rounded text-[10px] font-mono color-hex-input" value="#000000">
+                    <input type="text" placeholder="Nombre" class="flex-1 p-1 border rounded text-[10px] color-name-input">
+                    <button onclick="this.closest('.color-row').remove()" class="text-red-500 font-bold px-1 text-xs">✕</button>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-600 block mb-0.5">Seleccionar Foto:</label>
+                    <input type="file" accept="image/*" class="w-full text-[10px] file-input-prod">
+                </div>
+            `;
+            container.appendChild(row);
+        }
+
         // --- CÁLCULO DINÁMICO DE FECHAS DE ENTREGA SEGÚN HORA DE CORTE 11:00 AM ---
         function avanzarDiasHabiles(fechaBase, diasHabiles) {
             let resultado = new Date(fechaBase);
@@ -988,7 +1025,6 @@
                             contactWrapper.classList.remove('hidden');
                         }
                         
-                        // Recargar productos para que aparezcan/desaparezcan los botones de admin
                         const urlParams = new URLSearchParams(window.location.search);
                         const cat = urlParams.get('categoria');
                         const prod = urlParams.get('producto');
@@ -1105,19 +1141,7 @@
             }
         }
 
-        function addColorRow() {
-            const container = document.getElementById('color-rows-container');
-            const row = document.createElement('div');
-            row.className = 'flex gap-1 items-center color-row mt-1';
-            row.innerHTML = `
-                <input type="text" placeholder="#HEX" class="w-20 p-1.5 border rounded text-[11px] font-mono color-hex-input" value="#000000">
-                <input type="text" placeholder="Nombre color" class="w-20 p-1.5 border rounded text-[11px] color-name-input">
-                <input type="text" placeholder="URL Foto" class="flex-1 p-1.5 border rounded text-[11px] color-url-input">
-                <button onclick="this.parentElement.remove()" class="text-red-500 font-bold px-1 text-xs">✕</button>
-            `;
-            container.appendChild(row);
-        }
-
+        // --- SUBIR FOTO A FIREBASE STORAGE Y GUARDAR PRODUCTO ---
         async function guardarNuevoProducto() {
             const name = document.getElementById('new-prod-name').value.trim();
             const description = document.getElementById('new-prod-desc').value.trim();
@@ -1134,23 +1158,32 @@
             let colors = [];
             let images = [];
 
-            colorRows.forEach(row => {
-                const hex = row.querySelector('.color-hex-input').value.trim() || '#000000';
-                const cname = row.querySelector('.color-name-input').value.trim() || 'Único';
-                const url = row.querySelector('.color-url-input').value.trim();
-                if (url) {
-                    colors.push({ hex, name: cname, image: url });
-                    images.push(url);
-                }
-            });
-
-            if (images.length === 0) {
-                showToast("Agrega al menos una URL de imagen para el producto.", "error");
-                return;
-            }
+            showToast("Subiendo imágenes a Firebase Storage...", "success");
 
             try {
-                const { collection, addDoc } = window.FB_Methods;
+                const { ref, uploadBytes, getDownloadURL, collection, addDoc } = window.FB_Methods;
+
+                for (let row of colorRows) {
+                    const hex = row.querySelector('.color-hex-input').value.trim() || '#000000';
+                    const cname = row.querySelector('.color-name-input').value.trim() || 'Único';
+                    const fileInput = row.querySelector('.file-input-prod');
+
+                    if (fileInput.files.length > 0) {
+                        const file = fileInput.files[0];
+                        const storageRef = ref(window.FB_Storage, `products/${Date.now()}_${file.name}`);
+                        const snapshot = await uploadBytes(storageRef, file);
+                        const downloadURL = await getDownloadURL(snapshot.ref);
+
+                        colors.push({ hex, name: cname, image: downloadURL });
+                        images.push(downloadURL);
+                    }
+                }
+
+                if (images.length === 0) {
+                    showToast("Selecciona al menos una imagen para el producto.", "error");
+                    return;
+                }
+
                 await addDoc(collection(window.FB_Db, "products"), {
                     name,
                     description,
@@ -1208,7 +1241,6 @@
                 showToast("¡Producto actualizado con éxito!");
                 toggleEditProductModal();
                 
-                // Recargar vista actual
                 const urlParams = new URLSearchParams(window.location.search);
                 const cat = urlParams.get('categoria');
                 if (cat) loadCategoryProducts(cat);
@@ -1314,7 +1346,6 @@
 
             let adminControls = '';
             if (userData && userData.role === 'json' || (userData && userData.role === 'admin')) {
-                // Se genera un escape seguro para pasar strings en la función
                 const safeName = (p.name || '').replace(/'/g, "\\'");
                 const safeDesc = (p.description || '').replace(/'/g, "\\'");
                 adminControls = `
