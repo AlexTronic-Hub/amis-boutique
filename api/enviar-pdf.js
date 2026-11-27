@@ -1,28 +1,14 @@
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT) || 465,
-    secure: true,
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-    },
-    tls: {
-        rejectUnauthorized: false
-    }
-});
-
-module.exports = async (req, res) => {
-    // Configurar cabeceras CORS por seguridad
+export default async function handler(req, res) {
+    // Cabeceras CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
     res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
     if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
+        return res.status(200).end();
     }
 
     if (req.method !== 'POST') {
@@ -35,6 +21,23 @@ module.exports = async (req, res) => {
         if (!correoCliente) {
             return res.status(400).json({ error: 'Falta el correo del cliente.' });
         }
+
+        if (!pdfBase64) {
+            return res.status(400).json({ error: 'Falta el archivo PDF en base64.' });
+        }
+
+        const transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST,
+            port: Number(process.env.SMTP_PORT) || 465,
+            secure: true,
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS
+            },
+            tls: {
+                rejectUnauthorized: false
+            }
+        });
 
         const matches = pdfBase64.match(/^data:(.+);base64,(.+)$/);
         if (!matches || matches.length !== 3) {
@@ -57,12 +60,10 @@ module.exports = async (req, res) => {
         };
 
         await transporter.sendMail(mailOptions);
-        
-        // Asegurar respuesta estricta en JSON
-        return res.status(200).setHeader('Content-Type', 'application/json').json({ success: true, message: 'Correo enviado correctamente' });
+        return res.status(200).json({ success: true, message: 'Correo enviado correctamente' });
 
     } catch (error) {
-        console.error('Error detallado al enviar correo:', error);
-        return res.status(500).setHeader('Content-Type', 'application/json').json({ error: error.message });
+        console.error('SERVER_ERROR_DETAILS:', error);
+        return res.status(500).json({ error: error.message || 'Error interno al enviar el correo' });
     }
-};
+}
