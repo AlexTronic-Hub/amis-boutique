@@ -455,25 +455,40 @@
                         <h3 class="tracking-wide uppercase text-xs font-bold text-gray-900">Método de Envío</h3>
                         <div class="space-y-2 text-sm">
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="shipping-method" value="Envío local en GDL" checked onchange="applyShippingRules()" class="text-black focus:ring-black">
+                                <input type="radio" name="shipping-method" value="Envío Local Estándar" checked onchange="applyShippingRules()" class="text-black focus:ring-black">
                                 <div>
-                                    <span class="font-medium block">Envío local en Guadalajara</span>
-                                    <span class="text-xs text-gray-500">Costo según distancia (Se cotiza por WhatsApp)</span>
+                                    <span class="font-medium block">Envío Local Estándar ($69 MXN)</span>
+                                    <span id="desc-envio-estandar" class="text-xs text-emerald-700 font-medium block">Calculando fecha de entrega...</span>
                                 </div>
                             </label>
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="shipping-method" value="Envío Nacional" onchange="applyShippingRules()" class="text-black focus:ring-black">
+                                <input type="radio" name="shipping-method" value="Envío Local Express" onchange="applyShippingRules()" class="text-black focus:ring-black">
                                 <div>
-                                    <span class="font-medium block">Envío Nacional ($149 MXN)</span>
+                                    <span class="font-medium block">Envío Local Express ($99 MXN)</span>
+                                    <span id="desc-envio-express" class="text-xs text-amber-700 font-medium block">Calculando fecha de entrega...</span>
                                 </div>
                             </label>
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
                                 <input type="radio" name="shipping-method" value="Punto de entrega" onchange="applyShippingRules()" class="text-black focus:ring-black">
                                 <div>
-                                    <span class="font-medium block">Punto de entrega (Sin costo)</span>
-                                    <span class="text-xs text-gray-500">Elige tu plaza o punto de encuentro</span>
+                                    <span class="font-medium block">Punto de entrega ($0 MXN)</span>
+                                    <span class="text-xs text-gray-500">Elige tu plaza o punto de encuentro en GDL</span>
                                 </div>
                             </label>
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="shipping-method" value="Envío Nacional" onchange="applyShippingRules()" class="text-black focus:ring-black">
+                                <div>
+                                    <span class="font-medium block">Envío Nacional / Fuera de Periférico ($149 MXN)</span>
+                                    <span class="text-xs text-gray-500">Todo México y zonas fuera del anillo local</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- VALIDACIÓN DE CÓDIGO POSTAL LOCAL -->
+                        <div id="local-cp-validator" class="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-1.5">
+                            <label class="block text-xs font-bold uppercase text-gray-700">Verifica tu Código Postal (GDL) *</label>
+                            <input type="text" id="ship-cp" maxlength="5" placeholder="Ej. 44410" oninput="validarCPLocalCheckout(this.value)" class="w-full p-2 border border-gray-300 rounded-lg text-xs font-mono focus:outline-none focus:border-black">
+                            <p id="cp-status-msg" class="text-[11px] text-gray-500">Ingresa los 5 dígitos de tu C.P. para confirmar cobertura dentro de Periférico.</p>
                         </div>
 
                         <!-- PUNTOS DE ENTREGA -->
@@ -709,8 +724,102 @@
             }, 3000);
         }
 
+        // --- CÁLCULO DINÁMICO DE FECHAS DE ENTREGA SEGÚN HORA DE CORTE 11:00 AM ---
+        function avanzarDiasHabiles(fechaBase, diasHabiles) {
+            let resultado = new Date(fechaBase);
+            let agregados = 0;
+            while (agregados < diasHabiles) {
+                resultado.setDate(resultado.getDate() + 1);
+                // Envíos Pronto recolecta y entrega de Lunes (1) a Sábado (6). Saltamos Domingo (0).
+                if (resultado.getDay() !== 0) {
+                    agregados++;
+                }
+            }
+            return resultado;
+        }
+
+        function formatearFechaCorta(fecha) {
+            const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+            return `${dias[fecha.getDay()]} ${fecha.getDate()} de ${meses[fecha.getMonth()]}`;
+        }
+
+        function actualizarTextosFechasEnvio() {
+            const ahora = new Date();
+            const hora = ahora.getHours();
+            const diaSemana = ahora.getDay(); // 0 = Domingo
+
+            let fechaRecoleccion = new Date(ahora);
+            // Si es domingo o ya pasaron las 11:00 AM (hora >= 11), la recolección pasa al siguiente día hábil
+            if (diaSemana === 0 || hora >= 11) {
+                fechaRecoleccion = avanzarDiasHabiles(ahora, 1);
+            }
+
+            // El Express ($99) entrega el mismo día de la recolección
+            const fechaEntregaExpress = new Date(fechaRecoleccion);
+            // El Estándar ($69) entrega 1 día hábil después de la recolección
+            const fechaEntregaEstandar = avanzarDiasHabiles(fechaRecoleccion, 1);
+
+            const elEstandar = document.getElementById('desc-envio-estandar');
+            const elExpress = document.getElementById('desc-envio-express');
+
+            if (elEstandar) {
+                elEstandar.textContent = `Dentro de Periférico GDL · Llega el ${formatearFechaCorta(fechaEntregaEstandar)}`;
+            }
+            if (elExpress) {
+                const esHoy = (fechaEntregaExpress.toDateString() === ahora.toDateString());
+                elExpress.textContent = `Dentro de Periférico GDL · ${esHoy ? 'Llega HOY mismo' : 'Llega el ' + formatearFechaCorta(fechaEntregaExpress)}`;
+            }
+        }
+
+        // --- POLÍGONO DE COBERTURA GDL (PERIFÉRICO + AV. TONALTECAS -> ALDAMA -> ZALATITÁN) ---
+        function estaDentroDePoligonoGDL(cp) {
+            const cpNum = parseInt(cp.trim(), 10);
+            if (isNaN(cpNum) || cp.trim().length !== 5) return false;
+
+            const esGDL = (cpNum >= 44100 && cpNum <= 44999);
+            const esZapopanInt = (cpNum >= 45010 && cpNum <= 45199 && cpNum !== 45019);
+            const esTlaquepaqueInt = (cpNum >= 45500 && cpNum <= 45579);
+            const esTonalaPoligono = (cpNum >= 45400 && cpNum <= 45419 && cpNum !== 45409);
+
+            return (esGDL || esZapopanInt || esTlaquepaqueInt || esTonalaPoligono);
+        }
+
+        function validarCPLocalCheckout(cp) {
+            const msgEl = document.getElementById('cp-status-msg');
+            if (!msgEl) return;
+
+            if (cp.length < 5) {
+                msgEl.className = "text-[11px] text-gray-500";
+                msgEl.textContent = "Ingresa los 5 dígitos de tu C.P. para confirmar cobertura dentro de Periférico.";
+                return;
+            }
+
+            if (estaDentroDePoligonoGDL(cp)) {
+                msgEl.className = "text-[11px] text-emerald-600 font-bold";
+                msgEl.textContent = "✅ ¡Cobertura local confirmada dentro de Periférico!";
+            } else {
+                msgEl.className = "text-[11px] text-amber-700 font-bold";
+                msgEl.textContent = "⚠️ Fuera de Periférico: Se cambió automático a Envío Nacional ($149). Si prefieres envío por Uber, contáctanos por WhatsApp.";
+                const nacionalRadio = document.querySelector('input[name="shipping-method"][value="Envío Nacional"]');
+                if (nacionalRadio) {
+                    nacionalRadio.checked = true;
+                    applyShippingRules();
+                }
+            }
+        }
+
+        function obtenerCostoEnvioActual() {
+            const shippingMethod = document.querySelector('input[name="shipping-method"]:checked')?.value;
+            if (shippingMethod === 'Envío Local Estándar') return 69;
+            if (shippingMethod === 'Envío Local Express') return 99;
+            if (shippingMethod === 'Envío Nacional') return 149;
+            return 0;
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             updateCartUI();
+            actualizarTextosFechasEnvio();
 
             const checkFB = setInterval(() => {
                 if (window.FB_Auth && window.FB_Methods) {
@@ -1142,7 +1251,6 @@
                 
                 if (userSnap && userSnap.exists()) {
                     userData = userSnap.data();
-                    // Buscamos con múltiples variantes por si los campos en Firebase tienen otros nombres
                     names = userData.names || userData.name || userData.nombre || '';
                     surnames = userData.surnames || userData.apellido || userData.apellidos || '';
                     phone = userData.phone || userData.telefono || userData.celular || '';
@@ -1395,7 +1503,7 @@
                 toggleAuthModal();
             } catch (error) {
                 errorBox.textContent = "Correo o contraseña incorrectos.";
-                errorBox.classList.add('hidden');
+                errorBox.classList.remove('hidden');
             }
         }
 
@@ -1457,6 +1565,7 @@
                 modal.classList.remove('hidden');
                 setTimeout(() => drawer.classList.remove('translate-x-full'), 10);
                 checkoutStep = 1;
+                actualizarTextosFechasEnvio();
                 updateCartUI();
             } else {
                 drawer.classList.add('translate-x-full');
@@ -1493,8 +1602,7 @@
             if(stepPayment) stepPayment.classList.add('hidden');
 
             let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const shippingMethodChecked = document.querySelector('input[name="shipping-method"]:checked');
-            if (shippingMethodChecked && shippingMethodChecked.value === 'Envío Nacional') total += 149;
+            total += obtenerCostoEnvioActual();
 
             const totalEl = document.getElementById('cart-total');
             if(totalEl) totalEl.textContent = `$${total} MXN`;
@@ -1542,31 +1650,36 @@
                     actionBtn.style.display = 'block';
                 }
                 
-                // Inyectar datos del usuario logueado con respaldo automático
+                actualizarTextosFechasEnvio();
+
                 const nameInput = document.getElementById('ship-name');
                 const phoneInput = document.getElementById('ship-phone');
                 const emailInput = document.getElementById('ship-email');
                 const addressInput = document.getElementById('ship-address');
+                const cpInput = document.getElementById('ship-cp');
 
-                // Rellenar nombre uniendo 'names' y 'surnames' de Firestore
                 const dbNames = userData?.names || userData?.name || userData?.nombre || '';
                 const dbSurnames = userData?.surnames || userData?.apellido || userData?.apellidos || '';
                 const nombreCompletoFirestore = `${dbNames} ${dbSurnames}`.trim();
 
-                if (nameInput) {
-                nameInput.value = globalUserProfile.fullName || nombreCompletoFirestore || '';
+                if (nameInput && !nameInput.value) {
+                    nameInput.value = globalUserProfile.fullName || nombreCompletoFirestore || '';
                 }
-                if (phoneInput) {
+                if (phoneInput && !phoneInput.value) {
                     phoneInput.value = globalUserProfile.phone || userData?.phone || userData?.telefono || userData?.celular || '';
                 }
-                if (emailInput) {
+                if (emailInput && !emailInput.value) {
                     emailInput.value = currentUser ? currentUser.email : (globalUserProfile.email || userData?.email || '');
                 }
-                if (addressInput) {
-                    addressInput.value = globalUserProfile.address || (userData?.addresses && userData.addresses[0]) || '';
+                if (addressInput && !addressInput.value) {
+                    const savedAddr = globalUserProfile.address || (userData?.addresses && userData.addresses[0]) || '';
+                    addressInput.value = savedAddr;
+                    const cpMatch = savedAddr.match(/C\.P\.\s*(\d{5})/i);
+                    if (cpMatch && cpInput && !cpInput.value) {
+                        cpInput.value = cpMatch[1];
+                        validarCPLocalCheckout(cpMatch[1]);
+                    }
                 }
-
-                applyShippingRules();
             } else if (checkoutStep === 3) {
                 if(modalTitle) modalTitle.textContent = 'Método de Pago';
                 if(stepPayment) stepPayment.classList.remove('hidden');
@@ -1589,11 +1702,27 @@
                 if (cart.length === 0) return;
                 checkoutStep = 2;
                 updateCartUI();
+                applyShippingRules();
             } else if (checkoutStep === 2) {
                 const clientName = document.getElementById('ship-name').value.trim();
                 const clientPhone = document.getElementById('ship-phone').value.trim();
                 const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
+                const cpVal = document.getElementById('ship-cp')?.value.trim() || '';
                 let clientAddress = shippingMethod === "Punto de entrega" ? document.querySelector('input[name="meeting-point-radio"]:checked').value : document.getElementById('ship-address').value.trim();
+
+                if (shippingMethod.includes('Envío Local')) {
+                    if (cpVal.length !== 5) {
+                        showToast("Ingresa tu Código Postal de 5 dígitos para validar envío local.", "error");
+                        return;
+                    }
+                    if (!estaDentroDePoligonoGDL(cpVal)) {
+                        validarCPLocalCheckout(cpVal);
+                        return;
+                    }
+                    if (!clientAddress.includes(cpVal)) {
+                        clientAddress = `${clientAddress} (C.P. ${cpVal})`;
+                    }
+                }
 
                 if(!clientName || !clientPhone || !clientAddress) {
                     showToast("Por favor completa los campos obligatorios de envío.", "error");
@@ -1606,10 +1735,16 @@
                 const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
                 const clientName = document.getElementById('ship-name').value.trim();
                 const clientPhone = document.getElementById('ship-phone').value.trim();
+                const cpVal = document.getElementById('ship-cp')?.value.trim() || '';
                 let clientAddress = shippingMethod === "Punto de entrega" ? document.querySelector('input[name="meeting-point-radio"]:checked').value : document.getElementById('ship-address').value.trim();
 
+                if (shippingMethod.includes('Envío Local') && cpVal && !clientAddress.includes(cpVal)) {
+                    clientAddress = `${clientAddress} (C.P. ${cpVal})`;
+                }
+
                 let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                if (shippingMethod === "Envío Nacional") total += 149;
+                const costoEnvio = obtenerCostoEnvioActual();
+                total += costoEnvio;
 
                 const { collection, addDoc, getDocs, Timestamp } = window.FB_Methods;
                 const now = new Date();
@@ -1651,11 +1786,11 @@
                         unit_price: Number(i.price)
                     }));
 
-                    if (shippingMethod === "Envío Nacional") {
+                    if (costoEnvio > 0) {
                         mpItems.push({
-                            title: "Envío Nacional",
+                            title: shippingMethod,
                             quantity: 1,
-                            unit_price: 149
+                            unit_price: costoEnvio
                         });
                     }
 
@@ -1735,12 +1870,22 @@
             const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
             const meetingPointsContainer = document.getElementById('meeting-points-container');
             const addressFieldContainer = document.getElementById('address-field-container');
+            const cpValidator = document.getElementById('local-cp-validator');
+
             if (shippingMethod === 'Punto de entrega') {
                 meetingPointsContainer.classList.remove('hidden');
                 addressFieldContainer.classList.add('hidden');
+                if (cpValidator) cpValidator.classList.add('hidden');
             } else {
                 meetingPointsContainer.classList.add('hidden');
                 addressFieldContainer.classList.remove('hidden');
+                if (cpValidator) {
+                    if (shippingMethod.includes('Envío Local')) {
+                        cpValidator.classList.remove('hidden');
+                    } else {
+                        cpValidator.classList.add('hidden');
+                    }
+                }
             }
             applyPaymentRules();
             updateCartUI();
