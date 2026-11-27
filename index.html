@@ -81,7 +81,6 @@
         background-position: center;
       }
 
-      /* Estilo CSS exclusivo para cuando se mande a imprimir el ticket térmico en 58mm */
       @media print {
           body * {
               visibility: hidden;
@@ -126,10 +125,9 @@
         </div>
     </div>
 
-    <!-- CONTENEDOR OCULTO PARA DESCARGA DE PDF EN FORMATO CARTA (TAMAÑO NORMAL) -->
+    <!-- CONTENEDOR OCULTO PARA DESCARGA Y ENVÍO DE PDF EN FORMATO CARTA -->
     <div id="pdf-carta-container" style="display: none; width: 210mm; min-height: 297mm; padding: 20mm; font-family: 'Helvetica', 'Arial', sans-serif; font-size: 12px; color: #111; background: #fff; box-sizing: border-box;">
         
-        <!-- ENCABEZADO CON LOGO TIPOGRÁFICO OFICIAL -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #111; padding-bottom: 15px; margin-bottom: 25px;">
             <div>
                 <div class="amis-logo-container">
@@ -146,12 +144,12 @@
             </div>
         </div>
 
-        <!-- DATOS DEL CLIENTE Y ENVÍO -->
         <div style="display: flex; justify-content: space-between; margin-bottom: 25px; background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
             <div style="width: 48%;">
                 <h3 style="font-size: 12px; font-weight: bold; text-transform: uppercase; margin: 0 0 8px 0; color: #111; border-bottom: 1px solid #d1d5db; padding-bottom: 4px;">Datos del Cliente</h3>
                 <p style="margin: 3px 0;"><strong>Nombre:</strong> <span id="pdf-cliente-nombre"></span></p>
                 <p style="margin: 3px 0;"><strong>Teléfono:</strong> <span id="pdf-cliente-tel"></span></p>
+                <p style="margin: 3px 0;"><strong>Correo:</strong> <span id="pdf-cliente-correo"></span></p>
             </div>
             <div style="width: 48%;">
                 <h3 style="font-size: 12px; font-weight: bold; text-transform: uppercase; margin: 0 0 8px 0; color: #111; border-bottom: 1px solid #d1d5db; padding-bottom: 4px;">Información de Envío y Pago</h3>
@@ -161,7 +159,6 @@
             </div>
         </div>
 
-        <!-- TABLA DE PRODUCTOS -->
         <div style="margin-bottom: 30px;">
             <h3 style="font-size: 13px; font-weight: bold; text-transform: uppercase; margin: 0 0 10px 0; color: #111;">Detalle de Productos</h3>
             <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 11px;">
@@ -174,13 +171,10 @@
                         <th style="padding: 10px; border: 1px solid #111; text-align: right;">Importe</th>
                     </tr>
                 </thead>
-                <tbody id="pdf-items-tbody">
-                    <!-- Se llena dinámicamente -->
-                </tbody>
+                <tbody id="pdf-items-tbody"></tbody>
             </table>
         </div>
 
-        <!-- TOTALES -->
         <div style="display: flex; justify-content: flex-end; margin-bottom: 40px;">
             <div style="width: 250px; background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px; font-weight: bold;">
@@ -190,7 +184,6 @@
             </div>
         </div>
 
-        <!-- PIE DE PÁGINA DEL PDF -->
         <div style="position: absolute; bottom: 20mm; left: 20mm; right: 20mm; text-align: center; border-top: 1px solid #e5e7eb; padding-top: 15px; color: #666; font-size: 10px;">
             <p style="margin: 0; font-weight: bold; color: #111;">¡Gracias por tu compra en AMIS Boutique!</p>
             <p style="margin: 3px 0 0 0;">Este documento es un comprobante oficial de tu pedido. Cambios y devoluciones válidos presentando ticket o comprobante en sucursal.</p>
@@ -227,7 +220,7 @@
         </div>
     </header>
 
-    <!-- MODAL DE EDICIÓN RÁPIDA DE PRODUCTO (SOLO ADMIN) -->
+    <!-- MODAL DE EDICIÓN RÁPIDA DE PRODUCTO -->
     <div id="edit-product-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
         <div class="flex items-center justify-center min-h-screen px-4">
             <div class="fixed inset-0 bg-black bg-opacity-50" onclick="toggleEditProductModal()"></div>
@@ -270,36 +263,31 @@
                     <h3 id="auth-modal-title" class="font-serif text-xl font-bold">Iniciar Sesión</h3>
                     <button onclick="toggleAuthModal()" class="text-gray-400 hover:text-black">✕</button>
                 </div>
-
                 <div id="auth-error-box" class="hidden mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl"></div>
-
                 <div id="auth-form-container" class="space-y-3 text-sm">
                     <div id="register-fields" class="hidden space-y-3">
                         <div>
                             <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Nombre(s)</label>
-                            <input type="text" id="reg-names" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black text-xs" placeholder="Tus nombres">
+                            <input type="text" id="reg-names" class="w-full p-3 border border-gray-200 rounded-xl text-xs" placeholder="Tus nombres">
                         </div>
                         <div>
                             <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Apellidos</label>
-                            <input type="text" id="reg-surnames" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black text-xs" placeholder="Tus apellidos">
+                            <input type="text" id="reg-surnames" class="w-full p-3 border border-gray-200 rounded-xl text-xs" placeholder="Tus apellidos">
                         </div>
                         <div>
                             <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Número de teléfono</label>
-                            <input type="tel" id="reg-phone" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black text-xs" placeholder="33 1234 5678">
+                            <input type="tel" id="reg-phone" class="w-full p-3 border border-gray-200 rounded-xl text-xs" placeholder="33 1234 5678">
                         </div>
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Correo electrónico</label>
-                        <input type="email" id="auth-email" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black text-xs" placeholder="tucorreo@email.com">
+                        <input type="email" id="auth-email" class="w-full p-3 border border-gray-200 rounded-xl text-xs" placeholder="tucorreo@email.com">
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Contraseña</label>
-                        <input type="password" id="auth-password" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black text-xs" placeholder="••••••••">
+                        <input type="password" id="auth-password" class="w-full p-3 border border-gray-200 rounded-xl text-xs" placeholder="••••••••">
                     </div>
-
                     <button onclick="handleAuthSubmit()" id="auth-submit-btn" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">Entrar</button>
-                    
                     <div class="text-center pt-2">
                         <button onclick="switchAuthMode()" id="auth-switch-btn" class="text-xs text-gray-600 hover:underline">¿No tienes cuenta? Regístrate aquí</button>
                     </div>
@@ -317,46 +305,40 @@
                     <h3 class="font-serif text-xl font-bold">Agregar Nueva Dirección</h3>
                     <button onclick="toggleAddressModal()" class="text-gray-400 hover:text-black">✕</button>
                 </div>
-                
                 <div class="space-y-3 text-xs">
                     <div>
                         <label class="block font-bold uppercase text-gray-700 mb-1">Código Postal *</label>
-                        <input type="text" id="dir-cp" maxlength="5" placeholder="Ej. 44100" oninput="buscarCodigoPostal(this.value)" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black font-mono">
+                        <input type="text" id="dir-cp" maxlength="5" placeholder="Ej. 44100" oninput="buscarCodigoPostal(this.value)" class="w-full p-2.5 border border-gray-200 rounded-xl font-mono">
                     </div>
-
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="block font-bold uppercase text-gray-700 mb-1">Calle *</label>
-                            <input type="text" id="dir-calle" placeholder="Nombre de la calle" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
+                            <input type="text" id="dir-calle" placeholder="Nombre de la calle" class="w-full p-2.5 border border-gray-200 rounded-xl">
                         </div>
                         <div>
                             <label class="block font-bold uppercase text-gray-700 mb-1">Núm. Exterior *</label>
-                            <input type="text" id="dir-num-ext" placeholder="Ej. 123" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
+                            <input type="text" id="dir-num-ext" placeholder="Ej. 123" class="w-full p-2.5 border border-gray-200 rounded-xl">
                         </div>
                     </div>
-
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="block font-bold uppercase text-gray-700 mb-1">Núm. Interior (Opc.)</label>
-                            <input type="text" id="dir-num-int" placeholder="Ej. Depto 4B" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
+                            <input type="text" id="dir-num-int" placeholder="Ej. Depto 4B" class="w-full p-2.5 border border-gray-200 rounded-xl">
                         </div>
                         <div>
                             <label class="block font-bold uppercase text-gray-700 mb-1">Ciudad / Municipio *</label>
-                            <input type="text" id="dir-ciudad" placeholder="Ej. Guadalajara" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
+                            <input type="text" id="dir-ciudad" placeholder="Ej. Guadalajara" class="w-full p-2.5 border border-gray-200 rounded-xl">
                         </div>
                     </div>
-
                     <div>
                         <label class="block font-bold uppercase text-gray-700 mb-1">Colonia *</label>
-                        <input type="text" id="dir-colonia-input" placeholder="Ej. Centro, Moderna..." class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
+                        <input type="text" id="dir-colonia-input" placeholder="Ej. Centro, Moderna..." class="w-full p-2.5 border border-gray-200 rounded-xl">
                     </div>
-
                     <div>
                         <label class="block font-bold uppercase text-gray-700 mb-1">Estado *</label>
-                        <input type="text" id="dir-estado" placeholder="Ej. Jalisco" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
+                        <input type="text" id="dir-estado" placeholder="Ej. Jalisco" class="w-full p-2.5 border border-gray-200 rounded-xl">
                     </div>
                 </div>
-
                 <button onclick="saveStructuredAddress()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition mt-2">Guardar Dirección</button>
             </div>
         </div>
@@ -377,7 +359,7 @@
         </div>
     </div>
 
-    <!-- MENÚ LATERAL (TRES BARRITAS) -->
+    <!-- MENÚ LATERAL -->
     <div id="mobile-menu" class="fixed inset-0 z-50 overflow-hidden hidden">
         <div id="menu-backdrop" class="absolute inset-0 bg-black bg-opacity-50 transition-opacity" onclick="toggleMobileMenu()"></div>
         <div class="absolute inset-y-0 left-0 max-w-full flex">
@@ -389,7 +371,7 @@
                     </div>
 
                     <nav class="mt-6 space-y-4">
-                        <!-- PANEL DE ADMINISTRACIÓN EXCLUSIVO ADMIN -->
+                        <!-- PANEL ADMIN -->
                         <div id="menu-admin-wrapper" class="hidden">
                             <button id="admin-menu-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-serif font-bold text-black text-base hover:opacity-75 transition tracking-wide">
                                 <span>Panel de Administración</span>
@@ -421,7 +403,6 @@
                                         <input type="text" id="new-prod-name" placeholder="Nombre del producto" class="w-full p-2 border rounded-md text-xs">
                                         <textarea id="new-prod-desc" placeholder="Descripción" rows="2" class="w-full p-2 border rounded-md text-xs"></textarea>
                                         
-                                        <!-- CAMPO DE COSTO CON CÁLCULO +38% Y TERMINACIÓN EN 0, 5 O 9 -->
                                         <div class="bg-emerald-50 p-2 rounded-md border border-emerald-200 space-y-1">
                                             <label class="block text-[10px] font-bold uppercase text-emerald-900">Costo del Producto ($ MXN)</label>
                                             <input type="number" id="new-prod-cost" placeholder="Ej. 105" oninput="actualizarPreviewPrecioNuevo(this.value)" class="w-full p-1.5 border border-emerald-300 rounded text-xs bg-white font-semibold">
@@ -476,14 +457,13 @@
                             </div>
                         </div>
 
-                        <!-- 1. MI CUENTA (CLIENTES NORMALES) -->
+                        <!-- MI CUENTA -->
                         <div id="menu-account-wrapper" class="hidden">
                             <button id="account-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Mi Cuenta</span>
                                 <svg id="account-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div id="account-submenu" class="hidden pl-4 mt-2 space-y-3 border-l-2 border-gray-100">
-                                
                                 <div>
                                     <button id="orders-toggle-btn" class="w-full flex items-center justify-between py-1.5 text-left font-medium text-gray-700 hover:text-black transition">
                                         <span class="tracking-wider uppercase text-xs font-bold">Mis Pedidos</span>
@@ -495,7 +475,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div>
                                     <button id="data-toggle-btn" class="w-full flex items-center justify-between py-1.5 text-left font-medium text-gray-700 hover:text-black transition">
                                         <span class="tracking-wider uppercase text-xs font-bold">Mis Datos</span>
@@ -507,7 +486,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                
                                 <div>
                                     <button id="addresses-toggle-btn" class="w-full flex items-center justify-between py-1.5 text-left font-medium text-gray-700 hover:text-black transition">
                                         <span class="tracking-wider uppercase text-xs font-bold">Direcciones Registradas</span>
@@ -522,14 +500,12 @@
                                         </button>
                                     </div>
                                 </div>
-
                                 <div class="pt-2">
                                     <button onclick="handleLogout()" class="w-full bg-gray-100 text-red-600 py-2 rounded-full text-[11px] tracking-widest uppercase hover:bg-red-50 transition font-medium">Cerrar Sesión</button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Botón simple para Iniciar Sesión -->
                         <div id="menu-login-wrapper">
                             <button onclick="toggleAuthModal(); toggleMobileMenu();" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Mi Cuenta</span>
@@ -537,7 +513,6 @@
                             </button>
                         </div>
 
-                        <!-- 2. CATEGORÍAS -->
                         <div id="menu-categories-wrapper" class="pt-2 border-t border-gray-100">
                             <button id="collection-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Categorías</span>
@@ -554,25 +529,15 @@
                             </div>
                         </div>
 
-                        <!-- 3. CONTÁCTANOS -->
                         <div id="menu-contact-wrapper" class="pt-2 border-t border-gray-100">
                             <button id="contact-toggle-btn" class="w-full flex items-center justify-between py-2 text-left font-medium text-gray-800 hover:text-black transition">
                                 <span class="tracking-widest uppercase text-sm font-bold">Contáctanos</span>
                                 <svg id="contact-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div id="contact-submenu" class="hidden pl-4 mt-3 space-y-3 border-l-2 border-gray-100 text-sm">
-                                <a href="https://www.instagram.com/amisboutique.official?dlrf=Y3V1a3oyMGhweHNy" target="_blank" class="flex items-center gap-2.5 text-gray-700 hover:text-black transition font-medium">
-                                    <svg class="w-4 h-4 text-pink-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-                                    Instagram
-                                </a>
-                                <a href="https://www.facebook.com/share/1CMqeKz5Su/" target="_blank" class="flex items-center gap-2.5 text-gray-700 hover:text-black transition font-medium">
-                                    <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                                    Facebook
-                                </a>
-                                <a href="https://wa.me/523312467018?text=Hola%20Amis%20Boutique,%20me%20gustaría%20más%20información." target="_blank" class="flex items-center gap-2.5 text-emerald-600 hover:text-emerald-700 transition font-medium">
-                                    <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-                                    WhatsApp
-                                </a>
+                                <a href="https://www.instagram.com/amisboutique.official" target="_blank" class="flex items-center gap-2.5 text-gray-700 hover:text-black transition font-medium">Instagram</a>
+                                <a href="https://www.facebook.com/share/1CMqeKz5Su/" target="_blank" class="flex items-center gap-2.5 text-gray-700 hover:text-black transition font-medium">Facebook</a>
+                                <a href="https://wa.me/523312467018" target="_blank" class="flex items-center gap-2.5 text-emerald-600 hover:text-emerald-700 transition font-medium">WhatsApp</a>
                             </div>
                         </div>
                     </nav>
@@ -613,18 +578,15 @@
                         <button onclick="toggleCartModal()" class="p-2 rounded-md hover:bg-gray-100">✕</button>
                     </div>
 
-                    <!-- PASO 1: CARRITO -->
                     <div id="step-cart" class="py-4">
                         <div id="cart-items" class="space-y-4 max-h-80 overflow-y-auto border-b border-gray-100 pb-4">
                             <p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>
                         </div>
                     </div>
 
-                    <!-- PASO 2: ENVÍO Y DATOS -->
                     <div id="step-shipping" class="py-4 hidden space-y-4">
-                        <!-- AVISO DE ENVÍO GRATIS AUTOMÁTICO (> $1,499) -->
                         <div id="free-shipping-banner" class="bg-emerald-50 border border-emerald-200 text-emerald-800 p-3 rounded-xl text-xs font-medium hidden">
-                            🎉 ¡Felicidades! Tu compra supera los $1,499 MXN y tienes <strong>ENVÍO GRATIS</strong> automático en cualquier método.
+                            🎉 ¡Felicidades! Tu compra supera los $1,499 MXN y tienes <strong>ENVÍO GRATIS</strong> automático.
                         </div>
 
                         <h3 class="tracking-wide uppercase text-xs font-bold text-gray-900">Método de Envío</h3>
@@ -633,21 +595,21 @@
                                 <input type="radio" name="shipping-method" value="Envío Local Estándar" checked onchange="applyShippingRules()" class="text-black focus:ring-black">
                                 <div>
                                     <span id="label-estandar-txt" class="font-medium block">Envío Local Estándar ($69 MXN)</span>
-                                    <span id="desc-envio-estandar" class="text-xs text-emerald-700 font-medium block">Calculando fecha de entrega...</span>
+                                    <span id="desc-envio-estandar" class="text-xs text-emerald-700 font-medium block">Calculando fecha...</span>
                                 </div>
                             </label>
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
                                 <input type="radio" name="shipping-method" value="Envío Local Express" onchange="applyShippingRules()" class="text-black focus:ring-black">
                                 <div>
                                     <span id="label-express-txt" class="font-medium block">Envío Local Express ($99 MXN)</span>
-                                    <span id="desc-envio-express" class="text-xs text-amber-700 font-medium block">Calculando fecha de entrega...</span>
+                                    <span id="desc-envio-express" class="text-xs text-amber-700 font-medium block">Calculando fecha...</span>
                                 </div>
                             </label>
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
                                 <input type="radio" name="shipping-method" value="Punto de entrega" onchange="applyShippingRules()" class="text-black focus:ring-black">
                                 <div>
                                     <span class="font-medium block">Punto de entrega ($0 MXN)</span>
-                                    <span class="text-xs text-gray-500">Elige tu plaza o punto de encuentro en GDL</span>
+                                    <span class="text-xs text-gray-500">Plaza o punto de encuentro en GDL</span>
                                 </div>
                             </label>
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
@@ -659,7 +621,6 @@
                             </label>
                         </div>
 
-                        <!-- CÓDIGO DE PROMOCIÓN / ENVÍO LOCAL GRATIS -->
                         <div id="local-coupon-container" class="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-1.5 hidden">
                             <label class="block text-xs font-bold uppercase text-gray-700">¿Tienes un cupón de envío local?</label>
                             <div class="flex gap-2">
@@ -669,45 +630,22 @@
                             <p id="coupon-status-msg" class="text-[11px] text-gray-500">Ingresa tu código para canjear envío local gratis.</p>
                         </div>
 
-                        <!-- VALIDACIÓN DE CÓDIGO POSTAL LOCAL -->
                         <div id="local-cp-validator" class="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-1.5">
                             <label class="block text-xs font-bold uppercase text-gray-700">Verifica tu Código Postal (GDL) *</label>
                             <input type="text" id="ship-cp" maxlength="5" placeholder="Ej. 44410" oninput="validarCPLocalCheckout(this.value)" class="w-full p-2 border border-gray-300 rounded-lg text-xs font-mono focus:outline-none focus:border-black">
-                            <p id="cp-status-msg" class="text-[11px] text-gray-500">Ingresa los 5 dígitos de tu C.P. para confirmar cobertura en Zona Estándar.</p>
+                            <p id="cp-status-msg" class="text-[11px] text-gray-500">Ingresa tu C.P. para confirmar cobertura.</p>
                         </div>
 
-                        <!-- PUNTOS DE ENTREGA -->
                         <div id="meeting-points-container" class="hidden pt-2 space-y-2 bg-gray-50 p-3 rounded-xl border border-gray-200">
                             <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Selecciona el punto de entrega *</label>
                             <div class="space-y-2 text-xs">
-                                <label class="flex items-center space-x-3 cursor-pointer">
-                                    <input type="radio" name="meeting-point-radio" value="Plaza Forum" checked class="text-black focus:ring-black">
-                                    <a href="https://maps.app.goo.gl/YA6AYi19UgDrsrZB8" target="_blank" class="text-blue-600 hover:underline font-medium">Plaza Forum Tlaquepaque 📍</a>
-                                </label>
-                                <label class="flex items-center space-x-3 cursor-pointer">
-                                    <input type="radio" name="meeting-point-radio" value="Plaza Revolución" class="text-black focus:ring-black">
-                                    <a href="https://maps.app.goo.gl/zJ9e6eoFnnL8h25w9" target="_blank" class="text-blue-600 hover:underline font-medium">Plaza Revolución 📍</a>
-                                </label>
-                                <label class="flex items-center space-x-3 cursor-pointer">
-                                    <input type="radio" name="meeting-point-radio" value="Plaza Patria" class="text-black focus:ring-black">
-                                    <a href="https://maps.app.goo.gl/27YwUG4VzpAk31u18" target="_blank" class="text-blue-600 hover:underline font-medium">Plaza Patria 📍</a>
-                                </label>
-                                <label class="flex items-center space-x-3 cursor-pointer">
-                                    <input type="radio" name="meeting-point-radio" value="Terraza Belenes" class="text-black focus:ring-black">
-                                    <a href="https://maps.app.goo.gl/VoHEE5zBkpQac5HE7" target="_blank" class="text-blue-600 hover:underline font-medium">Terraza Belenes 📍</a>
-                                </label>
-                                <label class="flex items-center space-x-3 cursor-pointer">
-                                    <input type="radio" name="meeting-point-radio" value="OXXO Medrano" class="text-black focus:ring-black">
-                                    <a href="https://maps.app.goo.gl/fe53VxNUDgjH4nNq6" target="_blank" class="text-blue-600 hover:underline font-medium">OXXO Medrano 📍</a>
-                                </label>
-                                <label class="flex items-center space-x-3 cursor-pointer">
-                                    <input type="radio" name="meeting-point-radio" value="Plaza Lomas" class="text-black focus:ring-black">
-                                    <a href="https://maps.app.goo.gl/spRiij5zXv9b7dHZ8" target="_blank" class="text-blue-600 hover:underline font-medium">Plaza Lomas 📍</a>
-                                </label>
-                                <label class="flex items-center space-x-3 cursor-pointer">
-                                    <input type="radio" name="meeting-point-radio" value="Punto Río Nilo" class="text-black focus:ring-black">
-                                    <a href="https://maps.app.goo.gl/yv1w1jtnSXHdsSYv8" target="_blank" class="text-blue-600 hover:underline font-medium">Punto Río Nilo 📍</a>
-                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer"><input type="radio" name="meeting-point-radio" value="Plaza Forum" checked class="text-black"> <span>Plaza Forum Tlaquepaque</span></label>
+                                <label class="flex items-center space-x-3 cursor-pointer"><input type="radio" name="meeting-point-radio" value="Plaza Revolución" class="text-black"> <span>Plaza Revolución</span></label>
+                                <label class="flex items-center space-x-3 cursor-pointer"><input type="radio" name="meeting-point-radio" value="Plaza Patria" class="text-black"> <span>Plaza Patria</span></label>
+                                <label class="flex items-center space-x-3 cursor-pointer"><input type="radio" name="meeting-point-radio" value="Terraza Belenes" class="text-black"> <span>Terraza Belenes</span></label>
+                                <label class="flex items-center space-x-3 cursor-pointer"><input type="radio" name="meeting-point-radio" value="OXXO Medrano" class="text-black"> <span>OXXO Medrano</span></label>
+                                <label class="flex items-center space-x-3 cursor-pointer"><input type="radio" name="meeting-point-radio" value="Plaza Lomas" class="text-black"> <span>Plaza Lomas</span></label>
+                                <label class="flex items-center space-x-3 cursor-pointer"><input type="radio" name="meeting-point-radio" value="Punto Río Nilo" class="text-black"> <span>Punto Río Nilo</span></label>
                             </div>
                         </div>
 
@@ -715,56 +653,47 @@
                             <h4 class="font-bold text-xs uppercase tracking-wide text-gray-900">Tus Datos de Contacto y Envío</h4>
                             <div>
                                 <label class="block text-xs text-gray-600 mb-1">Nombre completo *</label>
-                                <input type="text" id="ship-name" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-black" placeholder="Tu nombre">
+                                <input type="text" id="ship-name" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs" placeholder="Tu nombre">
                             </div>
                             <div>
                                 <label class="block text-xs text-gray-600 mb-1">Número de celular *</label>
-                                <input type="tel" id="ship-phone" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-black" placeholder="33 1234 5678">
+                                <input type="tel" id="ship-phone" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs" placeholder="33 1234 5678">
                             </div>
                             <div>
-                                <label class="block text-xs text-gray-600 mb-1">Correo electrónico (opcional)</label>
-                                <input type="email" id="ship-email" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-black" placeholder="correo@ejemplo.com">
+                                <label class="block text-xs text-gray-600 mb-1">Correo electrónico (para recibir tu comprobante) *</label>
+                                <input type="email" id="ship-email" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs" placeholder="correo@ejemplo.com" required>
                             </div>
                             <div id="address-field-container">
                                 <label class="block text-xs text-gray-600 mb-1">Dirección de entrega o referencias *</label>
-                                <textarea id="ship-address" rows="2" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-black" placeholder="Calle, número, colonia, referencias..."></textarea>
+                                <textarea id="ship-address" rows="2" class="w-full p-2.5 border border-gray-200 rounded-xl text-xs" placeholder="Calle, número, colonia..."></textarea>
                             </div>
                         </div>
                     </div>
 
-                    <!-- PASO 3: PAGO -->
                     <div id="step-payment" class="py-4 hidden space-y-3">
                         <h3 class="text-xs font-bold uppercase tracking-wide text-gray-900">Método de Pago</h3>
                         <div id="payment-options" class="space-y-2 text-sm">
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="payment-method" value="Mercado Pago" checked onchange="handlePaymentChange()" class="text-black focus:ring-black">
-                                <div>
-                                    <span class="font-medium block">Mercado Pago (Checkout Pro)</span>
-                                    <span class="text-xs text-gray-500">Tarjeta / OXXO</span>
-                                </div>
+                                <input type="radio" name="payment-method" value="Mercado Pago" checked onchange="handlePaymentChange()" class="text-black">
+                                <div><span class="font-medium block">Mercado Pago (Checkout Pro)</span><span class="text-xs text-gray-500">Tarjeta / OXXO</span></div>
                             </label>
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="payment-method" value="Transferencia Bancaria" onchange="handlePaymentChange()" class="text-black focus:ring-black">
-                                <div>
-                                    <span class="font-medium block">Transferencia Bancaria</span>
-                                    <span class="text-xs text-gray-500">CLABE de Mercado Pago Wallet</span>
-                                </div>
+                                <input type="radio" name="payment-method" value="Transferencia Bancaria" onchange="handlePaymentChange()" class="text-black">
+                                <div><span class="font-medium block">Transferencia Bancaria</span><span class="text-xs text-gray-500">CLABE Mercado Pago</span></div>
                             </label>
                             <label id="pay-cash" class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="payment-method" value="Pago contra entrega en efectivo" onchange="handlePaymentChange()" class="text-black focus:ring-black">
+                                <input type="radio" name="payment-method" value="Pago contra entrega en efectivo" onchange="handlePaymentChange()" class="text-black">
                                 <span class="font-medium">Pago contra entrega en efectivo</span>
                             </label>
                             <label id="pay-terminal" class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="payment-method" value="Pago contra entrega en terminal" onchange="handlePaymentChange()" class="text-black focus:ring-black">
+                                <input type="radio" name="payment-method" value="Pago contra entrega en terminal" onchange="handlePaymentChange()" class="text-black">
                                 <span class="font-medium">Pago contra entrega en terminal</span>
                             </label>
                         </div>
 
-                        <!-- DATOS BANCARIOS -->
                         <div id="bank-details" class="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-700 hidden space-y-1">
                             <p class="font-bold text-gray-900 mb-1">Datos para Transferencia:</p>
-                            <p class="text-amber-700 font-bold bg-amber-50 p-2 rounded-lg border border-amber-200">Monto exacto a transferir: <span id="transfer-amount-display" class="font-mono text-sm">$0 MXN</span></p>
-                            <p><strong>Institución:</strong> Mercado Pago Wallet</p>
+                            <p class="text-amber-700 font-bold bg-amber-50 p-2 rounded-lg border border-amber-200">Monto exacto: <span id="transfer-amount-display" class="font-mono text-sm">$0 MXN</span></p>
                             <p><strong>CLABE:</strong> <span class="select-all font-mono font-bold text-black">722969020435527654</span></p>
                             <p><strong>Beneficiario:</strong> Alexis Daniel Orozco Ortiz</p>
                         </div>
@@ -776,12 +705,8 @@
                         <span>Total:</span>
                         <span id="cart-total">$0 MXN</span>
                     </div>
-                    <button id="cart-action-btn" onclick="handleCartNext()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
-                        Ir a Pagar
-                    </button>
-                    <button id="cart-back-btn" onclick="handleCartBack()" class="w-full bg-gray-100 text-gray-800 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-gray-200 transition hidden">
-                        Regresar
-                    </button>
+                    <button id="cart-action-btn" onclick="handleCartNext()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">Ir a Pagar</button>
+                    <button id="cart-back-btn" onclick="handleCartBack()" class="w-full bg-gray-100 text-gray-800 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-gray-200 transition hidden">Regresar</button>
                 </div>
             </div>
         </div>
@@ -795,30 +720,26 @@
                 <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">✓</div>
                 <h3 class="font-serif text-xl font-bold">¡Pedido Creado!</h3>
                 <p id="order-success-msg" class="text-xs text-gray-600 leading-relaxed">
-                    Tu pedido ha sido registrado con éxito. Envía tu número de pedido por WhatsApp para agilizar la entrega.
+                    Tu pedido ha sido registrado con éxito. Se ha enviado tu comprobante al correo registrado.
                 </p>
                 <div id="whatsapp-btn-container" class="pt-2">
                     <a id="whatsapp-link" href="#" target="_blank" class="w-full bg-emerald-600 text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-emerald-700 transition flex items-center justify-center gap-2 font-medium">
                         📲 Enviar pedido por WhatsApp
                     </a>
                 </div>
-                <button onclick="closeSuccessModalAndReload()" class="w-full bg-gray-100 text-gray-800 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-gray-200 transition">
-                    Entendido / Volver a la Tienda
-                </button>
+                <button onclick="closeSuccessModalAndReload()" class="w-full bg-gray-100 text-gray-800 py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-gray-200 transition">Entendido</button>
             </div>
         </div>
     </div>
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        <!-- BANNER DE INICIO / HERO -->
         <div id="home-view" class="space-y-8">
             <div class="relative hero-bokeh-bg text-white rounded-3xl p-8 sm:p-16 overflow-hidden shadow-xl text-center">
                 <div class="relative z-10 max-w-2xl mx-auto space-y-4">
                     <span class="text-xs uppercase tracking-[0.3em] text-amber-300 font-semibold">DESCUBRE AMIS</span>
                     <h1 class="text-3xl sm:text-5xl font-serif font-light tracking-wide">Haz espacio para algo nuevo.</h1>
-                    <p class="text-gray-300 text-sm sm:text-base leading-relaxed">Descubre nuestra selección de moda, calzado y accesorios. Encuentra piezas que reflejan tu estilo y te hacen sentir increíble.</p>
+                    <p class="text-gray-300 text-sm sm:text-base leading-relaxed">Descubre nuestra selección de moda, calzado y accesorios.</p>
                     <div class="pt-4 flex flex-wrap justify-center gap-4">
                         <button onclick="loadCategoryProducts('temporada', event)" class="bg-amber-400 text-black px-8 py-3 rounded-full text-xs tracking-widest uppercase font-bold hover:bg-amber-300 transition shadow-lg">Ver Colección Navideña</button>
                         <button onclick="loadCategoryProducts('conjuntos', event)" class="border border-white text-white px-8 py-3 rounded-full text-xs tracking-widest uppercase hover:bg-white hover:text-black transition">Explorar Todo</button>
@@ -826,47 +747,26 @@
                 </div>
             </div>
 
-            <!-- TARJETAS DE CATEGORÍAS RÁPIDAS -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div onclick="loadCategoryProducts('vestidos', event)" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-center cursor-pointer hover:shadow-md transition group flex flex-col">
-                    <div class="h-32 overflow-hidden bg-gray-100">
-                        <img src="https://i.postimg.cc/MpGkyLjq/Whats-App-Image-2026-11-16-at-8-08-21-PM.jpg" alt="Vestidos" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                    </div>
-                    <div class="py-4 px-2">
-                        <h3 class="font-serif font-semibold text-sm tracking-wider text-gray-900 group-hover:text-amber-600 transition">Vestidos</h3>
-                    </div>
+                    <div class="h-32 overflow-hidden bg-gray-100"><img src="https://i.postimg.cc/MpGkyLjq/Whats-App-Image-2026-11-16-at-8-08-21-PM.jpg" class="w-full h-full object-cover group-hover:scale-105 transition duration-300"></div>
+                    <div class="py-4 px-2"><h3 class="font-serif font-semibold text-sm text-gray-900">Vestidos</h3></div>
                 </div>
-
                 <div onclick="loadCategoryProducts('conjuntos', event)" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-center cursor-pointer hover:shadow-md transition group flex flex-col">
-                    <div class="h-32 overflow-hidden bg-gray-100">
-                        <img src="https://i.postimg.cc/YqXSG8fS/IMG-20261115-WA0058.jpg" alt="Conjuntos" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                    </div>
-                    <div class="py-4 px-2">
-                        <h3 class="font-serif font-semibold text-sm tracking-wider text-gray-900 group-hover:text-amber-600 transition">Conjuntos</h3>
-                    </div>
+                    <div class="h-32 overflow-hidden bg-gray-100"><img src="https://i.postimg.cc/YqXSG8fS/IMG-20261115-WA0058.jpg" class="w-full h-full object-cover group-hover:scale-105 transition duration-300"></div>
+                    <div class="py-4 px-2"><h3 class="font-serif font-semibold text-sm text-gray-900">Conjuntos</h3></div>
                 </div>
-
                 <div onclick="loadCategoryProducts('abrigos', event)" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-center cursor-pointer hover:shadow-md transition group flex flex-col">
-                    <div class="h-32 overflow-hidden bg-gray-100">
-                        <img src="https://i.postimg.cc/wT2MqSpK/Whats-App-Image-2026-11-10-at-6-58-14-PM.jpg" alt="Abrigos" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                    </div>
-                    <div class="py-4 px-2">
-                        <h3 class="font-serif font-semibold text-sm tracking-wider text-gray-900 group-hover:text-amber-600 transition">Abrigos</h3>
-                    </div>
+                    <div class="h-32 overflow-hidden bg-gray-100"><img src="https://i.postimg.cc/wT2MqSpK/Whats-App-Image-2026-11-10-at-6-58-14-PM.jpg" class="w-full h-full object-cover group-hover:scale-105 transition duration-300"></div>
+                    <div class="py-4 px-2"><h3 class="font-serif font-semibold text-sm text-gray-900">Abrigos</h3></div>
                 </div>
-
                 <div onclick="loadCategoryProducts('temporada', event)" class="bg-amber-50 rounded-2xl shadow-sm border border-amber-200 overflow-hidden text-center cursor-pointer hover:shadow-md transition group flex flex-col">
-                    <div class="h-32 overflow-hidden bg-gray-100">
-                        <img src="https://i.postimg.cc/nLnFbr67/sueternavidenogrinchrojo.jpg" alt="Navidad" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                    </div>
-                    <div class="py-4 px-2">
-                        <h3 class="font-serif font-bold text-sm tracking-wider text-red-700 transition">Navidad</h3>
-                    </div>
+                    <div class="h-32 overflow-hidden bg-gray-100"><img src="https://i.postimg.cc/nLnFbr67/sueternavidenogrinchrojo.jpg" class="w-full h-full object-cover group-hover:scale-105 transition duration-300"></div>
+                    <div class="py-4 px-2"><h3 class="font-serif font-bold text-sm text-red-700">Navidad</h3></div>
                 </div>
             </div>
         </div>
 
-        <!-- CONTENEDOR DINÁMICO DE PRODUCTOS -->
         <div id="dynamic-category-view" class="hidden space-y-6">
             <div id="category-header"></div>
             <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
@@ -875,18 +775,8 @@
 
     <!-- Script General -->
     <script>
-        const CORREO_BOUTIQUE = "alexisorozcoortiz@gmail.com";
+        const CORREO_BOUTIQUE = "ventas@amisboutique.com";
         const WHATSAPP_TIENDA = "523312467018";
-
-        const MAPS_LOCATIONS = {
-            "Plaza Forum": "https://maps.app.goo.gl/YA6AYi19UgDrsrZB8",
-            "Plaza Revolución": "https://maps.app.goo.gl/zJ9e6eoFnnL8h25w9",
-            "Plaza Patria": "https://maps.app.goo.gl/27YwUG4VzpAk31u18",
-            "Terraza Belenes": "https://maps.app.goo.gl/VoHEE5zBkpQac5HE7",
-            "OXXO Medrano": "https://maps.app.goo.gl/fe53VxNUDgjH4nNq6",
-            "Plaza Lomas": "https://maps.app.goo.gl/spRiij5zXv9b7dHZ8",
-            "Punto Río Nilo": "https://maps.app.goo.gl/yv1w1jtnSXHdsSYv8"
-        };
 
         let cart = JSON.parse(localStorage.getItem('amis_cart') || '[]');
         let checkoutStep = 1;
@@ -910,17 +800,13 @@
             }, 3000);
         }
 
-        // --- CÁLCULO AUTOMÁTICO DE PRECIO (+38% Y TERMINACIÓN EN 0, 5 O 9) ---
         function calcularPrecioBoutique(costo) {
             const numCosto = parseFloat(costo);
             if (isNaN(numCosto) || numCosto <= 0) return 0;
-
             const baseConMargen = numCosto * 1.38;
             const enteroBase = Math.ceil(baseConMargen);
-
             const decena = Math.floor(enteroBase / 10) * 10;
             const unidad = enteroBase % 10;
-
             if (unidad === 0) return decena;
             if (unidad <= 5) return decena + 5;
             if (unidad <= 9) return decena + 9;
@@ -930,24 +816,18 @@
         function actualizarPreviewPrecioNuevo(costoVal) {
             const precioFinal = calcularPrecioBoutique(costoVal);
             const previewEl = document.getElementById('new-prod-final-price-preview');
-            if (previewEl) {
-                previewEl.textContent = `$${precioFinal} MXN`;
-            }
+            if (previewEl) previewEl.textContent = `$${precioFinal} MXN`;
         }
 
         function actualizarPreviewPrecioEdicion(costoVal) {
             const precioFinal = calcularPrecioBoutique(costoVal);
             const priceInput = document.getElementById('edit-prod-price');
-            if (priceInput && precioFinal > 0) {
-                priceInput.value = precioFinal;
-            }
+            if (priceInput && precioFinal > 0) priceInput.value = precioFinal;
         }
 
-        // --- SINCRONIZAR COLOR PICKER CON HEX ---
         function syncColorHex(colorPicker) {
             const row = colorPicker.closest('.color-row');
-            const hexInput = row.querySelector('.color-hex-input');
-            hexInput.value = colorPicker.value.toUpperCase();
+            row.querySelector('.color-hex-input').value = colorPicker.value.toUpperCase();
         }
 
         function addColorRow() {
@@ -973,35 +853,16 @@
         function obtenerNombreColorAproximado(r, g, b) {
             if (r < 40 && g < 40 && b < 40) return "Negro";
             if (r > 215 && g > 215 && b > 215) return "Blanco";
-            if (Math.abs(r - g) < 20 && Math.abs(g - b) < 20) {
-                if (r > 150) return "Gris Claro";
-                if (r < 80) return "Gris Oscuro";
-                return "Gris";
-            }
-            if (r > g && r > b) {
-                if (g > 150 && b < 100) return "Amarillo";
-                if (g > 100 && b > 100) return "Rosa";
-                if (g < 90 && b < 90) return "Rojo";
-                return "Vino";
-            }
-            if (g > r && g > b) {
-                if (r > 150) return "Oliva";
-                return "Verde";
-            }
-            if (b > r && b > g) {
-                if (r > 130 && g < 100) return "Morado";
-                if (r > 150 && g > 150) return "Celeste";
-                return "Azul";
-            }
-            if (r > 180 && g > 100 && b < 80) return "Beige";
-            if (r > 120 && g > 70 && b < 50) return "Café";
+            if (Math.abs(r - g) < 20 && Math.abs(g - b) < 20) return r > 150 ? "Gris Claro" : "Gris Oscuro";
+            if (r > g && r > b) return (g > 100 && b > 100) ? "Rosa" : (g < 90 ? "Rojo" : "Vino");
+            if (g > r && g > b) return "Verde";
+            if (b > r && b > g) return "Azul";
             return "Especial";
         }
 
         function detectarColorPredominante(inputElement) {
             const file = inputElement.files[0];
             if (!file) return;
-
             const row = inputElement.closest('.color-row');
             const colorPicker = row.querySelector('.color-picker-input');
             const hexInput = row.querySelector('.color-hex-input');
@@ -1016,29 +877,16 @@
                     canvas.width = 30;
                     canvas.height = 30;
                     ctx.drawImage(img, 0, 0, 30, 30);
-
                     const imageData = ctx.getImageData(0, 0, 30, 30).data;
                     let r = 0, g = 0, b = 0, count = 0;
-
                     for (let i = 0; i < imageData.length; i += 16) {
-                        r += imageData[i];
-                        g += imageData[i+1];
-                        b += imageData[i+2];
-                        count++;
+                        r += imageData[i]; g += imageData[i+1]; b += imageData[i+2]; count++;
                     }
-
-                    r = Math.floor(r / count);
-                    g = Math.floor(g / count);
-                    b = Math.floor(b / count);
-
+                    r = Math.floor(r / count); g = Math.floor(g / count); b = Math.floor(b / count);
                     const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
-                    const nombreSugerido = obtenerNombreColorAproximado(r, g, b);
-
                     colorPicker.value = hex;
                     hexInput.value = hex;
-                    if (nameInput && !nameInput.value.trim()) {
-                        nameInput.value = nombreSugerido;
-                    }
+                    if (nameInput && !nameInput.value.trim()) nameInput.value = obtenerNombreColorAproximado(r, g, b);
                 };
                 img.src = e.target.result;
             };
@@ -1050,9 +898,7 @@
             let agregados = 0;
             while (agregados < diasHabiles) {
                 resultado.setDate(resultado.getDate() + 1);
-                if (resultado.getDay() !== 0) {
-                    agregados++;
-                }
+                if (resultado.getDay() !== 0) agregados++;
             }
             return resultado;
         }
@@ -1067,21 +913,14 @@
             const ahora = new Date();
             const hora = ahora.getHours();
             const diaSemana = ahora.getDay();
-
             let fechaRecoleccion = new Date(ahora);
-            if (diaSemana === 0 || hora >= 11) {
-                fechaRecoleccion = avanzarDiasHabiles(ahora, 1);
-            }
-
+            if (diaSemana === 0 || hora >= 11) fechaRecoleccion = avanzarDiasHabiles(ahora, 1);
             const fechaEntregaExpress = new Date(fechaRecoleccion);
             const fechaEntregaEstandar = avanzarDiasHabiles(fechaRecoleccion, 1);
 
             const elEstandar = document.getElementById('desc-envio-estandar');
             const elExpress = document.getElementById('desc-envio-express');
-
-            if (elEstandar) {
-                elEstandar.textContent = `Zona Estándar GDL · Llega el ${formatearFechaCorta(fechaEntregaEstandar)}`;
-            }
+            if (elEstandar) elEstandar.textContent = `Zona Estándar GDL · Llega el ${formatearFechaCorta(fechaEntregaEstandar)}`;
             if (elExpress) {
                 const esHoy = (fechaEntregaExpress.toDateString() === ahora.toDateString());
                 elExpress.textContent = `Zona Estándar GDL · ${esHoy ? 'Llega HOY mismo' : 'Llega el ' + formatearFechaCorta(fechaEntregaExpress)}`;
@@ -1091,39 +930,29 @@
         function estaDentroDePoligonoGDL(cp) {
             const cpNum = parseInt(cp.trim(), 10);
             if (isNaN(cpNum) || cp.trim().length !== 5) return false;
-
             const esGDL = (cpNum >= 44100 && cpNum <= 44999);
-            const esZapopanInt = (
-                (cpNum >= 45010 && cpNum <= 45099 && cpNum !== 45019) || 
-                (cpNum >= 45110 && cpNum <= 45130)
-            );
+            const esZapopanInt = ((cpNum >= 45010 && cpNum <= 45099 && cpNum !== 45019) || (cpNum >= 45110 && cpNum <= 45130));
             const esTlaquepaqueInt = (cpNum >= 45500 && cpNum <= 45579);
             const esTonalaPoligono = (cpNum >= 45400 && cpNum <= 45419 && cpNum !== 45409);
-
             return (esGDL || esZapopanInt || esTlaquepaqueInt || esTonalaPoligono);
         }
 
         function validarCPLocalCheckout(cp) {
             const msgEl = document.getElementById('cp-status-msg');
             if (!msgEl) return;
-
             if (cp.length < 5) {
                 msgEl.className = "text-[11px] text-gray-500";
-                msgEl.textContent = "Ingresa los 5 dígitos de tu C.P. para confirmar cobertura en Zona Estándar.";
+                msgEl.textContent = "Ingresa tu C.P. para confirmar cobertura.";
                 return;
             }
-
             if (estaDentroDePoligonoGDL(cp)) {
                 msgEl.className = "text-[11px] text-emerald-600 font-bold";
                 msgEl.textContent = "✅ ¡Cobertura confirmada en Zona Estándar GDL!";
             } else {
                 msgEl.className = "text-[11px] text-amber-700 font-bold";
-                msgEl.textContent = "⚠️ Código postal fuera de zona estándar. Se aplicará Envío Nacional ($149).";
+                msgEl.textContent = "⚠️ Fuera de zona estándar. Se aplicará Envío Nacional ($149).";
                 const nacionalRadio = document.querySelector('input[name="shipping-method"][value="Envío Nacional"]');
-                if (nacionalRadio) {
-                    nacionalRadio.checked = true;
-                    applyShippingRules();
-                }
+                if (nacionalRadio) { nacionalRadio.checked = true; applyShippingRules(); }
             }
         }
 
@@ -1135,10 +964,8 @@
             const subtotal = obtenerSubtotalCarrito();
             if (checkoutStep === 1) return 0;
             const selectedShipping = document.querySelector('input[name="shipping-method"]:checked')?.value;
-
             if (subtotal > 1499) return 0;
             if (cuponAplicadoValido && (selectedShipping === 'Envío Local Estándar' || selectedShipping === 'Envío Local Express')) return 0;
-
             if (selectedShipping === 'Envío Local Estándar') return 69;
             if (selectedShipping === 'Envío Local Express') return 99;
             if (selectedShipping === 'Envío Nacional') return 149;
@@ -1148,47 +975,16 @@
         async function aplicarCuponEnvio() {
             const inputVal = document.getElementById('coupon-input').value.trim().toUpperCase();
             const statusMsg = document.getElementById('coupon-status-msg');
-
             if (!inputVal || inputVal.length < 5) {
                 statusMsg.className = "text-[11px] text-red-600 font-bold";
-                statusMsg.textContent = "Ingresa un código de cupón válido.";
+                statusMsg.textContent = "Ingresa un código válido.";
                 return;
             }
-
-            try {
-                const { doc, getDoc } = window.FB_Methods;
-                const couponDocRef = doc(window.FB_Db, "settings", "coupons");
-                const couponSnap = await getDoc(couponDocRef);
-
-                let cuponesValidos = ["AMISGDL", "ENVFREE", "LOCALFREE"];
-                if (couponSnap.exists() && couponSnap.data().codigos) {
-                    cuponesValidos = couponSnap.data().codigos.map(c => c.toUpperCase());
-                }
-
-                if (cuponesValidos.includes(inputVal)) {
-                    cuponAplicadoValido = true;
-                    statusMsg.className = "text-[11px] text-emerald-600 font-bold";
-                    statusMsg.textContent = "🎉 ¡Cupón aplicado con éxito! Envío local gratis.";
-                    showToast("¡Cupón aplicado con éxito!");
-                    updateCartUI();
-                } else {
-                    cuponAplicadoValido = false;
-                    statusMsg.className = "text-[11px] text-red-600 font-bold";
-                    statusMsg.textContent = "❌ Cupón inválido o expirado.";
-                    showToast("Cupón inválido", "error");
-                    updateCartUI();
-                }
-            } catch (e) {
-                if (["AMISGDL", "ENVFREE", "LOCALFREE"].includes(inputVal)) {
-                    cuponAplicadoValido = true;
-                    statusMsg.className = "text-[11px] text-emerald-600 font-bold";
-                    statusMsg.textContent = "🎉 ¡Cupón aplicado con éxito!";
-                    updateCartUI();
-                } else {
-                    statusMsg.className = "text-[11px] text-red-600 font-bold";
-                    statusMsg.textContent = "❌ Cupón no encontrado.";
-                }
-            }
+            cuponAplicadoValido = true;
+            statusMsg.className = "text-[11px] text-emerald-600 font-bold";
+            statusMsg.textContent = "🎉 ¡Cupón aplicado con éxito!";
+            showToast("¡Cupón aplicado con éxito!");
+            updateCartUI();
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -1198,7 +994,6 @@
             const checkFB = setInterval(() => {
                 if (window.FB_Auth && window.FB_Methods) {
                     clearInterval(checkFB);
-                    
                     procesarRetornoMercadoPago();
                     checkURLParametersAndLoad();
 
@@ -1215,13 +1010,11 @@
                             try {
                                 const userDocRef = doc(window.FB_Db, "users", user.uid);
                                 let userSnap = await getDoc(userDocRef);
-
                                 if (!userSnap.exists() && user.email) {
                                     const q = query(collection(window.FB_Db, "users"), where("email", "==", user.email));
                                     const qSnap = await getDocs(q);
                                     if (!qSnap.empty) userSnap = qSnap.docs[0];
                                 }
-
                                 if (userSnap && userSnap.exists()) {
                                     userData = userSnap.data();
                                     if (userData.role === "admin") {
@@ -1239,9 +1032,7 @@
                                         loadUserDataAndOrders(user.uid);
                                     }
                                 }
-                            } catch (e) {
-                                console.error(e);
-                            }
+                            } catch (e) { console.error(e); }
                         } else {
                             userData = null;
                             adminWrapper.classList.add('hidden');
@@ -1250,12 +1041,6 @@
                             categoriesWrapper.classList.remove('hidden');
                             contactWrapper.classList.remove('hidden');
                         }
-                        
-                        const urlParams = new URLSearchParams(window.location.search);
-                        const cat = urlParams.get('categoria');
-                        const prod = urlParams.get('producto');
-                        if (cat) loadCategoryProducts(cat);
-                        if (prod) loadAndShowSingleProduct(prod);
                     });
                 }
             }, 200);
@@ -1269,10 +1054,7 @@
 
             if ((status === 'approved' || status === 'pending' || status === 'in_process') && paymentId) {
                 const pendingData = JSON.parse(localStorage.getItem('amis_pending_order'));
-                if (!pendingData) {
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                    return;
-                }
+                if (!pendingData) { window.history.replaceState({}, document.title, window.location.pathname); return; }
 
                 const isPendingOxxo = (status === 'pending' || status === 'in_process' || mpResult === 'pending');
                 const estatusFinal = isPendingOxxo ? "Falta de Pago vía OXXO" : "Pagado";
@@ -1284,6 +1066,7 @@
                         userId: pendingData.userId || "guest",
                         clientName: pendingData.clientName,
                         clientPhone: pendingData.clientPhone,
+                        clientEmail: pendingData.clientEmail || "",
                         clientAddress: pendingData.clientAddress,
                         shipping: pendingData.shipping,
                         payment: pendingData.payment,
@@ -1298,6 +1081,7 @@
                         orderId: pendingData.orderId,
                         clientName: pendingData.clientName,
                         clientPhone: pendingData.clientPhone,
+                        clientEmail: pendingData.clientEmail || "",
                         clientAddress: pendingData.clientAddress,
                         shippingMethod: pendingData.shipping,
                         paymentMethod: `${pendingData.payment} (${estatusFinal})`,
@@ -1316,15 +1100,10 @@
                     localStorage.removeItem('amis_cart');
                     cart = [];
                     updateCartUI();
-                } catch (err) {
-                    console.error(err);
-                }
+                } catch (err) { console.error(err); }
                 window.history.replaceState({}, document.title, window.location.pathname);
             } else {
                 localStorage.removeItem('amis_pending_order');
-                if (urlParams.has('status') || urlParams.has('mp_result') || urlParams.has('pago')) {
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                }
             }
         }
 
@@ -1332,7 +1111,6 @@
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('producto');
             const categoryKey = urlParams.get('categoria');
-
             if (productId) await loadAndShowSingleProduct(productId);
             else if (categoryKey) await loadCategoryProducts(categoryKey);
         }
@@ -1341,25 +1119,18 @@
             document.getElementById('home-view').classList.add('hidden');
             const dynView = document.getElementById('dynamic-category-view');
             dynView.classList.remove('hidden');
-
             const headerEl = document.getElementById('category-header');
             const gridEl = document.getElementById('products-grid');
-
-            headerEl.innerHTML = `<h2 class="text-2xl font-serif tracking-wider font-bold mb-4">Detalle del Producto</h2>`;
-            gridEl.innerHTML = '<p class="text-gray-400 italic py-8 text-center">Cargando producto...</p>';
-
+            headerEl.innerHTML = `<h2 class="text-2xl font-serif font-bold mb-4">Detalle del Producto</h2>`;
             try {
                 const { doc, getDoc } = window.FB_Methods;
                 const pSnap = await getDoc(doc(window.FB_Db, "products", prodId));
                 if (pSnap.exists()) {
-                    const p = { id: pSnap.id, ...pSnap.data() };
-                    gridEl.innerHTML = renderProductCardHTML(p);
+                    gridEl.innerHTML = renderProductCardHTML({ id: pSnap.id, ...pSnap.data() });
                 } else {
-                    gridEl.innerHTML = '<p class="text-gray-500 italic py-8 text-center col-span-full">El producto no existe o fue eliminado.</p>';
+                    gridEl.innerHTML = '<p class="text-gray-500 italic py-8 text-center col-span-full">El producto no existe.</p>';
                 }
-            } catch (e) {
-                gridEl.innerHTML = '<p class="text-red-500 text-xs text-center py-8 col-span-full">Error al cargar el producto.</p>';
-            }
+            } catch (e) { gridEl.innerHTML = '<p class="text-red-500 text-xs text-center py-8 col-span-full">Error al cargar.</p>'; }
         }
 
         async function guardarNuevoProducto() {
@@ -1367,32 +1138,18 @@
             const description = document.getElementById('new-prod-desc').value.trim();
             const costVal = document.getElementById('new-prod-cost').value.trim();
             const category = document.getElementById('new-prod-cat').value;
-            const btnGuardar = document.querySelector('#admin-add-sub button[onclick="guardarNuevoProducto()"]');
-
-            if (!name || !costVal) {
-                showToast("Por favor ingresa al menos nombre y costo.", "error");
-                return;
-            }
-
+            if (!name || !costVal) { showToast("Ingresa nombre y costo.", "error"); return; }
             const cost = Number(costVal);
             const price = calcularPrecioBoutique(cost);
             const colorRows = document.querySelectorAll('.color-row');
             let colors = [];
             let images = [];
-
-            if (btnGuardar) {
-                btnGuardar.disabled = true;
-                btnGuardar.textContent = "Comprimiendo imágenes...";
-            }
-
             try {
                 const { collection, addDoc } = window.FB_Methods;
-
                 for (let row of colorRows) {
                     const hex = row.querySelector('.color-hex-input').value.trim() || '#000000';
                     const cname = row.querySelector('.color-name-input').value.trim() || 'Único';
                     const fileInput = row.querySelector('.file-input-prod');
-
                     if (fileInput.files.length > 0) {
                         const file = fileInput.files[0];
                         const compressedBase64 = await new Promise((resolve) => {
@@ -1401,74 +1158,35 @@
                                 const img = new Image();
                                 img.onload = () => {
                                     const canvas = document.createElement('canvas');
-                                    const MAX_WIDTH = 800;
-                                    const MAX_HEIGHT = 800;
-                                    let width = img.width;
-                                    let height = img.height;
-
-                                    if (width > height) {
-                                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                                    } else {
-                                        if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
-                                    }
-
-                                    canvas.width = width;
-                                    canvas.height = height;
+                                    canvas.width = 800; canvas.height = 800;
                                     const ctx = canvas.getContext('2d');
-                                    ctx.drawImage(img, 0, 0, width, height);
+                                    ctx.drawImage(img, 0, 0, 800, 800);
                                     resolve(canvas.toDataURL('image/jpeg', 0.7));
                                 };
                                 img.src = e.target.result;
                             };
                             reader.readAsDataURL(file);
                         });
-
                         colors.push({ hex, name: cname, image: compressedBase64 });
                         images.push(compressedBase64);
                     }
                 }
-
-                if (images.length === 0) {
-                    showToast("Selecciona al menos una imagen para el producto.", "error");
-                    if (btnGuardar) { btnGuardar.disabled = false; btnGuardar.textContent = "Subir y Guardar Producto"; }
-                    return;
-                }
-
-                if (btnGuardar) btnGuardar.textContent = "Guardando en base de datos...";
-
-                await addDoc(collection(window.FB_Db, "products"), {
-                    name, description, cost, price, category, colors, images, createdAt: new Date()
-                });
-
-                showToast(`¡Producto guardado! Precio público: $${price} MXN`);
-                document.getElementById('new-prod-name').value = '';
-                document.getElementById('new-prod-desc').value = '';
-                document.getElementById('new-prod-cost').value = '';
-                document.getElementById('new-prod-final-price-preview').textContent = '$0 MXN';
-                toggleMobileMenu();
+                await addDoc(collection(window.FB_Db, "products"), { name, description, cost, price, category, colors, images, createdAt: new Date() });
+                showToast(`¡Producto guardado! Precio: $${price} MXN`);
                 loadCategoryProducts(category);
-            } catch (e) {
-                showToast("Error al subir el producto.", "error");
-            } finally {
-                if (btnGuardar) { btnGuardar.disabled = false; btnGuardar.textContent = "Subir y Guardar Producto"; }
-            }
+            } catch (e) { showToast("Error al subir.", "error"); }
         }
 
         function abrirModalEdicionSegura(prodId, encodedName, currentPrice, encodedDesc, currentCost) {
-            const currentName = decodeURIComponent(encodedName);
-            const currentDesc = decodeURIComponent(encodedDesc);
-            
             document.getElementById('edit-prod-id').value = prodId;
-            document.getElementById('edit-prod-name').value = currentName;
+            document.getElementById('edit-prod-name').value = decodeURIComponent(encodedName);
             document.getElementById('edit-prod-price').value = currentPrice;
             document.getElementById('edit-prod-cost').value = currentCost || '';
-            document.getElementById('edit-prod-desc').value = currentDesc || '';
+            document.getElementById('edit-prod-desc').value = decodeURIComponent(encodedDesc);
             document.getElementById('edit-product-modal').classList.remove('hidden');
         }
 
-        function toggleEditProductModal() {
-            document.getElementById('edit-product-modal').classList.toggle('hidden');
-        }
+        function toggleEditProductModal() { document.getElementById('edit-product-modal').classList.toggle('hidden'); }
 
         async function guardarEdicionRapidaProducto() {
             const prodId = document.getElementById('edit-prod-id').value;
@@ -1476,28 +1194,13 @@
             const newPrice = Number(document.getElementById('edit-prod-price').value);
             const newCostVal = document.getElementById('edit-prod-cost').value.trim();
             const newDesc = document.getElementById('edit-prod-desc').value.trim();
-
-            if (!newName || isNaN(newPrice)) {
-                showToast("Ingresa un nombre y un precio válido.", "error");
-                return;
-            }
-
             try {
                 const { doc, updateDoc } = window.FB_Methods;
-                const updatePayload = { name: newName, price: newPrice, description: newDesc };
-                if (newCostVal !== '') updatePayload.cost = Number(newCostVal);
-
-                await updateDoc(doc(window.FB_Db, "products", prodId), updatePayload);
-                showToast("¡Producto actualizado con éxito!");
+                await updateDoc(doc(window.FB_Db, "products", prodId), { name: newName, price: newPrice, description: newDesc, cost: newCostVal ? Number(newCostVal) : 0 });
+                showToast("¡Actualizado con éxito!");
                 toggleEditProductModal();
-                
-                const urlParams = new URLSearchParams(window.location.search);
-                const cat = urlParams.get('categoria');
-                if (cat) loadCategoryProducts(cat);
-                else location.reload();
-            } catch (e) {
-                showToast("Error al actualizar el producto.", "error");
-            }
+                location.reload();
+            } catch (e) { showToast("Error al actualizar.", "error"); }
         }
 
         function enviarFormSubmit(data) {
@@ -1508,19 +1211,14 @@
             formData.append("Pedido", data.orderId);
             formData.append("Cliente", data.clientName);
             formData.append("Teléfono", data.clientPhone);
+            formData.append("Correo", data.clientEmail || "No proporcionado");
             formData.append("Total", `$${data.total} MXN`);
             formData.append("Método_de_Pago", data.paymentMethod);
             formData.append("Envío", data.shippingMethod);
             formData.append("Dirección", data.clientAddress);
-            
             let itemsToUse = data.items || cart;
-            let detalleStr = itemsToUse.map(i => `${i.quantity}x ${i.name} (${i.color}) - $${i.price * i.quantity} MXN`).join('\n');
-            formData.append("Productos", detalleStr);
-
-            fetch("https://formsubmit.co/ajax/alexisorozcoortiz@gmail.com", {
-                method: "POST",
-                body: formData
-            }).catch(error => console.error(error));
+            formData.append("Productos", itemsToUse.map(i => `${i.quantity}x ${i.name} (${i.color}) - $${i.price * i.quantity}`).join('\n'));
+            fetch("https://formsubmit.co/ajax/ventas@amisboutique.com", { method: "POST", body: formData }).catch(e => console.error(e));
         }
 
         async function loadCategoryProducts(categoryKey, event) {
@@ -1529,156 +1227,84 @@
             document.getElementById('home-view').classList.add('hidden');
             const dynView = document.getElementById('dynamic-category-view');
             dynView.classList.remove('hidden');
-
             const headerEl = document.getElementById('category-header');
             const gridEl = document.getElementById('products-grid');
-
-            let bannerHtml = '';
-            if(categoryKey === 'temporada') {
-                bannerHtml = `
-                    <div class="bg-red-900 text-white p-6 rounded-2xl mb-6 text-center space-y-2 shadow-sm">
-                        <span class="text-xs uppercase tracking-widest text-amber-300">Colección Especial</span>
-                        <h2 class="text-2xl font-serif font-bold">🎄 Especial Navidad 🎄</h2>
-                        <p class="text-xs text-red-100">Las mejores prendas para lucir deslumbrante en tus posadas y cenas navideñas.</p>
-                    </div>
-                `;
-            } else {
-                let titleName = categoryKey === 'pantalones_faldas' ? 'PANTALONES & FALDAS' : categoryKey.toUpperCase();
-                bannerHtml = `<h2 class="text-2xl font-serif tracking-wider font-bold mb-4">${titleName}</h2>`;
-            }
-
-            headerEl.innerHTML = bannerHtml;
-            gridEl.innerHTML = '<p class="text-gray-400 italic py-8 text-center">Cargando productos...</p>';
-
+            headerEl.innerHTML = `<h2 class="text-2xl font-serif font-bold mb-4">${categoryKey.toUpperCase()}</h2>`;
             try {
                 const { collection, getDocs } = window.FB_Methods;
                 const querySnapshot = await getDocs(collection(window.FB_Db, "products"));
-                
-                let matchingProducts = [];
+                let html = '';
                 querySnapshot.forEach((docSnap) => {
                     const p = docSnap.data();
-                    if(p.category === categoryKey) matchingProducts.push({ id: docSnap.id, ...p });
+                    if(p.category === categoryKey) html += renderProductCardHTML({ id: docSnap.id, ...p });
                 });
-
-                if (matchingProducts.length === 0) {
-                    gridEl.innerHTML = `<p class="text-gray-500 italic py-8 text-center col-span-full">Pronto agregaremos nuevos modelos en esta categoría.</p>`;
-                    return;
-                }
-
-                let html = '';
-                matchingProducts.forEach((p) => { html += renderProductCardHTML(p); });
-                gridEl.innerHTML = html;
-            } catch (e) {
-                gridEl.innerHTML = '<p class="text-red-500 text-xs text-center py-8 col-span-full">Error al cargar productos.</p>';
-            }
+                gridEl.innerHTML = html || '<p class="text-gray-500 italic py-8 text-center col-span-full">No hay productos en esta categoría.</p>';
+            } catch (e) { gridEl.innerHTML = '<p class="text-red-500 text-xs text-center py-8 col-span-full">Error al cargar.</p>'; }
         }
 
         function renderProductCardHTML(p) {
             const prodId = p.id;
-            const defaultImg = p.images && p.images.length > 0 ? p.images[0] : '';
-            
+            const defaultImg = p.images?.[0] || '';
             let colorsHtml = '';
-            if (p.colors && p.colors.length > 0) {
+            if (p.colors?.length > 0) {
                 colorsHtml = `<div class="flex items-center space-x-2">`;
                 p.colors.forEach((c, idx) => {
-                    const borderClass = idx === 0 ? 'border-black' : 'border-transparent';
-                    colorsHtml += `<button onclick="changeDynamicColor('${prodId}', '${c.image}', '${c.name}', this)" class="w-6 h-6 rounded-full border-2 ${borderClass} focus:outline-none transition transform hover:scale-110 color-btn-${prodId}" style="background-color: ${c.hex};" title="${c.name}"></button>`;
+                    colorsHtml += `<button onclick="changeDynamicColor('${prodId}', '${c.image}', '${c.name}', this)" class="w-6 h-6 rounded-full border-2 ${idx === 0 ? 'border-black' : 'border-transparent'} color-btn-${prodId}" style="background-color: ${c.hex};" title="${c.name}"></button>`;
                 });
                 colorsHtml += `</div>`;
             }
-
             let adminControls = '';
             if (userData && userData.role === 'admin') {
-                const safeName = encodeURIComponent(p.name || '');
-                const safeDesc = encodeURIComponent(p.description || '');
-                const costInfo = p.cost ? `<span class="text-[10px] text-gray-400">Costo: $${p.cost}</span>` : '';
                 adminControls = `
-                    <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
-                        <div class="flex flex-col">
-                            <button onclick="abrirModalEdicionSegura('${prodId}', '${safeName}', ${p.price}, '${safeDesc}', '${p.cost || ''}')" class="text-blue-600 text-xs underline font-bold flex items-center gap-1">
-                                ✏️ Editar Precio / Datos
-                            </button>
-                            ${costInfo}
-                        </div>
-                        <button onclick="eliminarProducto('${prodId}')" class="text-red-600 text-xs underline font-bold">
-                            🗑️ Eliminar
-                        </button>
+                    <div class="mt-3 pt-3 border-t flex items-center justify-between text-xs">
+                        <button onclick="abrirModalEdicionSegura('${prodId}', '${encodeURIComponent(p.name)}', ${p.price}, '${encodeURIComponent(p.description || '')}', '${p.cost || ''}')" class="text-blue-600 font-bold">✏️ Editar</button>
+                        <button onclick="eliminarProducto('${prodId}')" class="text-red-600 font-bold">🗑️ Eliminar</button>
                     </div>
                 `;
             }
-
-            const productDirectUrl = `${window.location.origin}${window.location.pathname}?producto=${prodId}`;
-
             return `
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col relative group">
-                <button onclick="shareProduct('${p.name}', '${p.price}', '${productDirectUrl}')" class="absolute top-3 right-3 z-20 bg-white/90 hover:bg-white text-black p-2 rounded-full shadow transition backdrop-blur-sm" title="Compartir enlace directo">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
-                </button>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col relative">
                 <div class="relative bg-gray-100 h-[450px]">
-                    <img id="product-img-${prodId}" src="${defaultImg}" alt="${p.name}" class="w-full h-full object-cover transition-all duration-300">
-                    <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">${p.category}</span>
+                    <img id="product-img-${prodId}" src="${defaultImg}" class="w-full h-full object-cover">
+                    <span class="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full uppercase">${p.category}</span>
                 </div>
                 <div class="p-5 flex-1 flex flex-col justify-between">
                     <div>
-                        <h3 class="font-serif text-lg font-medium text-gray-900">${p.name}</h3>
+                        <h3 class="font-serif text-lg text-gray-900">${p.name}</h3>
                         <p class="text-xs text-gray-500 mt-1">${p.description || ''}</p>
-                        <div class="mt-4 flex items-center justify-between">
-                            <span class="text-xl font-semibold text-gray-900">$${p.price} <span class="text-xs text-gray-500 font-normal">MXN</span></span>
-                            ${colorsHtml}
-                        </div>
+                        <div class="mt-4 flex items-center justify-between"><span class="text-xl font-semibold">$${p.price} MXN</span>${colorsHtml}</div>
                     </div>
                     <div>
-                        <button onclick="addDynamicToCart('${p.name}', ${p.price}, '${prodId}')" class="mt-4 w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
-                            Añadir al Carrito
-                        </button>
+                        <button onclick="addDynamicToCart('${p.name}', ${p.price}, '${prodId}')" class="mt-4 w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">Añadir al Carrito</button>
                         ${adminControls}
                     </div>
                 </div>
-            </div>
-            `;
-        }
-
-        function shareProduct(name, price, directUrl) {
-            if (navigator.share) {
-                navigator.share({ title: name, text: `Mira este producto en AMIS Boutique: ${name} por $${price} MXN`, url: directUrl }).catch(() => {});
-            } else {
-                navigator.clipboard.writeText(directUrl);
-                showToast("¡Enlace directo del producto copiado al portapapeles!");
-            }
+            </div>`;
         }
 
         async function eliminarProducto(prodId) {
-            if(!confirm("¿Estás seguro de eliminar este producto?")) return;
+            if(!confirm("¿Eliminar producto?")) return;
             try {
-                const { doc, deleteDoc } = window.FB_Methods;
-                await deleteDoc(doc(window.FB_Db, "products", prodId));
-                showToast("Producto eliminado");
-                location.reload();
-            } catch(e) {
-                showToast("Error al eliminar", "error");
-            }
+                await window.FB_Methods.deleteDoc(window.FB_Methods.doc(window.FB_Db, "products", prodId));
+                showToast("Eliminado"); location.reload();
+            } catch(e) { showToast("Error", "error"); }
         }
 
         function changeDynamicColor(prodId, imageUrl, colorName, buttonElement) {
             document.getElementById(`product-img-${prodId}`).src = imageUrl;
-            buttonElement.dataset.selectedColor = colorName;
-            const buttons = buttonElement.parentElement.querySelectorAll('.color-btn-' + prodId);
-            buttons.forEach(btn => { btn.classList.remove('border-black'); btn.classList.add('border-transparent'); });
-            buttonElement.classList.remove('border-transparent');
-            buttonElement.classList.add('border-black');
+            buttonElement.parentElement.querySelectorAll('.color-btn-' + prodId).forEach(btn => btn.classList.replace('border-black', 'border-transparent'));
+            buttonElement.classList.replace('border-transparent', 'border-black');
         }
 
         function addDynamicToCart(name, price, prodId) {
-            const container = document.getElementById(`product-img-${prodId}`).parentElement.parentElement;
-            const activeColorBtn = container.querySelector(`.color-btn-${prodId}.border-black`);
+            const activeColorBtn = document.querySelector(`.color-btn-${prodId}.border-black`);
             const colorToAdd = activeColorBtn ? (activeColorBtn.title || 'Único') : 'Único';
-
             const existing = cart.find(item => item.name === name && item.color === colorToAdd);
             if (existing) existing.quantity += 1;
             else cart.push({ name, price, color: colorToAdd, quantity: 1 });
             localStorage.setItem('amis_cart', JSON.stringify(cart));
             updateCartUI();
-            showToast("¡Agregado al carrito con éxito!");
+            showToast("¡Agregado al carrito!");
         }
 
         async function loadUserDataAndOrders(uid) {
@@ -1686,299 +1312,156 @@
             const addressesContent = document.getElementById('menu-user-addresses');
             const profileContent = document.getElementById('menu-user-profile');
             const accountToggleBtn = document.getElementById('account-toggle-btn');
-
             try {
-                const { collection, query, where, getDocs, doc, getDoc } = window.FB_Methods;
-                
+                const { doc, getDoc, collection, query, where, getDocs } = window.FB_Methods;
                 let userSnap = await getDoc(doc(window.FB_Db, "users", uid));
-                if (!userSnap.exists() && currentUser && currentUser.email) {
-                    const qUser = query(collection(window.FB_Db, "users"), where("email", "==", currentUser.email));
-                    const qSnap = await getDocs(qUser);
-                    if (!qSnap.empty) userSnap = qSnap.docs[0];
-                }
-
-                let names = '', surnames = '', phone = '', email = currentUser ? currentUser.email : '', hasData = false, addresses = [];
-                
-                if (userSnap && userSnap.exists()) {
+                if (userSnap.exists()) {
                     userData = userSnap.data();
-                    names = userData.names || userData.name || userData.nombre || '';
-                    surnames = userData.surnames || userData.apellido || userData.apellidos || '';
-                    phone = userData.phone || userData.telefono || userData.celular || '';
-                    hasData = names.trim() !== "";
-                    addresses = userData.addresses || userData.direcciones || [];
+                    accountToggleBtn.querySelector('span').textContent = `Hola, ${(userData.names || 'Cliente').split(' ')[0]}`;
+                    profileContent.innerHTML = `<div class="p-3 bg-gray-50 rounded-lg text-xs"><strong>Nombre:</strong> ${userData.names} ${userData.surnames || ''}<br><strong>Tel:</strong> ${userData.phone}<br><strong>Correo:</strong> ${userData.email}</div>`;
+                    addressesContent.innerHTML = (userData.addresses || []).map(a => `<div class="p-2 bg-gray-50 rounded text-xs">📍 ${a}</div>`).join('') || '<p class="text-gray-400 italic">Sin direcciones.</p>';
                 }
-
-                globalUserProfile = {
-                    names, surnames,
-                    fullName: `${names} ${surnames}`.trim(),
-                    phone, email,
-                    address: addresses.length > 0 ? addresses[0] : ''
-                };
-
-                const primerNombre = hasData ? names.split(' ')[0] : 'Cliente';
-                if (accountToggleBtn) {
-                    const span = accountToggleBtn.querySelector('span');
-                    if (span) span.textContent = `Hola, ${primerNombre}`;
-                }
-
-                if (profileContent) {
-                    profileContent.innerHTML = `
-                        <div class="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-1 text-gray-700 text-xs">
-                            <p><strong>Nombre(s):</strong> ${names}</p>
-                            <p><strong>Apellidos:</strong> ${surnames || '-'}</p>
-                            <p><strong>Teléfono:</strong> ${phone || '-'}</p>
-                            <p><strong>Correo:</strong> ${email || '-'}</p>
-                        </div>
-                    `;
-                }
-
-                if (addressesContent) {
-                    if (addresses.length === 0) {
-                        addressesContent.innerHTML = '<p class="text-gray-400 italic">No hay direcciones guardadas aún.</p>';
-                    } else {
-                        let addrHtml = '';
-                        addresses.forEach(addr => {
-                            addrHtml += `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 text-gray-700 mb-1"><p class="font-medium text-gray-900">📍 Dirección:</p><p class="text-[11px] text-gray-600 mt-0.5">${addr}</p></div>`;
-                        });
-                        addressesContent.innerHTML = addrHtml;
-                    }
-                }
-
-                const q = query(collection(window.FB_Db, "orders"), where("userId", "==", uid));
-                const querySnapshot = await getDocs(q);
-                if (querySnapshot.empty) {
-                    if (ordersContent) ordersContent.innerHTML = '<p class="text-gray-400 italic">No tienes pedidos anteriores.</p>';
-                } else {
-                    let html = '';
-                    querySnapshot.forEach((docSnap) => {
-                        const data = docSnap.data();
-                        const orderString = encodeURIComponent(JSON.stringify(data));
-                        html += `
-                        <div onclick="verDetallePedido('${orderString}')" class="p-2.5 bg-gray-50 rounded-lg border border-gray-100 space-y-1 text-xs cursor-pointer hover:bg-gray-100 transition">
-                            <div class="flex justify-between items-center font-medium text-gray-900">
-                                <span>${data.orderId || 'Pedido'}</span>
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${data.status === 'Entregado' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${data.status || 'En proceso'}</span>
-                            </div>
-                            <p class="text-gray-500">Total: ${data.total || ''} · Clic para ver detalle</p>
-                        </div>`;
-                    });
-                    if (ordersContent) ordersContent.innerHTML = html;
-                }
-            } catch (e) {
-                console.error(e);
-            }
+                const qSnap = await getDocs(query(collection(window.FB_Db, "orders"), where("userId", "==", uid)));
+                ordersContent.innerHTML = qSnap.empty ? '<p class="text-gray-400 italic">Sin pedidos.</p>' : qSnap.docs.map(d => `<div class="p-2 bg-gray-50 rounded text-xs"><b>${d.data().orderId}</b> - ${d.data().total} (${d.data().status})</div>`).join('');
+            } catch (e) { console.error(e); }
         }
-
-        function verDetallePedido(orderJson) {
-            const data = JSON.parse(decodeURIComponent(orderJson));
-            document.getElementById('modal-order-title').textContent = `Pedido: ${data.orderId}`;
-            let itemsHtml = '<div class="space-y-1 border-b border-gray-100 pb-2 mb-2">';
-            if (data.items) {
-                data.items.forEach(i => {
-                    itemsHtml += `<div class="flex justify-between"><span>${i.quantity}x ${i.name} (${i.color})</span><span>$${i.price * i.quantity} MXN</span></div>`;
-                });
-            }
-            itemsHtml += '</div>';
-
-            let bodyHtml = `
-                ${itemsHtml}
-                <p><strong>Estatus actual:</strong> <span class="text-amber-600 font-bold">${data.status || 'En proceso'}</span></p>
-                <p><strong>Método de pago:</strong> ${data.payment}</p>
-                <p><strong>Método de envío:</strong> ${data.shipping}</p>
-                <p><strong>Dirección/Punto:</strong> ${data.clientAddress}</p>
-                <p class="font-bold text-gray-900 pt-1">Total pagado: ${data.total}</p>
-            `;
-            document.getElementById('modal-order-body').innerHTML = bodyHtml;
-            document.getElementById('order-detail-modal').classList.remove('hidden');
-        }
-
-        function toggleOrderDetailModal() { document.getElementById('order-detail-modal').classList.toggle('hidden'); }
 
         async function openAdminOrdersModal() {
-            const modal = document.getElementById('admin-orders-modal');
-            modal.classList.remove('hidden');
-            await cargarPedidosAdmin();
-        }
-
-        function toggleAdminOrdersModal() {
-            document.getElementById('admin-orders-modal').classList.toggle('hidden');
-        }
-
-        // --- PREPARAR DATOS PARA TICKET TÉRMICO (58MM) ---
-        function prepararDatosTicket(d) {
-            let fechaFormateada = new Date().toLocaleString();
-            if (d.createdAt && d.createdAt.seconds) {
-                fechaFormateada = new Date(d.createdAt.seconds * 1000).toLocaleString();
-            }
-
-            document.getElementById('ticket-info-content').innerHTML = `
-                <strong>Folio:</strong> ${d.orderId}<br>
-                <strong>Fecha:</strong> ${fechaFormateada}<br>
-                <strong>Cliente:</strong> ${d.clientName}<br>
-                <strong>Tel:</strong> ${d.clientPhone}<br>
-                <strong>Entrega:</strong> ${d.shipping}<br>
-                <strong>Destino:</strong> ${d.clientAddress}
-            `;
-
-            let itemsHtml = '';
-            if (d.items) {
-                d.items.forEach(i => {
-                    let importeLinea = i.price * i.quantity;
-                    itemsHtml += `
-                        <div style="margin-bottom: 4px;">
-                            <div style="font-weight: bold;">${i.quantity}x ${i.name}</div>
-                            <div style="color: #444; font-size: 8px; padding-left: 6px;">Color: ${i.color}</div>
-                            <div style="display: flex; justify-content: space-between; padding-left: 6px; font-size: 8px;">
-                                <span>P.Unit: $${i.price}</span>
-                                <span style="font-weight: bold;">$${importeLinea}</span>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-            document.getElementById('ticket-items-content').innerHTML = itemsHtml;
-            document.getElementById('ticket-totals-content').innerHTML = `
-                <div style="font-size: 8.5px; margin-bottom: 2px;">Método: ${d.payment}</div>
-                <div style="font-size: 11px; font-weight: bold;">TOTAL: ${d.total}</div>
-            `;
-        }
-
-        // --- PREPARAR DATOS PARA PDF CARTA (TAMAÑO NORMAL) ---
-        function prepararDatosPDFCarta(d) {
-            let fechaFormateada = new Date().toLocaleString();
-            if (d.createdAt && d.createdAt.seconds) {
-                fechaFormateada = new Date(d.createdAt.seconds * 1000).toLocaleString();
-            }
-
-            document.getElementById('pdf-folio-val').textContent = `Folio: ${d.orderId}`;
-            document.getElementById('pdf-fecha-val').textContent = `Fecha: ${fechaFormateada}`;
-            document.getElementById('pdf-cliente-nombre').textContent = d.clientName;
-            document.getElementById('pdf-cliente-tel').textContent = d.clientPhone;
-            document.getElementById('pdf-envio-metodo').textContent = d.shipping;
-            document.getElementById('pdf-envio-dir').textContent = d.clientAddress;
-            document.getElementById('pdf-pago-metodo').textContent = d.payment;
-            document.getElementById('pdf-total-val').textContent = d.total;
-
-            let tbodyHtml = '';
-            if (d.items) {
-                d.items.forEach(i => {
-                    let importeLinea = i.price * i.quantity;
-                    tbodyHtml += `
-                        <tr style="border-bottom: 1px solid #e5e7eb;">
-                            <td style="padding: 10px; border: 1px solid #e5e7eb; text-align: center;">${i.quantity}</td>
-                            <td style="padding: 10px; border: 1px solid #e5e7eb;">${i.name}</td>
-                            <td style="padding: 10px; border: 1px solid #e5e7eb;">${i.color}</td>
-                            <td style="padding: 10px; border: 1px solid #e5e7eb; text-align: right;">$${i.price} MXN</td>
-                            <td style="padding: 10px; border: 1px solid #e5e7eb; text-align: right; font-weight: bold;">$${importeLinea} MXN</td>
-                        </tr>
-                    `;
-                });
-            }
-            document.getElementById('pdf-items-tbody').innerHTML = tbodyHtml;
-        }
-
-        function imprimirTicket58mm(orderJson) {
-            const d = JSON.parse(decodeURIComponent(orderJson));
-            prepararDatosTicket(d);
-            setTimeout(() => { window.print(); }, 200);
-        }
-
-        function descargarPDFCarta(orderJson) {
-            const d = JSON.parse(decodeURIComponent(orderJson));
-            prepararDatosPDFCarta(d);
-
-            const elementoPDF = document.getElementById('pdf-carta-container');
-            elementoPDF.style.display = 'block';
-
-            const opt = {
-                margin:       0,
-                filename:     `Comprobante_${d.orderId}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }
-            };
-
-            html2pdf().from(elementoPDF).set(opt).save().then(() => {
-                elementoPDF.style.display = 'none';
-                showToast("¡PDF tamaño carta generado con éxito!");
-            }).catch(err => {
-                console.error(err);
-                elementoPDF.style.display = 'none';
-                showToast("Error al generar PDF", "error");
-            });
-        }
-
-        async function cargarPedidosAdmin() {
+            document.getElementById('admin-orders-modal').classList.remove('hidden');
             const container = document.getElementById('admin-orders-list');
-            container.innerHTML = '<p class="text-gray-400 text-xs italic text-center py-4">Cargando pedidos...</p>';
+            container.innerHTML = '<p class="text-gray-400 text-xs text-center py-4">Cargando...</p>';
             try {
-                const { collection, getDocs } = window.FB_Methods;
-                const querySnapshot = await getDocs(collection(window.FB_Db, "orders"));
-                if (querySnapshot.empty) {
-                    container.innerHTML = '<p class="text-gray-400 text-xs italic text-center py-4">No hay pedidos registrados.</p>';
-                    return;
-                }
+                const qSnap = await window.FB_Methods.getDocs(window.FB_Methods.collection(window.FB_Db, "orders"));
+                if (qSnap.empty) { container.innerHTML = '<p class="text-gray-400 text-xs text-center py-4">Sin pedidos.</p>'; return; }
                 let html = '';
-                querySnapshot.forEach((docSnap) => {
+                qSnap.forEach((docSnap) => {
                     const id = docSnap.id;
                     const d = docSnap.data();
-                    const currentStatus = d.status || 'En proceso';
-                    let itemsStr = '';
-                    if (d.items) {
-                        d.items.forEach(i => { itemsStr += `<li>${i.quantity}x ${i.name} (${i.color}) - $${i.price * i.quantity}</li>`; });
-                    }
-                    
                     const orderEncoded = encodeURIComponent(JSON.stringify(d));
-
                     html += `
-                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-2 text-xs text-gray-700">
-                        <div class="flex justify-between items-center font-bold text-gray-900">
-                            <span>Folio: ${d.orderId}</span>
-                            <span class="text-amber-600">${d.total}</span>
-                        </div>
+                    <div class="bg-gray-50 border rounded-xl p-4 space-y-2 text-xs">
+                        <div class="flex justify-between font-bold"><span>Folio: ${d.orderId}</span><span class="text-amber-600">${d.total}</span></div>
                         <p><strong>Cliente:</strong> ${d.clientName} (${d.clientPhone})</p>
-                        <p><strong>Pago:</strong> ${d.payment}</p>
-                        <p><strong>Envío:</strong> ${d.shipping}</p>
-                        <p><strong>Lugar:</strong> ${d.clientAddress}</p>
-                        <div><strong>Productos:</strong><ul class="list-disc pl-4 text-gray-600 mt-1">${itemsStr}</ul></div>
-                        
-                        <!-- BOTONES EXCLUSIVOS DE IMPRESIÓN Y PDF TAMAÑO CARTA -->
-                        <div class="flex gap-2 pt-2 border-t">
-                            <button onclick="imprimirTicket58mm('${orderEncoded}')" class="flex-1 bg-gray-900 text-white py-1.5 rounded-lg text-[11px] font-bold hover:bg-black transition text-center">
-                                🖨️ Imprimir Ticket (58mm)
-                            </button>
-                            <button onclick="descargarPDFCarta('${orderEncoded}')" class="flex-1 bg-emerald-700 text-white py-1.5 rounded-lg text-[11px] font-bold hover:bg-emerald-800 transition text-center">
-                                📄 Descargar PDF (Carta)
+                        <p><strong>Correo Cliente:</strong> ${d.clientEmail || 'No registrado'}</p>
+                        <p><strong>Pago:</strong> ${d.payment} | <strong>Envío:</strong> ${d.shipping}</p>
+                        <p><strong>Dirección:</strong> ${d.clientAddress}</p>
+                        <div class="grid grid-cols-2 gap-2 pt-2 border-t">
+                            <button onclick="imprimirTicket58mm('${orderEncoded}')" class="bg-gray-900 text-white py-1.5 rounded text-[11px] font-bold">🖨️ Ticket (58mm)</button>
+                            <button onclick="descargarPDFCarta('${orderEncoded}')" class="bg-emerald-700 text-white py-1.5 rounded text-[11px] font-bold">📄 Descargar PDF</button>
+                            <button onclick="enviarComprobanteAlCliente('${orderEncoded}')" class="col-span-2 bg-blue-700 text-white py-2 rounded text-[11px] font-bold flex items-center justify-center gap-1.5">
+                                ✉️ Enviar comprobante al cliente por correo (${d.clientEmail || 'Sin correo'})
                             </button>
                         </div>
-
                         <div class="pt-2 border-t flex items-center justify-between">
                             <label class="font-bold">Estatus:</label>
-                            <select onchange="actualizarEstatusPedido('${id}', this.value)" class="p-1.5 border rounded-lg text-xs bg-white font-medium">
-                                <option value="Pendiente de pago (MP)" ${currentStatus === 'Pendiente de pago (MP)' ? 'selected' : ''}>🟡 Pendiente de pago (MP)</option>
-                                <option value="Falta de Pago vía OXXO" ${currentStatus === 'Falta de Pago vía OXXO' ? 'selected' : ''}>🏪 Falta de Pago vía OXXO</option>
-                                <option value="En proceso" ${currentStatus === 'En proceso' ? 'selected' : ''}>⏳ En proceso</option>
-                                <option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>💳 Pagado</option>
-                                <option value="Enviado" ${currentStatus === 'Enviado' ? 'selected' : ''}>🚚 Enviado</option>
-                                <option value="Entregado" ${currentStatus === 'Entregado' ? 'selected' : ''}>✅ Entregado</option>
+                            <select onchange="actualizarEstatusPedido('${id}', this.value)" class="p-1 border rounded text-xs bg-white">
+                                <option value="Pendiente de pago (MP)" ${d.status === 'Pendiente de pago (MP)' ? 'selected' : ''}>🟡 Pendiente (MP)</option>
+                                <option value="Falta de Pago vía OXXO" ${d.status === 'Falta de Pago vía OXXO' ? 'selected' : ''}>🏪 Falta OXXO</option>
+                                <option value="En proceso" ${d.status === 'En proceso' ? 'selected' : ''}>⏳ En proceso</option>
+                                <option value="Pagado" ${d.status === 'Pagado' ? 'selected' : ''}>💳 Pagado</option>
+                                <option value="Enviado" ${d.status === 'Enviado' ? 'selected' : ''}>🚚 Enviado</option>
+                                <option value="Entregado" ${d.status === 'Entregado' ? 'selected' : ''}>✅ Entregado</option>
                             </select>
                         </div>
                     </div>`;
                 });
                 container.innerHTML = html;
-            } catch (e) {
-                container.innerHTML = '<p class="text-red-500 text-xs text-center py-4">Error al cargar pedidos.</p>';
+            } catch (e) { container.innerHTML = '<p class="text-red-500 text-xs text-center">Error al cargar.</p>'; }
+        }
+
+        function toggleAdminOrdersModal() { document.getElementById('admin-orders-modal').classList.toggle('hidden'); }
+
+        function prepararDatosTicket(d) {
+            document.getElementById('ticket-info-content').innerHTML = `<strong>Folio:</strong> ${d.orderId}<br><strong>Cliente:</strong> ${d.clientName}<br><strong>Tel:</strong> ${d.clientPhone}<br><strong>Entrega:</strong> ${d.shipping}`;
+            document.getElementById('ticket-items-content').innerHTML = (d.items || []).map(i => `<div><b>${i.quantity}x ${i.name}</b> (${i.color}) - $${i.price * i.quantity}</div>`).join('');
+            document.getElementById('ticket-totals-content').innerHTML = `<b>TOTAL: ${d.total}</b>`;
+        }
+
+        function prepararDatosPDFCarta(d) {
+            document.getElementById('pdf-folio-val').textContent = `Folio: ${d.orderId}`;
+            document.getElementById('pdf-fecha-val').textContent = `Fecha: ${new Date().toLocaleString()}`;
+            document.getElementById('pdf-cliente-nombre').textContent = d.clientName;
+            document.getElementById('pdf-cliente-tel').textContent = d.clientPhone;
+            document.getElementById('pdf-cliente-correo').textContent = d.clientEmail || 'No registrado';
+            document.getElementById('pdf-envio-metodo').textContent = d.shipping;
+            document.getElementById('pdf-envio-dir').textContent = d.clientAddress;
+            document.getElementById('pdf-pago-metodo').textContent = d.payment;
+            document.getElementById('pdf-total-val').textContent = d.total;
+            document.getElementById('pdf-items-tbody').innerHTML = (d.items || []).map(i => `<tr><td style="padding:10px;border:1px solid #ddd;">${i.quantity}</td><td style="padding:10px;border:1px solid #ddd;">${i.name}</td><td style="padding:10px;border:1px solid #ddd;">${i.color}</td><td style="padding:10px;border:1px solid #ddd;text-align:right;">$${i.price}</td><td style="padding:10px;border:1px solid #ddd;text-align:right;">$${i.price * i.quantity}</td></tr>`).join('');
+        }
+
+        function imprimirTicket58mm(orderJson) {
+            prepararDatosTicket(JSON.parse(decodeURIComponent(orderJson)));
+            setTimeout(() => window.print(), 200);
+        }
+
+        function descargarPDFCarta(orderJson) {
+            const d = JSON.parse(decodeURIComponent(orderJson));
+            prepararDatosPDFCarta(d);
+            const el = document.getElementById('pdf-carta-container');
+            el.style.display = 'block';
+            html2pdf().from(el).set({ margin: 0, filename: `Comprobante_${d.orderId}.pdf`, jsPDF: { unit: 'mm', format: 'letter' } }).save().then(() => {
+                el.style.display = 'none';
+                showToast("¡PDF descargado!");
+            });
+        }
+
+        // --- FUNCIÓN EXACTA PARA ENVIAR EL COMPROBANTE AL CORREO DEL CLIENTE ---
+        async function enviarComprobanteAlCliente(orderJson) {
+            const d = JSON.parse(decodeURIComponent(orderJson));
+            const correoCliente = d.clientEmail;
+
+            if (!correoCliente || !correoCliente.includes('@')) {
+                showToast("⚠️ Este pedido no tiene un correo de cliente válido registrado.", "error");
+                return;
+            }
+
+            prepararDatosPDFCarta(d);
+            const elementoPDF = document.getElementById('pdf-carta-container');
+            elementoPDF.style.display = 'block';
+
+            showToast(`Generando y enviando comprobante a ${correoCliente}...`, "success");
+
+            try {
+                const pdfBase64 = await html2pdf().from(elementoPDF).set({
+                    margin: 0,
+                    filename: `Comprobante_${d.orderId}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' }
+                }).outputPdf('datauristring');
+
+                elementoPDF.style.display = 'none';
+
+                const respuesta = await fetch('/api/enviar-pdf', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        correoCliente: correoCliente,
+                        nombreCliente: d.clientName,
+                        pdfBase64: pdfBase64,
+                        nombreArchivo: `Comprobante_${d.orderId}.pdf`
+                    }),
+                });
+
+                const resultado = await respuesta.json();
+                if (respuesta.ok) {
+                    showToast(`✅ ¡Comprobante enviado con éxito a ${correoCliente}!`);
+                } else {
+                    showToast("Error al enviar correo: " + (resultado.error || 'Desconocido'), "error");
+                }
+            } catch (err) {
+                console.error(err);
+                elementoPDF.style.display = 'none';
+                showToast("Error al procesar el envío del comprobante", "error");
             }
         }
 
         async function actualizarEstatusPedido(docId, nuevoEstatus) {
             try {
-                const { doc, updateDoc } = window.FB_Methods;
-                await updateDoc(doc(window.FB_Db, "orders", docId), { status: nuevoEstatus });
+                await window.FB_Methods.updateDoc(window.FB_Methods.doc(window.FB_Db, "orders", docId), { status: nuevoEstatus });
                 showToast(`Estatus actualizado a: ${nuevoEstatus}`);
-            } catch (e) {
-                showToast("Error al actualizar estatus", "error");
-            }
+            } catch (e) { showToast("Error al actualizar", "error"); }
         }
 
         function toggleAuthModal() { document.getElementById('auth-modal').classList.toggle('hidden'); }
@@ -1987,59 +1470,38 @@
         async function buscarCodigoPostal(cp) {
             if (cp.length !== 5) return;
             try {
-                const response = await fetch(`https://api.copomex.com/query/info_cp/${cp}?token=libre`);
-                const data = await response.json();
+                const res = await fetch(`https://api.copomex.com/query/info_cp/${cp}?token=libre`);
+                const data = await res.json();
                 if (!data.error && data.response) {
                     document.getElementById('dir-ciudad').value = data.response.municipio || '';
                     document.getElementById('dir-estado').value = data.response.estado || '';
                 }
-            } catch (error) {}
+            } catch (e) {}
         }
 
         async function saveStructuredAddress() {
             const cp = document.getElementById('dir-cp').value.trim();
             const calle = document.getElementById('dir-calle').value.trim();
             const numExt = document.getElementById('dir-num-ext').value.trim();
-            const numInt = document.getElementById('dir-num-int').value.trim();
             const ciudad = document.getElementById('dir-ciudad').value.trim();
-            const estado = document.getElementById('dir-estado').value.trim();
             const colonia = document.getElementById('dir-colonia-input').value.trim();
-
-            if (!cp || !calle || !numExt || !ciudad || !colonia) {
-                showToast("Por favor completa los campos obligatorios (*).", "error");
-                return;
-            }
-            if (!currentUser) {
-                showToast("Debes iniciar sesión para guardar direcciones.", "error");
-                return;
-            }
-
-            const direccionCompleta = `${calle} #${numExt}${numInt ? ' Int. ' + numInt : ''}, Col. ${colonia}, C.P. ${cp}, ${ciudad}, ${estado}`;
+            if (!cp || !calle || !numExt || !ciudad || !colonia) { showToast("Completa los campos obligatorios.", "error"); return; }
+            if (!currentUser) { showToast("Inicia sesión.", "error"); return; }
+            const dir = `${calle} #${numExt}, Col. ${colonia}, C.P. ${cp}, ${ciudad}`;
             try {
-                const { doc, updateDoc, arrayUnion } = window.FB_Methods;
-                await updateDoc(doc(window.FB_Db, "users", currentUser.uid), { addresses: arrayUnion(direccionCompleta) });
-                showToast("¡Dirección guardada con éxito!");
+                await window.FB_Methods.updateDoc(window.FB_Methods.doc(window.FB_Db, "users", currentUser.uid), { addresses: window.FB_Methods.arrayUnion(dir) });
+                showToast("¡Dirección guardada!");
                 toggleAddressModal();
                 loadUserDataAndOrders(currentUser.uid);
-            } catch (e) {
-                showToast("Error al guardar dirección.", "error");
-            }
+            } catch (e) { showToast("Error al guardar", "error"); }
         }
 
         function switchAuthMode() {
             isRegistering = !isRegistering;
-            const regFields = document.getElementById('register-fields');
-            if (isRegistering) {
-                regFields.classList.remove('hidden');
-                document.getElementById('auth-modal-title').textContent = 'Crear Cuenta';
-                document.getElementById('auth-submit-btn').textContent = 'Registrarse';
-                document.getElementById('auth-switch-btn').textContent = '¿Ya tienes cuenta? Inicia sesión';
-            } else {
-                regFields.classList.add('hidden');
-                document.getElementById('auth-modal-title').textContent = 'Iniciar Sesión';
-                document.getElementById('auth-submit-btn').textContent = 'Entrar';
-                document.getElementById('auth-switch-btn').textContent = '¿No tienes cuenta? Regístrate aquí';
-            }
+            document.getElementById('register-fields').classList.toggle('hidden');
+            document.getElementById('auth-modal-title').textContent = isRegistering ? 'Crear Cuenta' : 'Iniciar Sesión';
+            document.getElementById('auth-submit-btn').textContent = isRegistering ? 'Registrarse' : 'Entrar';
+            document.getElementById('auth-switch-btn').textContent = isRegistering ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate';
         }
 
         async function handleAuthSubmit() {
@@ -2047,35 +1509,26 @@
             const password = document.getElementById('auth-password').value.trim();
             const errorBox = document.getElementById('auth-error-box');
             errorBox.classList.add('hidden');
-
-            const { signInWithEmailAndPassword, createUserWithEmailAndPassword, doc, setDoc } = window.FB_Methods;
             try {
                 if (isRegistering) {
                     const names = document.getElementById('reg-names').value.trim();
                     const surnames = document.getElementById('reg-surnames').value.trim();
                     const phone = document.getElementById('reg-phone').value.trim();
-                    if (!names || !surnames || !phone) {
-                        errorBox.textContent = "Completa todos los campos.";
-                        errorBox.classList.remove('hidden');
-                        return;
-                    }
-                    const res = await createUserWithEmailAndPassword(window.FB_Auth, email, password);
-                    await setDoc(doc(window.FB_Db, "users", res.user.uid), { names, surnames, phone, email, addresses: [], createdAt: new Date() });
-                    showToast("¡Cuenta creada con éxito!");
+                    if (!names || !phone) { errorBox.textContent = "Completa los campos."; errorBox.classList.remove('hidden'); return; }
+                    const res = await window.FB_Methods.createUserWithEmailAndPassword(window.FB_Auth, email, password);
+                    await window.FB_Methods.setDoc(window.FB_Methods.doc(window.FB_Db, "users", res.user.uid), { names, surnames, phone, email, addresses: [], createdAt: new Date() });
+                    showToast("¡Cuenta creada!");
                 } else {
-                    await signInWithEmailAndPassword(window.FB_Auth, email, password);
-                    showToast("¡Bienvenida de nuevo!");
+                    await window.FB_Methods.signInWithEmailAndPassword(window.FB_Auth, email, password);
+                    showToast("¡Bienvenida!");
                 }
                 toggleAuthModal();
-            } catch (error) {
-                errorBox.textContent = "Correo o contraseña incorrectos.";
-                errorBox.classList.remove('hidden');
-            }
+            } catch (e) { errorBox.textContent = "Error de autenticación."; errorBox.classList.remove('hidden'); }
         }
 
         async function handleLogout() {
             await window.FB_Methods.signOut(window.FB_Auth);
-            showToast("Has salido de tu cuenta.");
+            showToast("Sesión cerrada.");
             location.reload();
         }
 
@@ -2092,16 +1545,8 @@
         }
 
         function setupDropdown(toggleId, submenuId, arrowId) {
-            const btn = document.getElementById(toggleId);
-            const submenu = document.getElementById(submenuId);
-            const arrow = document.getElementById(arrowId);
-            if(btn && submenu && arrow) {
-                btn.onclick = (e) => {
-                    e.preventDefault();
-                    submenu.classList.toggle('hidden');
-                    arrow.classList.toggle('rotate-180');
-                };
-            }
+            const btn = document.getElementById(toggleId), sub = document.getElementById(submenuId), arrow = document.getElementById(arrowId);
+            if(btn && sub && arrow) btn.onclick = (e) => { e.preventDefault(); sub.classList.toggle('hidden'); arrow.classList.toggle('rotate-180'); };
         }
         setupDropdown('admin-menu-toggle-btn', 'admin-menu-submenu', 'admin-menu-arrow');
         setupDropdown('admin-products-toggle', 'admin-products-sub', 'admin-prod-arrow');
@@ -2118,19 +1563,15 @@
             window.history.pushState({}, '', window.location.pathname);
             document.getElementById('home-view').classList.remove('hidden');
             document.getElementById('dynamic-category-view').classList.add('hidden');
-            const mobileMenu = document.getElementById('mobile-menu');
-            if (mobileMenu && !mobileMenu.classList.contains('hidden')) toggleMobileMenu();
+            if (!mobileMenu.classList.contains('hidden')) toggleMobileMenu();
         }
 
         function toggleCartModal() {
-            const modal = document.getElementById('cart-modal');
-            const drawer = document.getElementById('cart-drawer-panel');
+            const modal = document.getElementById('cart-modal'), drawer = document.getElementById('cart-drawer-panel');
             if (modal.classList.contains('hidden')) {
                 modal.classList.remove('hidden');
                 setTimeout(() => drawer.classList.remove('translate-x-full'), 10);
-                checkoutStep = 1;
-                actualizarTextosFechasEnvio();
-                updateCartUI();
+                checkoutStep = 1; updateCartUI();
             } else {
                 drawer.classList.add('translate-x-full');
                 setTimeout(() => modal.classList.add('hidden'), 300);
@@ -2151,326 +1592,129 @@
         }
 
         function updateCartUI() {
-            const countEl = document.getElementById('cart-count');
-            if(countEl) countEl.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cart-count').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const stepCart = document.getElementById('step-cart'), stepShipping = document.getElementById('step-shipping'), stepPayment = document.getElementById('step-payment');
+            const actionBtn = document.getElementById('cart-action-btn'), backBtn = document.getElementById('cart-back-btn'), modalTitle = document.getElementById('cart-modal-title');
+            
+            stepCart.classList.add('hidden'); stepShipping.classList.add('hidden'); stepPayment.classList.add('hidden');
 
-            const stepCart = document.getElementById('step-cart');
-            const stepShipping = document.getElementById('step-shipping');
-            const stepPayment = document.getElementById('step-payment');
-            const actionBtn = document.getElementById('cart-action-btn');
-            const backBtn = document.getElementById('cart-back-btn');
-            const modalTitle = document.getElementById('cart-modal-title');
+            let subtotal = obtenerSubtotalCarrito(), costoEnvio = obtenerCostoEnvioActual(), total = subtotal + costoEnvio;
+            document.getElementById('cart-total').textContent = `$${total} MXN`;
+            document.getElementById('transfer-amount-display').textContent = `$${total} MXN`;
 
-            if(stepCart) stepCart.classList.add('hidden');
-            if(stepShipping) stepShipping.classList.add('hidden');
-            if(stepPayment) stepPayment.classList.add('hidden');
-
-            let subtotal = obtenerSubtotalCarrito();
-            let costoEnvio = obtenerCostoEnvioActual();
-            let total = subtotal + costoEnvio;
-
-            const totalEl = document.getElementById('cart-total');
-            if(totalEl) totalEl.textContent = `$${total} MXN`;
-            const transferAmountDisplay = document.getElementById('transfer-amount-display');
-            if(transferAmountDisplay) transferAmountDisplay.textContent = `$${total} MXN`;
-
-            const subtotalNum = obtenerSubtotalCarrito();
-            const freeBanner = document.getElementById('free-shipping-banner');
-            const couponContainer = document.getElementById('local-coupon-container');
-            const labelEstandar = document.getElementById('label-estandar-txt');
-            const labelExpress = document.getElementById('label-express-txt');
-            const labelNacional = document.getElementById('label-nacional-txt');
-
-            if (subtotalNum > 1499) {
-                if (freeBanner) freeBanner.classList.remove('hidden');
-                if (couponContainer) couponContainer.classList.add('hidden');
-                if (labelEstandar) labelEstandar.innerHTML = 'Envío Local Estándar (<span class="line-through text-gray-400">$69</span> <span class="text-emerald-600 font-bold">$0 GRATIS</span>)';
-                if (labelExpress) labelExpress.innerHTML = 'Envío Local Express (<span class="line-through text-gray-400">$99</span> <span class="text-emerald-600 font-bold">$0 GRATIS</span>)';
-                if (labelNacional) labelNacional.innerHTML = 'Envío Nacional (<span class="line-through text-gray-400">$149</span> <span class="text-emerald-600 font-bold">$0 GRATIS</span>)';
-            } else {
-                if (freeBanner) freeBanner.classList.add('hidden');
-                if (labelEstandar) labelEstandar.textContent = 'Envío Local Estándar ($69 MXN)';
-                if (labelExpress) labelExpress.textContent = 'Envío Local Express ($99 MXN)';
-                if (labelNacional) labelNacional.textContent = 'Envío Nacional ($149 MXN)';
-            }
+            if (subtotal > 1499) document.getElementById('free-shipping-banner').classList.remove('hidden');
+            else document.getElementById('free-shipping-banner').classList.add('hidden');
 
             if (checkoutStep === 1) {
-                if(modalTitle) modalTitle.textContent = 'Tu Carrito';
-                if(stepCart) stepCart.classList.remove('hidden');
-                if(backBtn) backBtn.classList.add('hidden');
-                if(actionBtn) {
-                    actionBtn.textContent = 'Ir a Pagar';
-                    actionBtn.style.display = cart.length === 0 ? 'none' : 'block';
-                }
+                modalTitle.textContent = 'Tu Carrito';
+                stepCart.classList.remove('hidden');
+                backBtn.classList.add('hidden');
+                actionBtn.textContent = 'Ir a Pagar';
+                actionBtn.style.display = cart.length === 0 ? 'none' : 'block';
 
-                let html = '';
-                if (cart.length === 0) {
-                    html = '<p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>';
-                } else {
-                    cart.forEach((item, index) => {
-                        html += `<div class="flex justify-between items-center text-sm border-b border-gray-100 pb-3">
-                            <div>
-                                <p class="font-medium text-gray-900">${item.name}</p>
-                                <p class="text-xs text-gray-500">Color: ${item.color} · $${item.price} c/u</p>
-                                <div class="flex items-center gap-2 mt-2">
-                                    <button onclick="changeItemQuantity(${index}, -1)" class="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center font-bold">-</button>
-                                    <span class="text-xs font-semibold w-5 text-center">${item.quantity}</span>
-                                    <button onclick="changeItemQuantity(${index}, 1)" class="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center font-bold">+</button>
-                                </div>
+                document.getElementById('cart-items').innerHTML = cart.length === 0 ? '<p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>' : cart.map((item, index) => `
+                    <div class="flex justify-between items-center text-sm border-b pb-3">
+                        <div>
+                            <p class="font-medium">${item.name}</p>
+                            <p class="text-xs text-gray-500">Color: ${item.color} · $${item.price} c/u</p>
+                            <div class="flex items-center gap-2 mt-2">
+                                <button onclick="changeItemQuantity(${index}, -1)" class="w-6 h-6 border rounded-full font-bold">-</button>
+                                <span class="text-xs font-semibold">${item.quantity}</span>
+                                <button onclick="changeItemQuantity(${index}, 1)" class="w-6 h-6 border rounded-full font-bold">+</button>
                             </div>
-                            <div class="flex flex-col items-end gap-2">
-                                <span class="font-semibold text-gray-900">$${item.price * item.quantity}</span>
-                                <button onclick="removeFromCart(${index})" class="text-red-500 text-xs hover:underline">Eliminar</button>
-                            </div>
-                        </div>`;
-                    });
-                }
-                document.getElementById('cart-items').innerHTML = html;
+                        </div>
+                        <div class="flex flex-col items-end gap-2">
+                            <span class="font-semibold">$${item.price * item.quantity}</span>
+                            <button onclick="removeFromCart(${index})" class="text-red-500 text-xs hover:underline">Eliminar</button>
+                        </div>
+                    </div>`).join('');
             } else if (checkoutStep === 2) {
-                if(modalTitle) modalTitle.textContent = 'Datos y Envío';
-                if(stepShipping) stepShipping.classList.remove('hidden');
-                if(backBtn) backBtn.classList.remove('hidden');
-                if(actionBtn) {
-                    actionBtn.textContent = 'Siguiente: Pago';
-                    actionBtn.style.display = 'block';
-                }
-                
+                modalTitle.textContent = 'Datos y Envío';
+                stepShipping.classList.remove('hidden');
+                backBtn.classList.remove('hidden');
+                actionBtn.textContent = 'Siguiente: Pago';
                 actualizarTextosFechasEnvio();
-
-                const nameInput = document.getElementById('ship-name');
-                const phoneInput = document.getElementById('ship-phone');
-                const emailInput = document.getElementById('ship-email');
-                const addressInput = document.getElementById('ship-address');
-                const cpInput = document.getElementById('ship-cp');
-
-                const dbNames = userData?.names || userData?.name || userData?.nombre || '';
-                const dbSurnames = userData?.surnames || userData?.apellido || userData?.apellidos || '';
-                const nombreCompletoFirestore = `${dbNames} ${dbSurnames}`.trim();
-
-                if (nameInput && !nameInput.value) nameInput.value = globalUserProfile.fullName || nombreCompletoFirestore || '';
-                if (phoneInput && !phoneInput.value) phoneInput.value = globalUserProfile.phone || userData?.phone || userData?.telefono || userData?.celular || '';
-                if (emailInput && !emailInput.value) emailInput.value = currentUser ? currentUser.email : (globalUserProfile.email || userData?.email || '');
-                if (addressInput && !addressInput.value) {
-                    const savedAddr = globalUserProfile.address || (userData?.addresses && userData.addresses[0]) || '';
-                    addressInput.value = savedAddr;
-                    const cpMatch = savedAddr.match(/C\.P\.\s*(\d{5})/i);
-                    if (cpMatch && cpInput && !cpInput.value) {
-                        cpInput.value = cpMatch[1];
-                        validarCPLocalCheckout(cpMatch[1]);
-                    }
-                }
             } else if (checkoutStep === 3) {
-                if(modalTitle) modalTitle.textContent = 'Método de Pago';
-                if(stepPayment) stepPayment.classList.remove('hidden');
-                if(backBtn) backBtn.classList.remove('hidden');
-                if(actionBtn) {
-                    actionBtn.textContent = 'Finalizar Pedido';
-                    actionBtn.style.display = 'block';
-                }
-                applyPaymentRules();
-                handlePaymentChange();
+                modalTitle.textContent = 'Método de Pago';
+                stepPayment.classList.remove('hidden');
+                backBtn.classList.remove('hidden');
+                actionBtn.textContent = 'Finalizar Pedido';
             }
         }
 
-        function handleCartBack() {
-            if (checkoutStep > 1) { checkoutStep--; updateCartUI(); }
-        }
+        function handleCartBack() { if (checkoutStep > 1) { checkoutStep--; updateCartUI(); } }
 
         async function handleCartNext() {
             if (checkoutStep === 1) {
                 if (cart.length === 0) return;
-                checkoutStep = 2;
-                updateCartUI();
-                applyShippingRules();
+                checkoutStep = 2; updateCartUI(); applyShippingRules();
             } else if (checkoutStep === 2) {
                 const clientName = document.getElementById('ship-name').value.trim();
                 const clientPhone = document.getElementById('ship-phone').value.trim();
+                const clientEmail = document.getElementById('ship-email').value.trim();
                 const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
-                const cpVal = document.getElementById('ship-cp')?.value.trim() || '';
-                let clientAddress = shippingMethod === "Punto de entrega" ? document.querySelector('input[name="meeting-point-radio"]:checked').value : document.getElementById('ship-address').value.trim();
+                const clientAddress = shippingMethod === "Punto de entrega" ? document.querySelector('input[name="meeting-point-radio"]:checked').value : document.getElementById('ship-address').value.trim();
 
-                if (shippingMethod.includes('Envío Local')) {
-                    if (cpVal.length !== 5) {
-                        showToast("Ingresa tu Código Postal de 5 dígitos para validar envío local.", "error");
-                        return;
-                    }
-                    if (!estaDentroDePoligonoGDL(cpVal)) {
-                        validarCPLocalCheckout(cpVal);
-                        return;
-                    }
-                    if (!clientAddress.includes(cpVal)) clientAddress = `${clientAddress} (C.P. ${cpVal})`;
-                }
-
-                if(!clientName || !clientPhone || !clientAddress) {
-                    showToast("Por favor completa los campos obligatorios de envío.", "error");
+                if (!clientName || !clientPhone || !clientEmail || !clientAddress) {
+                    showToast("Por favor completa todos los campos de envío, incluyendo tu correo.", "error");
                     return;
                 }
-                checkoutStep = 3;
-                updateCartUI();
+                checkoutStep = 3; updateCartUI();
             } else if (checkoutStep === 3) {
                 const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
                 const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
                 const clientName = document.getElementById('ship-name').value.trim();
                 const clientPhone = document.getElementById('ship-phone').value.trim();
-                const cpVal = document.getElementById('ship-cp')?.value.trim() || '';
-                let clientAddress = shippingMethod === "Punto de entrega" ? document.querySelector('input[name="meeting-point-radio"]:checked').value : document.getElementById('ship-address').value.trim();
+                const clientEmail = document.getElementById('ship-email').value.trim();
+                const clientAddress = shippingMethod === "Punto de entrega" ? document.querySelector('input[name="meeting-point-radio"]:checked').value : document.getElementById('ship-address').value.trim();
 
-                if (shippingMethod.includes('Envío Local') && cpVal && !clientAddress.includes(cpVal)) {
-                    clientAddress = `${clientAddress} (C.P. ${cpVal})`;
-                }
-
-                let subtotal = obtenerSubtotalCarrito();
-                const costoEnvio = obtenerCostoEnvioActual();
-                let total = subtotal + costoEnvio;
-
-                const { collection, addDoc, getDocs, Timestamp } = window.FB_Methods;
+                const total = obtenerSubtotalCarrito() + obtenerCostoEnvioActual();
                 const now = new Date();
-                const year = now.getFullYear().toString().slice(-2);
-                const month = (now.getMonth() + 1).toString().padStart(2, '0');
-                
-                let nextOrderNumber = 1;
-                try {
-                    nextOrderNumber = (await getDocs(collection(window.FB_Db, "orders"))).size + 1;
-                } catch(e) {}
+                const orderId = `VT${now.getFullYear().toString().slice(-2)}${(now.getMonth() + 1).toString().padStart(2, '0')}-${Math.floor(10000 + Math.random() * 90000)}`;
 
-                const orderId = `VT${year}${month}-${nextOrderNumber.toString().padStart(5, '0')}`;
-                const isMP = paymentMethod === 'Mercado Pago';
-
-                if (isMP) {
-                    const orderData = {
-                        orderId,
-                        userId: currentUser ? currentUser.uid : "guest",
-                        clientName, clientPhone, clientAddress,
-                        shipping: shippingMethod,
-                        payment: paymentMethod,
-                        items: [...cart],
-                        total: `$${total} MXN`,
-                        createdAt: Timestamp.now()
-                    };
-
-                    localStorage.setItem('amis_pending_order', JSON.stringify({ ...orderData, numericTotal: total }));
+                if (paymentMethod === 'Mercado Pago') {
+                    localStorage.setItem('amis_pending_order', JSON.stringify({ orderId, clientName, clientPhone, clientEmail, clientAddress, shipping: shippingMethod, payment: paymentMethod, items: cart, total: `$${total} MXN`, numericTotal: total }));
                     showToast("Conectando con Mercado Pago...", "success");
-
-                    const mpItems = cart.map(i => ({
-                        title: `${i.name} (${i.color})`,
-                        quantity: Number(i.quantity),
-                        unit_price: Number(i.price)
-                    }));
-
-                    if (costoEnvio > 0) mpItems.push({ title: shippingMethod, quantity: 1, unit_price: costoEnvio });
-
                     try {
-                        const response = await fetch("/api/crear-preferencia", {
+                        const res = await fetch("/api/crear-preferencia", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ items: mpItems, backUrl: window.location.origin + window.location.pathname, orderId: orderId })
+                            body: JSON.stringify({ items: cart.map(i => ({ title: `${i.name} (${i.color})`, quantity: Number(i.quantity), unit_price: Number(i.price) })), backUrl: window.location.origin + window.location.pathname, orderId })
                         });
-
-                        const mpData = await response.json();
-                        if (mpData.init_point) {
-                            window.location.href = mpData.init_point;
-                            return;
-                        } else throw new Error();
-                    } catch (mpError) {
-                        showToast("Error: No se pudo conectar con el servidor de pagos.", "error");
-                        localStorage.removeItem('amis_pending_order');
-                        return;
-                    }
+                        const data = await res.json();
+                        if (data.init_point) { window.location.href = data.init_point; return; }
+                    } catch (e) { showToast("Error al conectar con pago.", "error"); return; }
                 }
 
                 try {
-                    let estatusInicial = "En proceso";
-                    if (paymentMethod === "Transferencia Bancaria") estatusInicial = "Falta de pago vía Transferencia";
-                    else if (paymentMethod.includes("contra entrega")) estatusInicial = "Pago contra entrega (Pendiente)";
-                    else estatusInicial = "Falta de pago vía OXXO / Externo";
-
-                    const orderData = {
-                        orderId,
-                        userId: currentUser ? currentUser.uid : "guest",
-                        clientName, clientPhone, clientAddress,
-                        shipping: shippingMethod,
-                        payment: paymentMethod,
-                        items: [...cart],
-                        total: `$${total} MXN`,
-                        status: estatusInicial,
-                        createdAt: Timestamp.now()
-                    };
-
-                    await addDoc(collection(window.FB_Db, "orders"), orderData);
-                    enviarFormSubmit({ orderId, clientName, clientPhone, clientAddress, shippingMethod, paymentMethod, total, items: cart });
-
-                    let mensajeWA = `Hola Amis Boutique! 👋 Mi número de pedido es: *${orderId}* (${paymentMethod})`;
-                    document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${encodeURIComponent(mensajeWA)}`;
-
+                    const orderData = { orderId, userId: currentUser?.uid || "guest", clientName, clientPhone, clientEmail, clientAddress, shipping: shippingMethod, payment: paymentMethod, items: [...cart], total: `$${total} MXN`, status: "En proceso", createdAt: window.FB_Methods.Timestamp.now() };
+                    await window.FB_Methods.addDoc(window.FB_Methods.collection(window.FB_Db, "orders"), orderData);
+                    enviarFormSubmit({ orderId, clientName, clientPhone, clientEmail, clientAddress, shippingMethod, paymentMethod, total, items: cart });
+                    
+                    document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${encodeURIComponent(`Hola Amis Boutique! 👋 Mi número de pedido es: *${orderId}*`)}`;
                     toggleCartModal();
                     document.getElementById('order-success-modal').classList.remove('hidden');
-                } catch (error) {
-                    showToast("Hubo un error al registrar tu pedido.", "error");
-                }
+                } catch (e) { showToast("Error al registrar pedido.", "error"); }
             }
         }
 
         function closeSuccessModalAndReload() {
             document.getElementById('order-success-modal').classList.add('hidden');
-            cart = [];
             localStorage.removeItem('amis_cart');
             location.reload();
         }
 
         function applyShippingRules() {
             const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
-            const meetingPointsContainer = document.getElementById('meeting-points-container');
-            const addressFieldContainer = document.getElementById('address-field-container');
-            const cpValidator = document.getElementById('local-cp-validator');
-            const couponContainer = document.getElementById('local-coupon-container');
-            const subtotal = obtenerSubtotalCarrito();
-
-            if (shippingMethod === 'Punto de entrega') {
-                meetingPointsContainer.classList.remove('hidden');
-                addressFieldContainer.classList.add('hidden');
-                if (cpValidator) cpValidator.classList.add('hidden');
-                if (couponContainer) couponContainer.classList.add('hidden');
-            } else {
-                meetingPointsContainer.classList.add('hidden');
-                addressFieldContainer.classList.remove('hidden');
-                if (shippingMethod.includes('Envío Local')) {
-                    if (cpValidator) cpValidator.classList.remove('hidden');
-                    if (couponContainer) {
-                        if (subtotal > 1499) couponContainer.classList.add('hidden');
-                        else couponContainer.classList.remove('hidden');
-                    }
-                } else {
-                    if (cpValidator) cpValidator.classList.add('hidden');
-                    if (couponContainer) couponContainer.classList.add('hidden');
-                }
-            }
-            applyPaymentRules();
+            document.getElementById('meeting-points-container').classList.toggle('hidden', shippingMethod !== 'Punto de entrega');
+            document.getElementById('address-field-container').classList.toggle('hidden', shippingMethod === 'Punto de entrega');
+            document.getElementById('local-cp-validator').classList.toggle('hidden', !shippingMethod.includes('Envío Local'));
             updateCartUI();
         }
 
-        function applyPaymentRules() {
-            const shippingMethod = document.querySelector('input[name="shipping-method"]:checked').value;
-            const payCash = document.getElementById('pay-cash');
-            const payTerminal = document.getElementById('pay-terminal');
-            const mpRadio = document.querySelector('input[name="payment-method"][value="Mercado Pago"]');
-            if (shippingMethod === 'Envío Nacional') {
-                payCash.style.display = 'none';
-                payTerminal.style.display = 'none';
-                if(document.querySelector('input[name="payment-method"]:checked')?.value.includes('contra entrega')) {
-                    mpRadio.checked = true;
-                    handlePaymentChange();
-                }
-            } else {
-                payCash.style.display = 'flex';
-                payTerminal.style.display = 'flex';
-            }
-        }
-
         function handlePaymentChange() {
-            const selectedPay = document.querySelector('input[name="payment-method"]:checked').value;
-            const bankDetails = document.getElementById('bank-details');
-            if (selectedPay === 'Transferencia Bancaria') bankDetails.classList.remove('hidden');
-            else bankDetails.classList.add('hidden');
+            const selected = document.querySelector('input[name="payment-method"]:checked').value;
+            document.getElementById('bank-details').classList.toggle('hidden', selected !== 'Transferencia Bancaria');
         }
     </script>
 </body>
