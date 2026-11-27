@@ -478,8 +478,8 @@
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
                                 <input type="radio" name="shipping-method" value="Envío Nacional" onchange="applyShippingRules()" class="text-black focus:ring-black">
                                 <div>
-                                    <span class="font-medium block">Envío Nacional / Fuera de Periférico ($149 MXN)</span>
-                                    <span class="text-xs text-gray-500">Todo México y zonas fuera del anillo local</span>
+                                    <span class="font-medium block">Envío Nacional ($149 MXN)</span>
+                                    <span class="text-xs text-gray-500">Todo México</span>
                                 </div>
                             </label>
                         </div>
@@ -488,7 +488,7 @@
                         <div id="local-cp-validator" class="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-1.5">
                             <label class="block text-xs font-bold uppercase text-gray-700">Verifica tu Código Postal (GDL) *</label>
                             <input type="text" id="ship-cp" maxlength="5" placeholder="Ej. 44410" oninput="validarCPLocalCheckout(this.value)" class="w-full p-2 border border-gray-300 rounded-lg text-xs font-mono focus:outline-none focus:border-black">
-                            <p id="cp-status-msg" class="text-[11px] text-gray-500">Ingresa los 5 dígitos de tu C.P. para confirmar cobertura dentro de Periférico.</p>
+                            <p id="cp-status-msg" class="text-[11px] text-gray-500">Ingresa los 5 dígitos de tu C.P. para confirmar cobertura en Zona Estándar.</p>
                         </div>
 
                         <!-- PUNTOS DE ENTREGA -->
@@ -730,7 +730,6 @@
             let agregados = 0;
             while (agregados < diasHabiles) {
                 resultado.setDate(resultado.getDate() + 1);
-                // Envíos Pronto recolecta y entrega de Lunes (1) a Sábado (6). Saltamos Domingo (0).
                 if (resultado.getDay() !== 0) {
                     agregados++;
                 }
@@ -747,50 +746,38 @@
         function actualizarTextosFechasEnvio() {
             const ahora = new Date();
             const hora = ahora.getHours();
-            const diaSemana = ahora.getDay(); // 0 = Domingo
+            const diaSemana = ahora.getDay();
 
             let fechaRecoleccion = new Date(ahora);
-            // Si es domingo o ya pasaron las 11:00 AM (hora >= 11), la recolección pasa al siguiente día hábil
             if (diaSemana === 0 || hora >= 11) {
                 fechaRecoleccion = avanzarDiasHabiles(ahora, 1);
             }
 
-            // El Express ($99) entrega el mismo día de la recolección
             const fechaEntregaExpress = new Date(fechaRecoleccion);
-            // El Estándar ($69) entrega 1 día hábil después de la recolección
             const fechaEntregaEstandar = avanzarDiasHabiles(fechaRecoleccion, 1);
 
             const elEstandar = document.getElementById('desc-envio-estandar');
             const elExpress = document.getElementById('desc-envio-express');
 
             if (elEstandar) {
-                elEstandar.textContent = `Dentro de Periférico GDL · Llega el ${formatearFechaCorta(fechaEntregaEstandar)}`;
+                elEstandar.textContent = `Zona Estándar GDL · Llega el ${formatearFechaCorta(fechaEntregaEstandar)}`;
             }
             if (elExpress) {
                 const esHoy = (fechaEntregaExpress.toDateString() === ahora.toDateString());
-                elExpress.textContent = `Dentro de Periférico GDL · ${esHoy ? 'Llega HOY mismo' : 'Llega el ' + formatearFechaCorta(fechaEntregaExpress)}`;
+                elExpress.textContent = `Zona Estándar GDL · ${esHoy ? 'Llega HOY mismo' : 'Llega el ' + formatearFechaCorta(fechaEntregaExpress)}`;
             }
         }
 
-       function estaDentroDePoligonoGDL(cp) {
+        function estaDentroDePoligonoGDL(cp) {
             const cpNum = parseInt(cp.trim(), 10);
             if (isNaN(cpNum) || cp.trim().length !== 5) return false;
 
-            // 1. Guadalajara completo (44100 - 44999)
             const esGDL = (cpNum >= 44100 && cpNum <= 44999);
-
-            // 2. Zapopan INTERNO dentro de Periférico (Excluyendo Tesistán, Valle Imperial y zonas exteriores norte/poniente)
-            // Los C.P. de Zapopan dentro de Periférico van estrictamente del 45010 al 45090 y algunas secciones específicas.
-            // Todo lo que sea 45110 al 45199 o 45200+ queda fuera (Tesistán, Cañadas, etc.)
             const esZapopanInt = (
                 (cpNum >= 45010 && cpNum <= 45099 && cpNum !== 45019) || 
-                (cpNum >= 45110 && cpNum <= 45130) // Excluye explícitamente 45134 y superiores hacia Tesistán
+                (cpNum >= 45110 && cpNum <= 45130)
             );
-
-            // 3. Tlaquepaque interno (norte/poniente de Periférico Sur y Carr. Chapala)
             const esTlaquepaqueInt = (cpNum >= 45500 && cpNum <= 45579);
-
-            // 4. Tonalá trazado Av. Tonaltecas -> Calle Aldama -> Av. Zalatitán -> Periférico
             const esTonalaPoligono = (cpNum >= 45400 && cpNum <= 45419 && cpNum !== 45409);
 
             return (esGDL || esZapopanInt || esTlaquepaqueInt || esTonalaPoligono);
@@ -802,16 +789,16 @@
 
             if (cp.length < 5) {
                 msgEl.className = "text-[11px] text-gray-500";
-                msgEl.textContent = "Ingresa los 5 dígitos de tu C.P. para confirmar cobertura dentro de Periférico.";
+                msgEl.textContent = "Ingresa los 5 dígitos de tu C.P. para confirmar cobertura en Zona Estándar.";
                 return;
             }
 
             if (estaDentroDePoligonoGDL(cp)) {
                 msgEl.className = "text-[11px] text-emerald-600 font-bold";
-                msgEl.textContent = "✅ ¡Cobertura local confirmada dentro de Periférico!";
+                msgEl.textContent = "✅ ¡Cobertura confirmada en Zona Estándar GDL!";
             } else {
                 msgEl.className = "text-[11px] text-amber-700 font-bold";
-                msgEl.textContent = "⚠️ Fuera de Periférico: Se cambió automático a Envío Nacional ($149). Si prefieres envío por Uber, contáctanos por WhatsApp.";
+                msgEl.textContent = "⚠️ Código postal fuera de zona estándar. Se aplicará Envío Nacional ($149).";
                 const nacionalRadio = document.querySelector('input[name="shipping-method"][value="Envío Nacional"]');
                 if (nacionalRadio) {
                     nacionalRadio.checked = true;
