@@ -6,7 +6,7 @@
     <title>AMIS Boutique | Colección & Boutique</title>
     
     <!-- Favicon Personalizado con el Monograma A+B -->
-    <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/2ymB4bsj/1795754192360.png">
+    <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/1XjgNKzh/AMIS-NAVIDAD.png">
 
     <!-- Importación de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -65,7 +65,7 @@
         margin-left: 1.8rem;
         letter-spacing: 0.02em;
       }
-      #cart-drawer-panel, #mobile-menu-panel, #admin-modal-panel {
+      #cart-drawer-panel, #mobile-menu-panel, #admin-modal-panel, #edit-product-modal-panel {
         transition: transform 0.3s ease-in-out;
       }
       
@@ -107,6 +107,35 @@
             </div>
         </div>
     </header>
+
+    <!-- MODAL DE EDICIÓN RÁPIDA DE PRODUCTO (SOLO ADMIN) -->
+    <div id="edit-product-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-black bg-opacity-50" onclick="toggleEditProductModal()"></div>
+            <div class="bg-white rounded-2xl max-w-sm w-full p-6 relative z-10 shadow-xl space-y-4">
+                <div class="flex justify-between items-center pb-3 border-b border-gray-100">
+                    <h3 class="font-serif text-lg font-bold">Editar Producto</h3>
+                    <button onclick="toggleEditProductModal()" class="text-gray-400 hover:text-black">✕</button>
+                </div>
+                <input type="hidden" id="edit-prod-id">
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <label class="block font-bold uppercase text-gray-700 mb-1">Nombre del producto</label>
+                        <input type="text" id="edit-prod-name" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black">
+                    </div>
+                    <div>
+                        <label class="block font-bold uppercase text-gray-700 mb-1">Precio ($ MXN)</label>
+                        <input type="number" id="edit-prod-price" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black font-semibold">
+                    </div>
+                    <div>
+                        <label class="block font-bold uppercase text-gray-700 mb-1">Descripción</label>
+                        <textarea id="edit-prod-desc" rows="2" class="w-full p-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-black"></textarea>
+                    </div>
+                </div>
+                <button onclick="guardarEdicionRapidaProducto()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL DE INICIO DE SESIÓN / REGISTRO -->
     <div id="auth-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
@@ -829,21 +858,17 @@
 
         function obtenerCostoEnvioActual() {
             const subtotal = obtenerSubtotalCarrito();
-            const shippingMethod = document.querySelector('input[name="shipping-method"]');
             
-            // Si el usuario todavía está en el Paso 1 (Carrito), el envío no se suma aún
             if (checkoutStep === 1) {
                 return 0;
             }
 
             const selectedShipping = document.querySelector('input[name="shipping-method"]:checked')?.value;
 
-            // REGLA: Si la compra supera $1,499 el envío es 0 para cualquier método
             if (subtotal > 1499) {
                 return 0;
             }
 
-            // REGLA: Si se aplicó cupón válido y es envío local (Estándar o Express)
             if (cuponAplicadoValido && (selectedShipping === 'Envío Local Estándar' || selectedShipping === 'Envío Local Express')) {
                 return 0;
             }
@@ -962,6 +987,13 @@
                             categoriesWrapper.classList.remove('hidden');
                             contactWrapper.classList.remove('hidden');
                         }
+                        
+                        // Recargar productos para que aparezcan/desaparezcan los botones de admin
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const cat = urlParams.get('categoria');
+                        const prod = urlParams.get('producto');
+                        if (cat) loadCategoryProducts(cat);
+                        if (prod) loadAndShowSingleProduct(prod);
                     });
                 }
             }, 200);
@@ -1141,6 +1173,52 @@
             }
         }
 
+        // --- FUNCIONES DE EDICIÓN RÁPIDA DE PRECIO/DATOS ---
+        function abrirModalEdicionRapida(prodId, currentName, currentPrice, currentDesc) {
+            document.getElementById('edit-prod-id').value = prodId;
+            document.getElementById('edit-prod-name').value = currentName;
+            document.getElementById('edit-prod-price').value = currentPrice;
+            document.getElementById('edit-prod-desc').value = currentDesc || '';
+            document.getElementById('edit-product-modal').classList.remove('hidden');
+        }
+
+        function toggleEditProductModal() {
+            document.getElementById('edit-product-modal').classList.toggle('hidden');
+        }
+
+        async function guardarEdicionRapidaProducto() {
+            const prodId = document.getElementById('edit-prod-id').value;
+            const newName = document.getElementById('edit-prod-name').value.trim();
+            const newPrice = Number(document.getElementById('edit-prod-price').value);
+            const newDesc = document.getElementById('edit-prod-desc').value.trim();
+
+            if (!newName || isNaN(newPrice)) {
+                showToast("Ingresa un nombre y un precio válido.", "error");
+                return;
+            }
+
+            try {
+                const { doc, updateDoc } = window.FB_Methods;
+                await updateDoc(doc(window.FB_Db, "products", prodId), {
+                    name: newName,
+                    price: newPrice,
+                    description: newDesc
+                });
+
+                showToast("¡Producto actualizado con éxito!");
+                toggleEditProductModal();
+                
+                // Recargar vista actual
+                const urlParams = new URLSearchParams(window.location.search);
+                const cat = urlParams.get('categoria');
+                if (cat) loadCategoryProducts(cat);
+                else location.reload();
+            } catch (e) {
+                console.error(e);
+                showToast("Error al actualizar el producto.", "error");
+            }
+        }
+
         function enviarFormSubmit(data) {
             const formData = new FormData();
             formData.append("_subject", "Nuevo Pedido en AMIS Boutique 🛍️");
@@ -1234,9 +1312,21 @@
                 colorsHtml += `</div>`;
             }
 
-            let adminDeleteBtn = '';
-            if (userData && userData.role === 'admin') {
-                adminDeleteBtn = `<button onclick="eliminarProducto('${prodId}')" class="mt-2 text-red-600 text-[11px] underline font-bold">🗑️ Eliminar Producto</button>`;
+            let adminControls = '';
+            if (userData && userData.role === 'json' || (userData && userData.role === 'admin')) {
+                // Se genera un escape seguro para pasar strings en la función
+                const safeName = (p.name || '').replace(/'/g, "\\'");
+                const safeDesc = (p.description || '').replace(/'/g, "\\'");
+                adminControls = `
+                    <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
+                        <button onclick="abrirModalEdicionRapida('${prodId}', '${safeName}', ${p.price}, '${safeDesc}')" class="text-blue-600 text-xs underline font-bold flex items-center gap-1">
+                            ✏️ Editar Precio / Datos
+                        </button>
+                        <button onclick="eliminarProducto('${prodId}')" class="text-red-600 text-xs underline font-bold">
+                            🗑️ Eliminar
+                        </button>
+                    </div>
+                `;
             }
 
             const productDirectUrl = `${window.location.origin}${window.location.pathname}?producto=${prodId}`;
@@ -1263,7 +1353,7 @@
                         <button onclick="addDynamicToCart('${p.name}', ${p.price}, '${prodId}')" class="mt-4 w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition">
                             Añadir al Carrito
                         </button>
-                        ${adminDeleteBtn}
+                        ${adminControls}
                     </div>
                 </div>
             </div>
@@ -1694,7 +1784,6 @@
             const transferAmountDisplay = document.getElementById('transfer-amount-display');
             if(transferAmountDisplay) transferAmountDisplay.textContent = `$${total} MXN`;
 
-            // Actualizar etiquetas de precios en opciones de envío si subtotal > 1499
             const subtotalNum = obtenerSubtotalCarrito();
             const freeBanner = document.getElementById('free-shipping-banner');
             const couponContainer = document.getElementById('local-coupon-container');
@@ -1704,7 +1793,7 @@
 
             if (subtotalNum > 1499) {
                 if (freeBanner) freeBanner.classList.remove('hidden');
-                if (couponContainer) couponContainer.classList.add('hidden'); // Se oculta cupón si pasa de 1499
+                if (couponContainer) couponContainer.classList.add('hidden');
                 if (labelEstandar) labelEstandar.innerHTML = 'Envío Local Estándar (<span class="line-through text-gray-400">$69</span> <span class="text-emerald-600 font-bold">$0 GRATIS</span>)';
                 if (labelExpress) labelExpress.innerHTML = 'Envío Local Express (<span class="line-through text-gray-400">$99</span> <span class="text-emerald-600 font-bold">$0 GRATIS</span>)';
                 if (labelNacional) labelNacional.innerHTML = 'Envío Nacional (<span class="line-through text-gray-400">$149</span> <span class="text-emerald-600 font-bold">$0 GRATIS</span>)';
@@ -1991,7 +2080,6 @@
                 
                 if (shippingMethod.includes('Envío Local')) {
                     if (cpValidator) cpValidator.classList.remove('hidden');
-                    // Solo se muestra el cupón si es envío local Y el subtotal NO supera los $1,499
                     if (couponContainer) {
                         if (subtotal > 1499) {
                             couponContainer.classList.add('hidden');
