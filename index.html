@@ -452,19 +452,24 @@
 
                     <!-- PASO 2: ENVÍO Y DATOS -->
                     <div id="step-shipping" class="py-4 hidden space-y-4">
+                        <!-- AVISO DE ENVÍO GRATIS AUTOMÁTICO (> $1,499) -->
+                        <div id="free-shipping-banner" class="bg-emerald-50 border border-emerald-200 text-emerald-800 p-3 rounded-xl text-xs font-medium hidden">
+                            🎉 ¡Felicidades! Tu compra supera los $1,499 MXN y tienes <strong>ENVÍO GRATIS</strong> automático en cualquier método.
+                        </div>
+
                         <h3 class="tracking-wide uppercase text-xs font-bold text-gray-900">Método de Envío</h3>
                         <div class="space-y-2 text-sm">
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
                                 <input type="radio" name="shipping-method" value="Envío Local Estándar" checked onchange="applyShippingRules()" class="text-black focus:ring-black">
                                 <div>
-                                    <span class="font-medium block">Envío Local Estándar ($69 MXN)</span>
+                                    <span id="label-estandar-txt" class="font-medium block">Envío Local Estándar ($69 MXN)</span>
                                     <span id="desc-envio-estandar" class="text-xs text-emerald-700 font-medium block">Calculando fecha de entrega...</span>
                                 </div>
                             </label>
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
                                 <input type="radio" name="shipping-method" value="Envío Local Express" onchange="applyShippingRules()" class="text-black focus:ring-black">
                                 <div>
-                                    <span class="font-medium block">Envío Local Express ($99 MXN)</span>
+                                    <span id="label-express-txt" class="font-medium block">Envío Local Express ($99 MXN)</span>
                                     <span id="desc-envio-express" class="text-xs text-amber-700 font-medium block">Calculando fecha de entrega...</span>
                                 </div>
                             </label>
@@ -478,17 +483,17 @@
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50">
                                 <input type="radio" name="shipping-method" value="Envío Nacional" onchange="applyShippingRules()" class="text-black focus:ring-black">
                                 <div>
-                                    <span class="font-medium block">Envío Nacional ($149 MXN)</span>
+                                    <span id="label-nacional-txt" class="font-medium block">Envío Nacional ($149 MXN)</span>
                                     <span class="text-xs text-gray-500">Todo México</span>
                                 </div>
                             </label>
                         </div>
 
-                        <!-- CÓDIGO DE PROMOCIÓN / ENVÍO LOCAL GRATIS (SOLO APARECE EN ENVÍO LOCAL) -->
+                        <!-- CÓDIGO DE PROMOCIÓN / ENVÍO LOCAL GRATIS (SE OCULTA SI SUPERA $1,499) -->
                         <div id="local-coupon-container" class="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-1.5 hidden">
                             <label class="block text-xs font-bold uppercase text-gray-700">¿Tienes un cupón de envío local?</label>
                             <div class="flex gap-2">
-                                <input type="text" id="coupon-input" maxlength="7" placeholder="Ej. MICUPON" class="w-full p-2 border border-gray-300 rounded-lg text-xs font-mono uppercase focus:outline-none focus:border-black">
+                                <input type="text" id="coupon-input" maxlength="7" class="w-full p-2 border border-gray-300 rounded-lg text-xs font-mono uppercase focus:outline-none focus:border-black">
                                 <button type="button" onclick="aplicarCuponEnvio()" class="bg-black text-white px-4 py-2 rounded-lg text-xs tracking-wider uppercase hover:bg-gray-800 transition">Aplicar</button>
                             </div>
                             <p id="coupon-status-msg" class="text-[11px] text-gray-500">Ingresa tu código para canjear envío local gratis.</p>
@@ -823,22 +828,29 @@
         }
 
         function obtenerCostoEnvioActual() {
-            const shippingMethod = document.querySelector('input[name="shipping-method"]:checked')?.value;
             const subtotal = obtenerSubtotalCarrito();
+            const shippingMethod = document.querySelector('input[name="shipping-method"]');
+            
+            // Si el usuario todavía está en el Paso 1 (Carrito), el envío no se suma aún
+            if (checkoutStep === 1) {
+                return 0;
+            }
 
-            // REGLA: Si la compra pasa de $1,499 el envío es gratis en cualquiera de los dos (Local o Nacional)
+            const selectedShipping = document.querySelector('input[name="shipping-method"]:checked')?.value;
+
+            // REGLA: Si la compra supera $1,499 el envío es 0 para cualquier método
             if (subtotal > 1499) {
                 return 0;
             }
 
-            // REGLA: Si se aplicó cupón válido y es envío local (Estándar o Express), el envío es gratis
-            if (cuponAplicadoValido && (shippingMethod === 'Envío Local Estándar' || shippingMethod === 'Envío Local Express')) {
+            // REGLA: Si se aplicó cupón válido y es envío local (Estándar o Express)
+            if (cuponAplicadoValido && (selectedShipping === 'Envío Local Estándar' || selectedShipping === 'Envío Local Express')) {
                 return 0;
             }
 
-            if (shippingMethod === 'Envío Local Estándar') return 69;
-            if (shippingMethod === 'Envío Local Express') return 99;
-            if (shippingMethod === 'Envío Nacional') return 149;
+            if (selectedShipping === 'Envío Local Estándar') return 69;
+            if (selectedShipping === 'Envío Local Express') return 99;
+            if (selectedShipping === 'Envío Nacional') return 149;
             return 0;
         }
 
@@ -848,17 +860,16 @@
 
             if (!inputVal || inputVal.length < 5) {
                 statusMsg.className = "text-[11px] text-red-600 font-bold";
-                statusMsg.textContent = "Ingresa un código de cupón válido (5 a 7 dígitos).";
+                statusMsg.textContent = "Ingresa un código de cupón válido.";
                 return;
             }
 
             try {
                 const { doc, getDoc } = window.FB_Methods;
-                // Consultamos Firebase en la colección "settings", documento "coupons"
                 const couponDocRef = doc(window.FB_Db, "settings", "coupons");
                 const couponSnap = await getDoc(couponDocRef);
 
-                let cuponesValidos = ["AMISGDL", "ENVFREE", "LOCALFREE"]; // respaldo por defecto
+                let cuponesValidos = ["AMISGDL", "ENVFREE", "LOCALFREE"];
                 if (couponSnap.exists() && couponSnap.data().codigos) {
                     cuponesValidos = couponSnap.data().codigos.map(c => c.toUpperCase());
                 }
@@ -878,7 +889,6 @@
                 }
             } catch (e) {
                 console.error("Error verificando cupón:", e);
-                // Respaldo local si ocurre algún error de red
                 if (["AMISGDL", "ENVFREE", "LOCALFREE"].includes(inputVal)) {
                     cuponAplicadoValido = true;
                     statusMsg.className = "text-[11px] text-emerald-600 font-bold";
@@ -1684,6 +1694,27 @@
             const transferAmountDisplay = document.getElementById('transfer-amount-display');
             if(transferAmountDisplay) transferAmountDisplay.textContent = `$${total} MXN`;
 
+            // Actualizar etiquetas de precios en opciones de envío si subtotal > 1499
+            const subtotalNum = obtenerSubtotalCarrito();
+            const freeBanner = document.getElementById('free-shipping-banner');
+            const couponContainer = document.getElementById('local-coupon-container');
+            const labelEstandar = document.getElementById('label-estandar-txt');
+            const labelExpress = document.getElementById('label-express-txt');
+            const labelNacional = document.getElementById('label-nacional-txt');
+
+            if (subtotalNum > 1499) {
+                if (freeBanner) freeBanner.classList.remove('hidden');
+                if (couponContainer) couponContainer.classList.add('hidden'); // Se oculta cupón si pasa de 1499
+                if (labelEstandar) labelEstandar.innerHTML = 'Envío Local Estándar (<span class="line-through text-gray-400">$69</span> <span class="text-emerald-600 font-bold">$0 GRATIS</span>)';
+                if (labelExpress) labelExpress.innerHTML = 'Envío Local Express (<span class="line-through text-gray-400">$99</span> <span class="text-emerald-600 font-bold">$0 GRATIS</span>)';
+                if (labelNacional) labelNacional.innerHTML = 'Envío Nacional (<span class="line-through text-gray-400">$149</span> <span class="text-emerald-600 font-bold">$0 GRATIS</span>)';
+            } else {
+                if (freeBanner) freeBanner.classList.add('hidden');
+                if (labelEstandar) labelEstandar.textContent = 'Envío Local Estándar ($69 MXN)';
+                if (labelExpress) labelExpress.textContent = 'Envío Local Express ($99 MXN)';
+                if (labelNacional) labelNacional.textContent = 'Envío Nacional ($149 MXN)';
+            }
+
             if (checkoutStep === 1) {
                 if(modalTitle) modalTitle.textContent = 'Tu Carrito';
                 if(stepCart) stepCart.classList.remove('hidden');
@@ -1947,6 +1978,7 @@
             const addressFieldContainer = document.getElementById('address-field-container');
             const cpValidator = document.getElementById('local-cp-validator');
             const couponContainer = document.getElementById('local-coupon-container');
+            const subtotal = obtenerSubtotalCarrito();
 
             if (shippingMethod === 'Punto de entrega') {
                 meetingPointsContainer.classList.remove('hidden');
@@ -1959,10 +1991,17 @@
                 
                 if (shippingMethod.includes('Envío Local')) {
                     if (cpValidator) cpValidator.classList.remove('hidden');
-                    if (couponContainer) couponContainer.classList.remove('hidden'); // Solo sale en envío local
+                    // Solo se muestra el cupón si es envío local Y el subtotal NO supera los $1,499
+                    if (couponContainer) {
+                        if (subtotal > 1499) {
+                            couponContainer.classList.add('hidden');
+                        } else {
+                            couponContainer.classList.remove('hidden');
+                        }
+                    }
                 } else {
                     if (cpValidator) cpValidator.classList.add('hidden');
-                    if (couponContainer) couponContainer.classList.add('hidden'); // No sale en nacional ni punto de entrega
+                    if (couponContainer) couponContainer.classList.add('hidden');
                 }
             }
             applyPaymentRules();
@@ -1977,8 +2016,8 @@
             if (shippingMethod === 'Envío Nacional') {
                 payCash.style.display = 'none';
                 payTerminal.style.display = 'none';
-                const currentPayment = document.querySelector('input[name="payment-method"]:checked');
-                if(currentPayment && currentPayment.value.includes('contra entrega')) {
+                const currentPayment = document.querySelector('input[name="payment-method"][value="Mercado Pago"]');
+                if(currentPayment && document.querySelector('input[name="payment-method"]:checked')?.value.includes('contra entrega')) {
                     mpRadio.checked = true;
                     handlePaymentChange();
                 }
