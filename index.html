@@ -101,49 +101,99 @@
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans">
 
-    <!-- CONTENEDOR OCULTO PARA IMPRESIÓN DE TICKET 58MM Y PDF -->
+    <!-- CONTENEDOR OCULTO PARA IMPRESIÓN TÉRMICA (58MM) -->
     <div id="ticket-print-container" style="display: none; width: 58mm; padding: 4mm; font-family: 'Courier New', Courier, monospace; font-size: 9px; color: #000; background: #fff; line-height: 1.2;">
-        <!-- LOGO OFICIAL -->
         <div style="text-align: center; margin-bottom: 6px;">
             <img src="https://i.postimg.cc/1XjgNKzh/AMIS-NAVIDAD.png" alt="Logo AMIS" style="width: 32px; height: 32px; object-fit: contain; margin: 0 auto 2px auto; display: block;">
             <h2 style="font-size: 13px; font-weight: bold; margin: 0; letter-spacing: 1px;">AMIS BOUTIQUE</h2>
             <p style="margin: 1px 0; font-size: 8px;">Guadalajara, Jalisco</p>
         </div>
-
         <div style="border-bottom: 1px dashed #000; margin-bottom: 5px;"></div>
-
-        <!-- DATOS DE LA COMPRA -->
-        <div id="ticket-info-content" style="margin-bottom: 5px; font-size: 8.5px;">
-            <!-- Se llena dinámicamente con Folio, Fecha y Cliente -->
-        </div>
-
+        <div id="ticket-info-content" style="margin-bottom: 5px; font-size: 8.5px;"></div>
         <div style="border-bottom: 1px dashed #000; margin-bottom: 5px;"></div>
-
-        <!-- ENCABEZADO DE TABLA DE PRODUCTOS -->
         <div style="display: flex; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 2px; margin-bottom: 4px; font-size: 8px;">
             <span>CANT / DESCRIPCIÓN</span>
             <span>IMP.</span>
         </div>
-
-        <!-- LISTA DE PRODUCTOS -->
-        <div id="ticket-items-content" style="margin-bottom: 5px; font-size: 8.5px;">
-            <!-- Se llena dinámicamente -->
-        </div>
-
+        <div id="ticket-items-content" style="margin-bottom: 5px; font-size: 8.5px;"></div>
         <div style="border-bottom: 1px dashed #000; margin-bottom: 5px;"></div>
-
-        <!-- TOTALES Y PAGO -->
-        <div id="ticket-totals-content" style="text-align: right; margin-bottom: 8px; font-size: 9px;">
-            <!-- Se llena dinámicamente -->
-        </div>
-
+        <div id="ticket-totals-content" style="text-align: right; margin-bottom: 8px; font-size: 9px;"></div>
         <div style="border-bottom: 1px dashed #000; margin-bottom: 6px;"></div>
-
-        <!-- PIE DE TICKET -->
         <div style="text-align: center; font-size: 8px;">
             <p style="margin: 0; font-weight: bold;">¡Gracias por tu compra!</p>
             <p style="margin: 2px 0;">Cambios en sucursal con ticket</p>
             <p style="margin: 0; color: #555;">IG: @amisboutique.official</p>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR OCULTO PARA DESCARGA DE PDF EN FORMATO CARTA (TAMAÑO NORMAL) -->
+    <div id="pdf-carta-container" style="display: none; width: 210mm; min-height: 297mm; padding: 20mm; font-family: 'Helvetica', 'Arial', sans-serif; font-size: 12px; color: #111; background: #fff; box-sizing: border-box;">
+        
+        <!-- ENCABEZADO CON LOGO TIPOGRÁFICO OFICIAL -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #111; padding-bottom: 15px; margin-bottom: 25px;">
+            <div>
+                <div class="amis-logo-container">
+                    <span class="amis-logo-title" style="font-size: 2.2rem;">AMIS</span>
+                    <span class="amis-logo-subtitle" style="font-size: 1.4rem;">collection &amp; boutique</span>
+                </div>
+                <p style="margin: 5px 0 0 0; font-size: 11px; color: #555;">Guadalajara, Jalisco, México</p>
+                <p style="margin: 2px 0 0 0; font-size: 11px; color: #555;">Instagram: @amisboutique.official</p>
+            </div>
+            <div style="text-align: right;">
+                <h2 style="font-size: 20px; font-weight: bold; margin: 0; letter-spacing: 1px; color: #111;">COMPROBANTE DE PEDIDO</h2>
+                <p id="pdf-folio-val" style="margin: 5px 0 0 0; font-size: 13px; font-weight: bold; color: #333;"></p>
+                <p id="pdf-fecha-val" style="margin: 3px 0 0 0; font-size: 11px; color: #666;"></p>
+            </div>
+        </div>
+
+        <!-- DATOS DEL CLIENTE Y ENVÍO -->
+        <div style="display: flex; justify-content: space-between; margin-bottom: 25px; background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+            <div style="width: 48%;">
+                <h3 style="font-size: 12px; font-weight: bold; text-transform: uppercase; margin: 0 0 8px 0; color: #111; border-bottom: 1px solid #d1d5db; padding-bottom: 4px;">Datos del Cliente</h3>
+                <p style="margin: 3px 0;"><strong>Nombre:</strong> <span id="pdf-cliente-nombre"></span></p>
+                <p style="margin: 3px 0;"><strong>Teléfono:</strong> <span id="pdf-cliente-tel"></span></p>
+            </div>
+            <div style="width: 48%;">
+                <h3 style="font-size: 12px; font-weight: bold; text-transform: uppercase; margin: 0 0 8px 0; color: #111; border-bottom: 1px solid #d1d5db; padding-bottom: 4px;">Información de Envío y Pago</h3>
+                <p style="margin: 3px 0;"><strong>Método de Envío:</strong> <span id="pdf-envio-metodo"></span></p>
+                <p style="margin: 3px 0;"><strong>Dirección / Punto:</strong> <span id="pdf-envio-dir"></span></p>
+                <p style="margin: 3px 0;"><strong>Método de Pago:</strong> <span id="pdf-pago-metodo"></span></p>
+            </div>
+        </div>
+
+        <!-- TABLA DE PRODUCTOS -->
+        <div style="margin-bottom: 30px;">
+            <h3 style="font-size: 13px; font-weight: bold; text-transform: uppercase; margin: 0 0 10px 0; color: #111;">Detalle de Productos</h3>
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 11px;">
+                <thead>
+                    <tr style="background-color: #111; color: #fff;">
+                        <th style="padding: 10px; border: 1px solid #111;">Cant.</th>
+                        <th style="padding: 10px; border: 1px solid #111;">Descripción / Artículo</th>
+                        <th style="padding: 10px; border: 1px solid #111;">Color</th>
+                        <th style="padding: 10px; border: 1px solid #111; text-align: right;">Precio Unitario</th>
+                        <th style="padding: 10px; border: 1px solid #111; text-align: right;">Importe</th>
+                    </tr>
+                </thead>
+                <tbody id="pdf-items-tbody">
+                    <!-- Se llena dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TOTALES -->
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 40px;">
+            <div style="width: 250px; background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px; font-weight: bold;">
+                    <span>Total a Pagar:</span>
+                    <span id="pdf-total-val" style="color: #047857;">$0 MXN</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- PIE DE PÁGINA DEL PDF -->
+        <div style="position: absolute; bottom: 20mm; left: 20mm; right: 20mm; text-align: center; border-top: 1px solid #e5e7eb; padding-top: 15px; color: #666; font-size: 10px;">
+            <p style="margin: 0; font-weight: bold; color: #111;">¡Gracias por tu compra en AMIS Boutique!</p>
+            <p style="margin: 3px 0 0 0;">Este documento es un comprobante oficial de tu pedido. Cambios y devoluciones válidos presentando ticket o comprobante en sucursal.</p>
         </div>
     </div>
 
@@ -920,7 +970,6 @@
             container.appendChild(row);
         }
 
-        // --- FUNCIÓN INTELIGENTE PARA DETECTAR COLOR Y NOMBRE APROXIMADO ---
         function obtenerNombreColorAproximado(r, g, b) {
             if (r < 40 && g < 40 && b < 40) return "Negro";
             if (r > 215 && g > 215 && b > 215) return "Blanco";
@@ -964,7 +1013,6 @@
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    
                     canvas.width = 30;
                     canvas.height = 30;
                     ctx.drawImage(img, 0, 0, 30, 30);
@@ -997,7 +1045,6 @@
             reader.readAsDataURL(file);
         }
 
-        // --- CÁLCULO DINÁMICO DE FECHAS DE ENTREGA SEGÚN HORA DE CORTE 11:00 AM ---
         function avanzarDiasHabiles(fechaBase, diasHabiles) {
             let resultado = new Date(fechaBase);
             let agregados = 0;
@@ -1086,20 +1133,11 @@
 
         function obtenerCostoEnvioActual() {
             const subtotal = obtenerSubtotalCarrito();
-            
-            if (checkoutStep === 1) {
-                return 0;
-            }
-
+            if (checkoutStep === 1) return 0;
             const selectedShipping = document.querySelector('input[name="shipping-method"]:checked')?.value;
 
-            if (subtotal > 1499) {
-                return 0;
-            }
-
-            if (cuponAplicadoValido && (selectedShipping === 'Envío Local Estándar' || selectedShipping === 'Envío Local Express')) {
-                return 0;
-            }
+            if (subtotal > 1499) return 0;
+            if (cuponAplicadoValido && (selectedShipping === 'Envío Local Estándar' || selectedShipping === 'Envío Local Express')) return 0;
 
             if (selectedShipping === 'Envío Local Estándar') return 69;
             if (selectedShipping === 'Envío Local Express') return 99;
@@ -1141,7 +1179,6 @@
                     updateCartUI();
                 }
             } catch (e) {
-                console.error("Error verificando cupón:", e);
                 if (["AMISGDL", "ENVFREE", "LOCALFREE"].includes(inputVal)) {
                     cuponAplicadoValido = true;
                     statusMsg.className = "text-[11px] text-emerald-600 font-bold";
@@ -1182,9 +1219,7 @@
                                 if (!userSnap.exists() && user.email) {
                                     const q = query(collection(window.FB_Db, "users"), where("email", "==", user.email));
                                     const qSnap = await getDocs(q);
-                                    if (!qSnap.empty) {
-                                        userSnap = qSnap.docs[0];
-                                    }
+                                    if (!qSnap.empty) userSnap = qSnap.docs[0];
                                 }
 
                                 if (userSnap && userSnap.exists()) {
@@ -1205,7 +1240,7 @@
                                     }
                                 }
                             } catch (e) {
-                                console.error("Error cargando perfil:", e);
+                                console.error(e);
                             }
                         } else {
                             userData = null;
@@ -1234,7 +1269,6 @@
 
             if ((status === 'approved' || status === 'pending' || status === 'in_process') && paymentId) {
                 const pendingData = JSON.parse(localStorage.getItem('amis_pending_order'));
-                
                 if (!pendingData) {
                     window.history.replaceState({}, document.title, window.location.pathname);
                     return;
@@ -1283,7 +1317,7 @@
                     cart = [];
                     updateCartUI();
                 } catch (err) {
-                    console.error("Error guardando orden de MP:", err);
+                    console.error(err);
                 }
                 window.history.replaceState({}, document.title, window.location.pathname);
             } else {
@@ -1299,11 +1333,8 @@
             const productId = urlParams.get('producto');
             const categoryKey = urlParams.get('categoria');
 
-            if (productId) {
-                await loadAndShowSingleProduct(productId);
-            } else if (categoryKey) {
-                await loadCategoryProducts(categoryKey);
-            }
+            if (productId) await loadAndShowSingleProduct(productId);
+            else if (categoryKey) await loadCategoryProducts(categoryKey);
         }
 
         async function loadAndShowSingleProduct(prodId) {
@@ -1327,12 +1358,10 @@
                     gridEl.innerHTML = '<p class="text-gray-500 italic py-8 text-center col-span-full">El producto no existe o fue eliminado.</p>';
                 }
             } catch (e) {
-                console.error(e);
                 gridEl.innerHTML = '<p class="text-red-500 text-xs text-center py-8 col-span-full">Error al cargar el producto.</p>';
             }
         }
 
-        // --- SUBIR PRODUCTO CON COMPRESIÓN AUTOMÁTICA DE 4 IMÁGENES Y LECTURA DE COLOR/NOMBRE ---
         async function guardarNuevoProducto() {
             const name = document.getElementById('new-prod-name').value.trim();
             const description = document.getElementById('new-prod-desc').value.trim();
@@ -1366,7 +1395,6 @@
 
                     if (fileInput.files.length > 0) {
                         const file = fileInput.files[0];
-                        
                         const compressedBase64 = await new Promise((resolve) => {
                             const reader = new FileReader();
                             reader.onload = (e) => {
@@ -1379,15 +1407,9 @@
                                     let height = img.height;
 
                                     if (width > height) {
-                                        if (width > MAX_WIDTH) {
-                                            height *= MAX_WIDTH / width;
-                                            width = MAX_WIDTH;
-                                        }
+                                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
                                     } else {
-                                        if (height > MAX_HEIGHT) {
-                                            width *= MAX_HEIGHT / height;
-                                            height = MAX_HEIGHT;
-                                        }
+                                        if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
                                     }
 
                                     canvas.width = width;
@@ -1408,24 +1430,14 @@
 
                 if (images.length === 0) {
                     showToast("Selecciona al menos una imagen para el producto.", "error");
-                    if (btnGuardar) {
-                        btnGuardar.disabled = false;
-                        btnGuardar.textContent = "Subir y Guardar Producto";
-                    }
+                    if (btnGuardar) { btnGuardar.disabled = false; btnGuardar.textContent = "Subir y Guardar Producto"; }
                     return;
                 }
 
                 if (btnGuardar) btnGuardar.textContent = "Guardando en base de datos...";
 
                 await addDoc(collection(window.FB_Db, "products"), {
-                    name,
-                    description,
-                    cost,
-                    price,
-                    category,
-                    colors,
-                    images,
-                    createdAt: new Date()
+                    name, description, cost, price, category, colors, images, createdAt: new Date()
                 });
 
                 showToast(`¡Producto guardado! Precio público: $${price} MXN`);
@@ -1436,17 +1448,12 @@
                 toggleMobileMenu();
                 loadCategoryProducts(category);
             } catch (e) {
-                console.error("Detalle del error:", e);
-                showToast("Error: Las imágenes juntas pesan demasiado o falló la conexión.", "error");
+                showToast("Error al subir el producto.", "error");
             } finally {
-                if (btnGuardar) {
-                    btnGuardar.disabled = false;
-                    btnGuardar.textContent = "Subir y Guardar Producto";
-                }
+                if (btnGuardar) { btnGuardar.disabled = false; btnGuardar.textContent = "Subir y Guardar Producto"; }
             }
         }
 
-        // --- FUNCIONES DE EDICIÓN RÁPIDA DE PRECIO/DATOS ---
         function abrirModalEdicionSegura(prodId, encodedName, currentPrice, encodedDesc, currentCost) {
             const currentName = decodeURIComponent(encodedName);
             const currentDesc = decodeURIComponent(encodedDesc);
@@ -1477,17 +1484,10 @@
 
             try {
                 const { doc, updateDoc } = window.FB_Methods;
-                const updatePayload = {
-                    name: newName,
-                    price: newPrice,
-                    description: newDesc
-                };
-                if (newCostVal !== '') {
-                    updatePayload.cost = Number(newCostVal);
-                }
+                const updatePayload = { name: newName, price: newPrice, description: newDesc };
+                if (newCostVal !== '') updatePayload.cost = Number(newCostVal);
 
                 await updateDoc(doc(window.FB_Db, "products", prodId), updatePayload);
-
                 showToast("¡Producto actualizado con éxito!");
                 toggleEditProductModal();
                 
@@ -1496,7 +1496,6 @@
                 if (cat) loadCategoryProducts(cat);
                 else location.reload();
             } catch (e) {
-                console.error(e);
                 showToast("Error al actualizar el producto.", "error");
             }
         }
@@ -1521,7 +1520,7 @@
             fetch("https://formsubmit.co/ajax/alexisorozcoortiz@gmail.com", {
                 method: "POST",
                 body: formData
-            }).catch(error => console.error("Error al enviar correo:", error));
+            }).catch(error => console.error(error));
         }
 
         async function loadCategoryProducts(categoryKey, event) {
@@ -1558,9 +1557,7 @@
                 let matchingProducts = [];
                 querySnapshot.forEach((docSnap) => {
                     const p = docSnap.data();
-                    if(p.category === categoryKey) {
-                        matchingProducts.push({ id: docSnap.id, ...p });
-                    }
+                    if(p.category === categoryKey) matchingProducts.push({ id: docSnap.id, ...p });
                 });
 
                 if (matchingProducts.length === 0) {
@@ -1569,13 +1566,9 @@
                 }
 
                 let html = '';
-                matchingProducts.forEach((p) => {
-                    html += renderProductCardHTML(p);
-                });
-
+                matchingProducts.forEach((p) => { html += renderProductCardHTML(p); });
                 gridEl.innerHTML = html;
             } catch (e) {
-                console.error(e);
                 gridEl.innerHTML = '<p class="text-red-500 text-xs text-center py-8 col-span-full">Error al cargar productos.</p>';
             }
         }
@@ -1701,9 +1694,7 @@
                 if (!userSnap.exists() && currentUser && currentUser.email) {
                     const qUser = query(collection(window.FB_Db, "users"), where("email", "==", currentUser.email));
                     const qSnap = await getDocs(qUser);
-                    if (!qSnap.empty) {
-                        userSnap = qSnap.docs[0];
-                    }
+                    if (!qSnap.empty) userSnap = qSnap.docs[0];
                 }
 
                 let names = '', surnames = '', phone = '', email = currentUser ? currentUser.email : '', hasData = false, addresses = [];
@@ -1718,11 +1709,9 @@
                 }
 
                 globalUserProfile = {
-                    names,
-                    surnames,
+                    names, surnames,
                     fullName: `${names} ${surnames}`.trim(),
-                    phone,
-                    email,
+                    phone, email,
                     address: addresses.length > 0 ? addresses[0] : ''
                 };
 
@@ -1815,7 +1804,7 @@
             document.getElementById('admin-orders-modal').classList.toggle('hidden');
         }
 
-        // --- FUNCIONES PARA PREPARAR Y GENERAR TICKET Y PDF ---
+        // --- PREPARAR DATOS PARA TICKET TÉRMICO (58MM) ---
         function prepararDatosTicket(d) {
             let fechaFormateada = new Date().toLocaleString();
             if (d.createdAt && d.createdAt.seconds) {
@@ -1848,42 +1837,73 @@
                 });
             }
             document.getElementById('ticket-items-content').innerHTML = itemsHtml;
-
             document.getElementById('ticket-totals-content').innerHTML = `
                 <div style="font-size: 8.5px; margin-bottom: 2px;">Método: ${d.payment}</div>
                 <div style="font-size: 11px; font-weight: bold;">TOTAL: ${d.total}</div>
             `;
         }
 
+        // --- PREPARAR DATOS PARA PDF CARTA (TAMAÑO NORMAL) ---
+        function prepararDatosPDFCarta(d) {
+            let fechaFormateada = new Date().toLocaleString();
+            if (d.createdAt && d.createdAt.seconds) {
+                fechaFormateada = new Date(d.createdAt.seconds * 1000).toLocaleString();
+            }
+
+            document.getElementById('pdf-folio-val').textContent = `Folio: ${d.orderId}`;
+            document.getElementById('pdf-fecha-val').textContent = `Fecha: ${fechaFormateada}`;
+            document.getElementById('pdf-cliente-nombre').textContent = d.clientName;
+            document.getElementById('pdf-cliente-tel').textContent = d.clientPhone;
+            document.getElementById('pdf-envio-metodo').textContent = d.shipping;
+            document.getElementById('pdf-envio-dir').textContent = d.clientAddress;
+            document.getElementById('pdf-pago-metodo').textContent = d.payment;
+            document.getElementById('pdf-total-val').textContent = d.total;
+
+            let tbodyHtml = '';
+            if (d.items) {
+                d.items.forEach(i => {
+                    let importeLinea = i.price * i.quantity;
+                    tbodyHtml += `
+                        <tr style="border-bottom: 1px solid #e5e7eb;">
+                            <td style="padding: 10px; border: 1px solid #e5e7eb; text-align: center;">${i.quantity}</td>
+                            <td style="padding: 10px; border: 1px solid #e5e7eb;">${i.name}</td>
+                            <td style="padding: 10px; border: 1px solid #e5e7eb;">${i.color}</td>
+                            <td style="padding: 10px; border: 1px solid #e5e7eb; text-align: right;">$${i.price} MXN</td>
+                            <td style="padding: 10px; border: 1px solid #e5e7eb; text-align: right; font-weight: bold;">$${importeLinea} MXN</td>
+                        </tr>
+                    `;
+                });
+            }
+            document.getElementById('pdf-items-tbody').innerHTML = tbodyHtml;
+        }
+
         function imprimirTicket58mm(orderJson) {
             const d = JSON.parse(decodeURIComponent(orderJson));
             prepararDatosTicket(d);
-            setTimeout(() => {
-                window.print();
-            }, 200);
+            setTimeout(() => { window.print(); }, 200);
         }
 
-        function descargarPDF(orderJson) {
+        function descargarPDFCarta(orderJson) {
             const d = JSON.parse(decodeURIComponent(orderJson));
-            prepararDatosTicket(d);
+            prepararDatosPDFCarta(d);
 
-            const elementoTicket = document.getElementById('ticket-print-container');
-            elementoTicket.style.display = 'block';
+            const elementoPDF = document.getElementById('pdf-carta-container');
+            elementoPDF.style.display = 'block';
 
             const opt = {
-                margin:       2,
-                filename:     `Ticket_${d.orderId}.pdf`,
+                margin:       0,
+                filename:     `Comprobante_${d.orderId}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: [58, 160], orientation: 'portrait' }
+                jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }
             };
 
-            html2pdf().from(elementoTicket).set(opt).save().then(() => {
-                elementoTicket.style.display = 'none';
-                showToast("¡PDF generado con éxito!");
+            html2pdf().from(elementoPDF).set(opt).save().then(() => {
+                elementoPDF.style.display = 'none';
+                showToast("¡PDF tamaño carta generado con éxito!");
             }).catch(err => {
-                console.error("Error generando PDF:", err);
-                elementoTicket.style.display = 'none';
+                console.error(err);
+                elementoPDF.style.display = 'none';
                 showToast("Error al generar PDF", "error");
             });
         }
@@ -1922,13 +1942,13 @@
                         <p><strong>Lugar:</strong> ${d.clientAddress}</p>
                         <div><strong>Productos:</strong><ul class="list-disc pl-4 text-gray-600 mt-1">${itemsStr}</ul></div>
                         
-                        <!-- BOTONES EXCLUSIVOS DE IMPRESIÓN Y PDF PARA EL ADMIN -->
+                        <!-- BOTONES EXCLUSIVOS DE IMPRESIÓN Y PDF TAMAÑO CARTA -->
                         <div class="flex gap-2 pt-2 border-t">
                             <button onclick="imprimirTicket58mm('${orderEncoded}')" class="flex-1 bg-gray-900 text-white py-1.5 rounded-lg text-[11px] font-bold hover:bg-black transition text-center">
                                 🖨️ Imprimir Ticket (58mm)
                             </button>
-                            <button onclick="descargarPDF('${orderEncoded}')" class="flex-1 bg-emerald-700 text-white py-1.5 rounded-lg text-[11px] font-bold hover:bg-emerald-800 transition text-center">
-                                📄 Descargar PDF
+                            <button onclick="descargarPDFCarta('${orderEncoded}')" class="flex-1 bg-emerald-700 text-white py-1.5 rounded-lg text-[11px] font-bold hover:bg-emerald-800 transition text-center">
+                                📄 Descargar PDF (Carta)
                             </button>
                         </div>
 
@@ -1973,7 +1993,7 @@
                     document.getElementById('dir-ciudad').value = data.response.municipio || '';
                     document.getElementById('dir-estado').value = data.response.estado || '';
                 }
-            } catch (error) { console.error(error); }
+            } catch (error) {}
         }
 
         async function saveStructuredAddress() {
@@ -2099,9 +2119,7 @@
             document.getElementById('home-view').classList.remove('hidden');
             document.getElementById('dynamic-category-view').classList.add('hidden');
             const mobileMenu = document.getElementById('mobile-menu');
-            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
-                toggleMobileMenu();
-            }
+            if (mobileMenu && !mobileMenu.classList.contains('hidden')) toggleMobileMenu();
         }
 
         function toggleCartModal() {
@@ -2229,15 +2247,9 @@
                 const dbSurnames = userData?.surnames || userData?.apellido || userData?.apellidos || '';
                 const nombreCompletoFirestore = `${dbNames} ${dbSurnames}`.trim();
 
-                if (nameInput && !nameInput.value) {
-                    nameInput.value = globalUserProfile.fullName || nombreCompletoFirestore || '';
-                }
-                if (phoneInput && !phoneInput.value) {
-                    phoneInput.value = globalUserProfile.phone || userData?.phone || userData?.telefono || userData?.celular || '';
-                }
-                if (emailInput && !emailInput.value) {
-                    emailInput.value = currentUser ? currentUser.email : (globalUserProfile.email || userData?.email || '');
-                }
+                if (nameInput && !nameInput.value) nameInput.value = globalUserProfile.fullName || nombreCompletoFirestore || '';
+                if (phoneInput && !phoneInput.value) phoneInput.value = globalUserProfile.phone || userData?.phone || userData?.telefono || userData?.celular || '';
+                if (emailInput && !emailInput.value) emailInput.value = currentUser ? currentUser.email : (globalUserProfile.email || userData?.email || '');
                 if (addressInput && !addressInput.value) {
                     const savedAddr = globalUserProfile.address || (userData?.addresses && userData.addresses[0]) || '';
                     addressInput.value = savedAddr;
@@ -2286,9 +2298,7 @@
                         validarCPLocalCheckout(cpVal);
                         return;
                     }
-                    if (!clientAddress.includes(cpVal)) {
-                        clientAddress = `${clientAddress} (C.P. ${cpVal})`;
-                    }
+                    if (!clientAddress.includes(cpVal)) clientAddress = `${clientAddress} (C.P. ${cpVal})`;
                 }
 
                 if(!clientName || !clientPhone || !clientAddress) {
@@ -2330,9 +2340,7 @@
                     const orderData = {
                         orderId,
                         userId: currentUser ? currentUser.uid : "guest",
-                        clientName,
-                        clientPhone,
-                        clientAddress,
+                        clientName, clientPhone, clientAddress,
                         shipping: shippingMethod,
                         payment: paymentMethod,
                         items: [...cart],
@@ -2340,11 +2348,7 @@
                         createdAt: Timestamp.now()
                     };
 
-                    localStorage.setItem('amis_pending_order', JSON.stringify({
-                        ...orderData,
-                        numericTotal: total
-                    }));
-                    
+                    localStorage.setItem('amis_pending_order', JSON.stringify({ ...orderData, numericTotal: total }));
                     showToast("Conectando con Mercado Pago...", "success");
 
                     const mpItems = cart.map(i => ({
@@ -2353,34 +2357,21 @@
                         unit_price: Number(i.price)
                     }));
 
-                    if (costoEnvio > 0) {
-                        mpItems.push({
-                            title: shippingMethod,
-                            quantity: 1,
-                            unit_price: costoEnvio
-                        });
-                    }
+                    if (costoEnvio > 0) mpItems.push({ title: shippingMethod, quantity: 1, unit_price: costoEnvio });
 
                     try {
                         const response = await fetch("/api/crear-preferencia", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                items: mpItems,
-                                backUrl: window.location.origin + window.location.pathname,
-                                orderId: orderId
-                            })
+                            body: JSON.stringify({ items: mpItems, backUrl: window.location.origin + window.location.pathname, orderId: orderId })
                         });
 
                         const mpData = await response.json();
                         if (mpData.init_point) {
                             window.location.href = mpData.init_point;
                             return;
-                        } else {
-                            throw new Error("No se generó el punto de inicio de MP");
-                        }
+                        } else throw new Error();
                     } catch (mpError) {
-                        console.error("Error conectando con MP:", mpError);
                         showToast("Error: No se pudo conectar con el servidor de pagos.", "error");
                         localStorage.removeItem('amis_pending_order');
                         return;
@@ -2389,20 +2380,14 @@
 
                 try {
                     let estatusInicial = "En proceso";
-                    if (paymentMethod === "Transferencia Bancaria") {
-                        estatusInicial = "Falta de pago vía Transferencia";
-                    } else if (paymentMethod.includes("contra entrega")) {
-                        estatusInicial = "Pago contra entrega (Pendiente)";
-                    } else {
-                        estatusInicial = "Falta de pago vía OXXO / Externo";
-                    }
+                    if (paymentMethod === "Transferencia Bancaria") estatusInicial = "Falta de pago vía Transferencia";
+                    else if (paymentMethod.includes("contra entrega")) estatusInicial = "Pago contra entrega (Pendiente)";
+                    else estatusInicial = "Falta de pago vía OXXO / Externo";
 
                     const orderData = {
                         orderId,
                         userId: currentUser ? currentUser.uid : "guest",
-                        clientName,
-                        clientPhone,
-                        clientAddress,
+                        clientName, clientPhone, clientAddress,
                         shipping: shippingMethod,
                         payment: paymentMethod,
                         items: [...cart],
@@ -2420,7 +2405,6 @@
                     toggleCartModal();
                     document.getElementById('order-success-modal').classList.remove('hidden');
                 } catch (error) {
-                    console.error("Error guardando orden en Firebase:", error);
                     showToast("Hubo un error al registrar tu pedido.", "error");
                 }
             }
@@ -2449,15 +2433,11 @@
             } else {
                 meetingPointsContainer.classList.add('hidden');
                 addressFieldContainer.classList.remove('hidden');
-                
                 if (shippingMethod.includes('Envío Local')) {
                     if (cpValidator) cpValidator.classList.remove('hidden');
                     if (couponContainer) {
-                        if (subtotal > 1499) {
-                            couponContainer.classList.add('hidden');
-                        } else {
-                            couponContainer.classList.remove('hidden');
-                        }
+                        if (subtotal > 1499) couponContainer.classList.add('hidden');
+                        else couponContainer.classList.remove('hidden');
                     }
                 } else {
                     if (cpValidator) cpValidator.classList.add('hidden');
@@ -2476,8 +2456,7 @@
             if (shippingMethod === 'Envío Nacional') {
                 payCash.style.display = 'none';
                 payTerminal.style.display = 'none';
-                const currentPayment = document.querySelector('input[name="payment-method"][value="Mercado Pago"]');
-                if(currentPayment && document.querySelector('input[name="payment-method"]:checked')?.value.includes('contra entrega')) {
+                if(document.querySelector('input[name="payment-method"]:checked')?.value.includes('contra entrega')) {
                     mpRadio.checked = true;
                     handlePaymentChange();
                 }
