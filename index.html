@@ -835,25 +835,72 @@
         }
 
         function addColorRow() {
-            const container = document.getElementById('color-rows-container');
-            const row = document.createElement('div');
-            row.className = 'p-2 border rounded bg-gray-50 color-row space-y-2 mt-2';
-            row.innerHTML = `
-                <div class="flex items-center gap-2">
-                    <label class="text-[10px] font-bold">Color:</label>
-                    <input type="color" value="#000000" oninput="syncColorHex(this)" class="w-8 h-7 rounded border cursor-pointer color-picker-input">
-                    <input type="text" placeholder="#HEX" class="w-20 p-1 border rounded text-[10px] font-mono color-hex-input" value="#000000">
-                    <input type="text" placeholder="Nombre" class="flex-1 p-1 border rounded text-[10px] color-name-input">
-                    <button onclick="this.closest('.color-row').remove()" class="text-red-500 font-bold px-1 text-xs">✕</button>
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-gray-600 block mb-0.5">Seleccionar Foto:</label>
-                    <input type="file" accept="image/*" class="w-full text-[10px] file-input-prod">
-                </div>
-            `;
-            container.appendChild(row);
-        }
+    const container = document.getElementById('color-rows-container');
+    const row = document.createElement('div');
+    row.className = 'p-2 border rounded bg-gray-50 color-row space-y-2 mt-2';
+    row.innerHTML = `
+        <div class="flex items-center gap-2">
+            <label class="text-[10px] font-bold">Color:</label>
+            <input type="color" value="#000000" oninput="syncColorHex(this)" class="w-8 h-7 rounded border cursor-pointer color-picker-input">
+            <input type="text" placeholder="#HEX" class="w-20 p-1 border rounded text-[10px] font-mono color-hex-input" value="#000000">
+            <input type="text" placeholder="Nombre" class="flex-1 p-1 border rounded text-[10px] color-name-input">
+            <button onclick="this.closest('.color-row').remove()" class="text-red-500 font-bold px-1 text-xs">✕</button>
+        </div>
+        <div>
+            <label class="text-[10px] font-bold text-gray-600 block mb-0.5">Seleccionar Foto:</label>
+            <input type="file" accept="image/*" onchange="detectarColorPredominante(this)" class="w-full text-[10px] file-input-prod">
+        </div>
+    `;
+    container.appendChild(row);
+}
 
+// Función para detectar el color mayoritario de la imagen subida
+function detectarColorPredominante(inputElement) {
+    const file = inputElement.files[0];
+    if (!file) return;
+
+    const row = inputElement.closest('.color-row');
+    const colorPicker = row.querySelector('.color-picker-input');
+    const hexInput = row.querySelector('.color-hex-input');
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Redimensionamos a una minúscula escala (ej. 30x30) para procesar los píxeles rápido
+            canvas.width = 30;
+            canvas.height = 30;
+            ctx.drawImage(img, 0, 0, 30, 30);
+
+            const imageData = ctx.getImageData(0, 0, 30, 30).data;
+            let r = 0, g = 0, b = 0, count = 0;
+
+            // Promediamos los colores de los píxeles (muestreo rápido para color predominante)
+            for (let i = 0; i < imageData.length; i += 16) {
+                r += imageData[i];
+                g += imageData[i+1];
+                b += imageData[i+2];
+                count++;
+            }
+
+            r = Math.floor(r / count);
+            g = Math.floor(g / count);
+            b = Math.floor(b / count);
+
+            // Convertir RGB a Hexadecimal
+            const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+
+            // Asignar automáticamente al input de color y al campo HEX
+            colorPicker.value = hex;
+            hexInput.value = hex;
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
         // --- CÁLCULO DINÁMICO DE FECHAS DE ENTREGA SEGÚN HORA DE CORTE 11:00 AM ---
         function avanzarDiasHabiles(fechaBase, diasHabiles) {
             let resultado = new Date(fechaBase);
