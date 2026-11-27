@@ -1190,72 +1190,92 @@
         }
 
         // --- SUBIR FOTO A FIREBASE STORAGE Y GUARDAR PRODUCTO CON MARGEN +38% (TERMINACIÓN 0, 5, 9) ---
-        async function guardarNuevoProducto() {
-            const name = document.getElementById('new-prod-name').value.trim();
-            const description = document.getElementById('new-prod-desc').value.trim();
-            const costVal = document.getElementById('new-prod-cost').value.trim();
-            const category = document.getElementById('new-prod-cat').value;
+       async function guardarNuevoProducto() {
+    const name = document.getElementById('new-prod-name').value.trim();
+    const description = document.getElementById('new-prod-desc').value.trim();
+    const costVal = document.getElementById('new-prod-cost').value.trim();
+    const category = document.getElementById('new-prod-cat').value;
+    const btnGuardar = document.querySelector('#admin-add-sub button[onclick="guardarNuevoProducto()"]');
 
-            if (!name || !costVal) {
-                showToast("Por favor ingresa al menos nombre y costo.", "error");
-                return;
-            }
+    if (!name || !costVal) {
+        showToast("Por favor ingresa al menos nombre y costo.", "error");
+        return;
+    }
 
-            const cost = Number(costVal);
-            const price = calcularPrecioBoutique(cost);
-            const colorRows = document.querySelectorAll('.color-row');
-            let colors = [];
-            let images = [];
+    const cost = Number(costVal);
+    const price = calcularPrecioBoutique(cost);
+    const colorRows = document.querySelectorAll('.color-row');
+    let colors = [];
+    let images = [];
 
-            showToast("Subiendo imágenes a Firebase Storage...", "success");
+    if (btnGuardar) {
+        btnGuardar.disabled = true;
+        btnGuardar.textContent = "Procesando imágenes...";
+    }
 
-            try {
-                const { ref, uploadBytes, getDownloadURL, collection, addDoc } = window.FB_Methods;
+    try {
+        const { collection, addDoc } = window.FB_Methods;
 
-                for (let row of colorRows) {
-                    const hex = row.querySelector('.color-hex-input').value.trim() || '#000000';
-                    const cname = row.querySelector('.color-name-input').value.trim() || 'Único';
-                    const fileInput = row.querySelector('.file-input-prod');
+        for (let row of colorRows) {
+            const hex = row.querySelector('.color-hex-input').value.trim() || '#000000';
+            const cname = row.querySelector('.color-name-input').value.trim() || 'Único';
+            const fileInput = row.querySelector('.file-input-prod');
 
-                    if (fileInput.files.length > 0) {
-                        const file = fileInput.files[0];
-                        const storageRef = ref(window.FB_Storage, `products/${Date.now()}_${file.name}`);
-                        const snapshot = await uploadBytes(storageRef, file);
-                        const downloadURL = await getDownloadURL(snapshot.ref);
-
-                        colors.push({ hex, name: cname, image: downloadURL });
-                        images.push(downloadURL);
-                    }
-                }
-
-                if (images.length === 0) {
-                    showToast("Selecciona al menos una imagen para el producto.", "error");
-                    return;
-                }
-
-                await addDoc(collection(window.FB_Db, "products"), {
-                    name,
-                    description,
-                    cost,
-                    price,
-                    category,
-                    colors,
-                    images,
-                    createdAt: new Date()
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                
+                // Convertir archivo local a Base64 para evitar usar Firebase Storage de pago
+                const base64Url = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = error => reject(error);
+                    reader.readAsDataURL(file);
                 });
 
-                showToast(`¡Producto guardado! Precio público: $${price} MXN`);
-                document.getElementById('new-prod-name').value = '';
-                document.getElementById('new-prod-desc').value = '';
-                document.getElementById('new-prod-cost').value = '';
-                document.getElementById('new-prod-final-price-preview').textContent = '$0 MXN';
-                toggleMobileMenu();
-                loadCategoryProducts(category);
-            } catch (e) {
-                console.error(e);
-                showToast("Error al guardar el producto.", "error");
+                colors.push({ hex, name: cname, image: base64Url });
+                images.push(base64Url);
             }
         }
+
+        if (images.length === 0) {
+            showToast("Selecciona al menos una imagen para el producto.", "error");
+            if (btnGuardar) {
+                btnGuardar.disabled = false;
+                btnGuardar.textContent = "Subir y Guardar Producto";
+            }
+            return;
+        }
+
+        if (btnGuardar) btnGuardar.textContent = "Guardando en base de datos...";
+
+        await addDoc(collection(window.FB_Db, "products"), {
+            name,
+            description,
+            cost,
+            price,
+            category,
+            colors,
+            images,
+            createdAt: new Date()
+        });
+
+        showToast(`¡Producto guardado! Precio público: $${price} MXN`);
+        document.getElementById('new-prod-name').value = '';
+        document.getElementById('new-prod-desc').value = '';
+        document.getElementById('new-prod-cost').value = '';
+        document.getElementById('new-prod-final-price-preview').textContent = '$0 MXN';
+        toggleMobileMenu();
+        loadCategoryProducts(category);
+    } catch (e) {
+        console.error("Detalle del error:", e);
+        showToast("Error al guardar en base de datos.", "error");
+    } finally {
+        if (btnGuardar) {
+            btnGuardar.disabled = false;
+            btnGuardar.textContent = "Subir y Guardar Producto";
+        }
+    }
+}
 
         // --- FUNCIONES DE EDICIÓN RÁPIDA DE PRECIO/DATOS ---
         function abrirModalEdicionRapida(prodId, currentName, currentPrice, currentDesc, currentCost = '') {
