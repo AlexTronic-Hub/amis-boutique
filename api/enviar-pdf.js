@@ -9,11 +9,22 @@ const transporter = nodemailer.createTransport({
         pass: process.env.SMTP_PASS
     },
     tls: {
-        rejectUnauthorized: false // Ignora la discrepancia del certificado del servidor SMTP
+        rejectUnauthorized: false
     }
 });
 
 module.exports = async (req, res) => {
+    // Configurar cabeceras CORS por seguridad
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Método no permitido' });
     }
@@ -46,10 +57,12 @@ module.exports = async (req, res) => {
         };
 
         await transporter.sendMail(mailOptions);
-        return res.status(200).json({ success: true, message: 'Correo enviado correctamente' });
+        
+        // Asegurar respuesta estricta en JSON
+        return res.status(200).setHeader('Content-Type', 'application/json').json({ success: true, message: 'Correo enviado correctamente' });
 
     } catch (error) {
-        console.error('Error al enviar correo:', error);
-        return res.status(500).json({ error: error.message });
+        console.error('Error detallado al enviar correo:', error);
+        return res.status(500).setHeader('Content-Type', 'application/json').json({ error: error.message });
     }
 };
