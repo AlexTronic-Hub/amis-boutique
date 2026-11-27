@@ -101,30 +101,33 @@
 <body class="bg-gray-50 text-gray-900 font-sans">
 
     <!-- CONTENEDOR OCULTO PARA IMPRESIÓN TÉRMICA (58MM) -->
-    <div id="ticket-print-container" style="display: none; width: 58mm; padding: 4mm; font-family: 'Courier New', Courier, monospace; font-size: 9px; color: #000; background: #fff; line-height: 1.2;">
-        <div style="text-align: center; margin-bottom: 6px;">
-            <img src="https://i.postimg.cc/1XjgNKzh/AMIS-NAVIDAD.png" alt="Logo AMIS" style="width: 32px; height: 32px; object-fit: contain; margin: 0 auto 2px auto; display: block;">
-            <h2 style="font-size: 13px; font-weight: bold; margin: 0; letter-spacing: 1px;">AMIS BOUTIQUE</h2>
-            <p style="margin: 1px 0; font-size: 8px;">Guadalajara, Jalisco</p>
+<div id="ticket-print-container" style="display: none; width: 58mm; padding: 4mm; font-family: 'Courier New', Courier, monospace; font-size: 9px; color: #000; background: #fff; line-height: 1.2;">
+    <div style="text-align: center; margin-bottom: 6px;">
+        <!-- Usamos el contenedor de texto con las fuentes tipográficas idénticas al PDF -->
+        <div class="amis-logo-container" style="display: inline-flex; flex-direction: column; align-items: center; margin-bottom: 2px;">
+            <span style="font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; letter-spacing: 0.12em; color: #000; line-height: 1; margin: 0;">AMIS</span>
+            <span style="font-family: 'Pinyon Script', cursive; font-size: 0.95rem; color: #1a1a1a; margin-top: -2px; margin-left: 0.8rem; letter-spacing: 0.02em;">collection &amp; boutique</span>
         </div>
-        <div style="border-bottom: 1px dashed #000; margin-bottom: 5px;"></div>
-        <div id="ticket-info-content" style="margin-bottom: 5px; font-size: 8.5px;"></div>
-        <div style="border-bottom: 1px dashed #000; margin-bottom: 5px;"></div>
-        <div style="display: flex; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 2px; margin-bottom: 4px; font-size: 8px;">
-            <span>CANT / DESCRIPCIÓN</span>
-            <span>IMP.</span>
-        </div>
-        <div id="ticket-items-content" style="margin-bottom: 5px; font-size: 8.5px;"></div>
-        <div style="border-bottom: 1px dashed #000; margin-bottom: 5px;"></div>
-        <div id="ticket-totals-content" style="text-align: right; margin-bottom: 8px; font-size: 9px;"></div>
-        <div style="border-bottom: 1px dashed #000; margin-bottom: 6px;"></div>
-        <div style="text-align: center; font-size: 8px;">
-            <p style="margin: 0; font-weight: bold;">¡Gracias por tu compra!</p>
-            <p style="margin: 2px 0;">Cambios en sucursal con ticket</p>
-            <p style="margin: 0; color: #555;">IG: @amisboutique.official</p>
-        </div>
+        <p style="margin: 2px 0 0 0; font-size: 8px; color: #555;">Guadalajara, Jalisco</p>
     </div>
-
+    <div style="border-bottom: 1px dashed #000; margin-bottom: 5px;"></div>
+    <div id="ticket-info-content" style="margin-bottom: 5px; font-size: 8.5px;"></div>
+    <div style="border-bottom: 1px dashed #000; margin-bottom: 5px;"></div>
+    <div style="display: flex; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 2px; margin-bottom: 4px; font-size: 8px;">
+        <span>CANT / DESCRIPCIÓN</span>
+        <span>IMP.</span>
+    </div>
+    <div id="ticket-items-content" style="margin-bottom: 5px; font-size: 8.5px;"></div>
+    <div style="border-bottom: 1px dashed #000; margin-bottom: 5px;"></div>
+    <div id="ticket-totals-content" style="text-align: right; margin-bottom: 8px; font-size: 9px;"></div>
+    <div style="border-bottom: 1px dashed #000; margin-bottom: 6px;"></div>
+    <div style="text-align: center; font-size: 8px;">
+        <p style="margin: 0; font-weight: bold;">¡Gracias por tu compra!</p>
+        <p style="margin: 2px 0;">Cambios en sucursal con ticket</p>
+        <p style="margin: 0; color: #555;">IG: @amisboutique.official</p>
+    </div>
+</div>
+    
     <!-- CONTENEDOR OCULTO PARA DESCARGA Y ENVÍO DE PDF EN FORMATO CARTA -->
     <div id="pdf-carta-container" style="display: none; width: 210mm; min-height: 297mm; padding: 20mm; font-family: 'Helvetica', 'Arial', sans-serif; font-size: 12px; color: #111; background: #fff; box-sizing: border-box;">
         
