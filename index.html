@@ -484,6 +484,16 @@
                             </label>
                         </div>
 
+                        <!-- CÓDIGO DE PROMOCIÓN / ENVÍO LOCAL GRATIS (SOLO APARECE EN ENVÍO LOCAL) -->
+                        <div id="local-coupon-container" class="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-1.5 hidden">
+                            <label class="block text-xs font-bold uppercase text-gray-700">¿Tienes un cupón de envío local?</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="coupon-input" maxlength="7" placeholder="Ej. AMISGDL" class="w-full p-2 border border-gray-300 rounded-lg text-xs font-mono uppercase focus:outline-none focus:border-black">
+                                <button type="button" onclick="aplicarCuponEnvio()" class="bg-black text-white px-4 py-2 rounded-lg text-xs tracking-wider uppercase hover:bg-gray-800 transition">Aplicar</button>
+                            </div>
+                            <p id="coupon-status-msg" class="text-[11px] text-gray-500">Ingresa tu código para canjear envío local gratis.</p>
+                        </div>
+
                         <!-- VALIDACIÓN DE CÓDIGO POSTAL LOCAL -->
                         <div id="local-cp-validator" class="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-1.5">
                             <label class="block text-xs font-bold uppercase text-gray-700">Verifica tu Código Postal (GDL) *</label>
@@ -710,6 +720,7 @@
         let globalUserProfile = { names: '', surnames: '', fullName: '', phone: '', email: '', address: '' };
         let isRegistering = false;
         let toastTimeout = null;
+        let cuponAplicadoValido = false;
 
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast-notification');
@@ -807,12 +818,77 @@
             }
         }
 
+        function obtenerSubtotalCarrito() {
+            return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        }
+
         function obtenerCostoEnvioActual() {
             const shippingMethod = document.querySelector('input[name="shipping-method"]:checked')?.value;
+            const subtotal = obtenerSubtotalCarrito();
+
+            // REGLA: Si la compra pasa de $1,499 el envío es gratis en cualquiera de los dos (Local o Nacional)
+            if (subtotal > 1499) {
+                return 0;
+            }
+
+            // REGLA: Si se aplicó cupón válido y es envío local (Estándar o Express), el envío es gratis
+            if (cuponAplicadoValido && (shippingMethod === 'Envío Local Estándar' || shippingMethod === 'Envío Local Express')) {
+                return 0;
+            }
+
             if (shippingMethod === 'Envío Local Estándar') return 69;
             if (shippingMethod === 'Envío Local Express') return 99;
             if (shippingMethod === 'Envío Nacional') return 149;
             return 0;
+        }
+
+        async function aplicarCuponEnvio() {
+            const inputVal = document.getElementById('coupon-input').value.trim().toUpperCase();
+            const statusMsg = document.getElementById('coupon-status-msg');
+
+            if (!inputVal || inputVal.length < 5) {
+                statusMsg.className = "text-[11px] text-red-600 font-bold";
+                statusMsg.textContent = "Ingresa un código de cupón válido (5 a 7 dígitos).";
+                return;
+            }
+
+            try {
+                const { doc, getDoc } = window.FB_Methods;
+                // Consultamos Firebase en la colección "settings", documento "coupons"
+                const couponDocRef = doc(window.FB_Db, "settings", "coupons");
+                const couponSnap = await getDoc(couponDocRef);
+
+                let cuponesValidos = ["AMISGDL", "ENVFREE", "LOCALFREE"]; // respaldo por defecto
+                if (couponSnap.exists() && couponSnap.data().codigos) {
+                    cuponesValidos = couponSnap.data().codigos.map(c => c.toUpperCase());
+                }
+
+                if (cuponesValidos.includes(inputVal)) {
+                    cuponAplicadoValido = true;
+                    statusMsg.className = "text-[11px] text-emerald-600 font-bold";
+                    statusMsg.textContent = "🎉 ¡Cupón aplicado con éxito! Envío local gratis.";
+                    showToast("¡Cupón aplicado con éxito!");
+                    updateCartUI();
+                } else {
+                    cuponAplicadoValido = false;
+                    statusMsg.className = "text-[11px] text-red-600 font-bold";
+                    statusMsg.textContent = "❌ Cupón inválido o expirado.";
+                    showToast("Cupón inválido", "error");
+                    updateCartUI();
+                }
+            } catch (e) {
+                console.error("Error verificando cupón:", e);
+                // Respaldo local si ocurre algún error de red
+                if (["AMISGDL", "ENVFREE", "LOCALFREE"].includes(inputVal)) {
+                    cuponAplicadoValido = true;
+                    statusMsg.className = "text-[11px] text-emerald-600 font-bold";
+                    statusMsg.textContent = "🎉 ¡Cupón aplicado con éxito!";
+                    updateCartUI();
+                } else {
+                    statusMsg.className = "text-[11px] text-red-600 font-bold";
+                    statusMsg.textContent = "❌ Cupón no encontrado.";
+                }
+            }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -1599,8 +1675,9 @@
             if(stepShipping) stepShipping.classList.add('hidden');
             if(stepPayment) stepPayment.classList.add('hidden');
 
-            let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            total += obtenerCostoEnvioActual();
+            let subtotal = obtenerSubtotalCarrito();
+            let costoEnvio = obtenerCostoEnvioActual();
+            let total = subtotal + costoEnvio;
 
             const totalEl = document.getElementById('cart-total');
             if(totalEl) totalEl.textContent = `$${total} MXN`;
@@ -1740,9 +1817,9 @@
                     clientAddress = `${clientAddress} (C.P. ${cpVal})`;
                 }
 
-                let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                let subtotal = obtenerSubtotalCarrito();
                 const costoEnvio = obtenerCostoEnvioActual();
-                total += costoEnvio;
+                let total = subtotal + costoEnvio;
 
                 const { collection, addDoc, getDocs, Timestamp } = window.FB_Methods;
                 const now = new Date();
@@ -1869,20 +1946,23 @@
             const meetingPointsContainer = document.getElementById('meeting-points-container');
             const addressFieldContainer = document.getElementById('address-field-container');
             const cpValidator = document.getElementById('local-cp-validator');
+            const couponContainer = document.getElementById('local-coupon-container');
 
             if (shippingMethod === 'Punto de entrega') {
                 meetingPointsContainer.classList.remove('hidden');
                 addressFieldContainer.classList.add('hidden');
                 if (cpValidator) cpValidator.classList.add('hidden');
+                if (couponContainer) couponContainer.classList.add('hidden');
             } else {
                 meetingPointsContainer.classList.add('hidden');
                 addressFieldContainer.classList.remove('hidden');
-                if (cpValidator) {
-                    if (shippingMethod.includes('Envío Local')) {
-                        cpValidator.classList.remove('hidden');
-                    } else {
-                        cpValidator.classList.add('hidden');
-                    }
+                
+                if (shippingMethod.includes('Envío Local')) {
+                    if (cpValidator) cpValidator.classList.remove('hidden');
+                    if (couponContainer) couponContainer.classList.remove('hidden'); // Solo sale en envío local
+                } else {
+                    if (cpValidator) cpValidator.classList.add('hidden');
+                    if (couponContainer) couponContainer.classList.add('hidden'); // No sale en nacional ni punto de entrega
                 }
             }
             applyPaymentRules();
