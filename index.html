@@ -78,8 +78,8 @@
       .hero-bokeh-bg {
         background-image: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://i.postimg.cc/SQVy0c4n/fiam.png');
         background-size: cover;
-        background-position: center;
-      }
+        background-position: center; } /* Gotero visible en celular */ .color-row > div:first-child{flex-wrap:wrap;} .color-row .color-picker-btn{display:block;flex:0 0 100%;width:100%;min-width:0;min-height:44px;padding:10px 12px;font-size:14px;line-height:1.2;text-align:center;box-sizing:border-box;} .color-preview-wrap{position:relative;display:block;width:100%;} .color-preview-img:not(.hidden){display:block!important;width:100%;max-width:100%;height:auto;cursor:crosshair;} .color-picker-hint:not(.hidden){display:block;} .color-picker-overlay{position:absolute;top:8px;right:8px;z-index:5;display:none;align-items:center;justify-content:center;width:44px;height:44px;min-width:44px;min-height:44px;border-radius:9999px;background:#f59e0b;color:#111;font-size:20px;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.35);cursor:pointer;} .color-preview-wrap:has(.color-preview-img:not(.hidden)) .color-picker-overlay{display:flex;} @media (max-width:600px){ .color-row .color-picker-btn{width:100%;min-height:44px;font-size:15px;} .color-preview-img:not(.hidden){width:100%;min-height:140px;object-fit:contain;} .color-picker-hint:not(.hidden){font-size:13px;} }
+   }
 
       @media print {
           @page {
@@ -397,14 +397,14 @@
                                             <div id="color-rows-container" class="space-y-2">
                                                 <div class="p-2 border rounded bg-gray-50 color-row space-y-2">
                                                     <div class="flex items-center gap-2">
-                                                        <label class="text-[10px] font-bold">Color:</label>
+                                                        <label class="text-[10px] font-bold">Color personalizado:</label>
                                                         <input type="color" value="#000000" oninput="syncColorHex(this)" class="w-8 h-7 rounded border cursor-pointer color-picker-input">
                                                         <input type="text" placeholder="#HEX" class="w-20 p-1 border rounded text-[10px] font-mono color-hex-input" value="#000000"><span class="color-swatch inline-block w-5 h-5 rounded border shrink-0" style="background-color:#000000" title="Color elegido"></span>
-                                                        <input type="text" placeholder="Nombre" class="flex-1 p-1 border rounded text-[10px] color-name-input"><button type="button" class="color-picker-btn text-[10px] bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded px-2 py-1 font-bold shrink-0" onclick="activarGotero(this)" title="Elegir color de la imagen">🖊️ Elegir color de la imagen</button>
+                                                        <input type="text" placeholder="Nombre" class="flex-1 p-1 border rounded text-[10px] color-name-input"><button type="button" class="color-picker-btn text-[10px] bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded px-2 py-1 font-bold shrink-0" onclick="activarGotero(this)" title="Elegir color de la foto">🖊️ Elegir color de la foto</button>
                                                     </div>
                                                     <div>
                                                         <label class="text-[10px] font-bold text-gray-600 block mb-0.5">Seleccionar Foto:</label>
-                                                        <input type="file" accept="image/*" onchange="detectarColorPredominante(this)" class="w-full text-[10px] file-input-prod"><img class="color-preview-img hidden w-full rounded mt-1 border" alt="Vista previa del producto" onclick="elegirColorDePixel(this, event)"><p class="color-picker-hint hidden text-[10px] text-amber-600 font-bold mt-1">Toca un píxel de la foto para elegir ese color</p>
+                                                        <input type="file" accept="image/*" onchange="detectarColorPredominante(this)" class="w-full text-[10px] file-input-prod"><div class="color-preview-wrap"><img class="color-preview-img hidden w-full rounded border" alt="Vista previa del producto" onclick="elegirColorDePixel(this, event)"><button type="button" class="color-picker-overlay" onclick="activarGotero(this.closest('.color-row').querySelector('.color-picker-btn'))" title="Elegir color de la foto" aria-label="Elegir color de la foto">🖊️</button></div><p class="color-picker-hint hidden text-[10px] text-amber-600 font-bold mt-1">Toca un píxel de la foto para elegir ese color</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -825,15 +825,15 @@
             row.className = 'p-2 border rounded bg-gray-50 color-row space-y-2 mt-2';
             row.innerHTML = `
                 <div class="flex items-center gap-2">
-                    <label class="text-[10px] font-bold">Color:</label>
+                    <label class="text-[10px] font-bold">Color personalizado:</label>
                     <input type="color" value="#000000" oninput="syncColorHex(this)" class="w-8 h-7 rounded border cursor-pointer color-picker-input">
                     <input type="text" placeholder="#HEX" class="w-20 p-1 border rounded text-[10px] font-mono color-hex-input" value="#000000"><span class="color-swatch inline-block w-5 h-5 rounded border shrink-0" style="background-color:#000000" title="Color elegido"></span>
-                    <input type="text" placeholder="Nombre" class="flex-1 p-1 border rounded text-[10px] color-name-input"><button type="button" class="color-picker-btn text-[10px] bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded px-2 py-1 font-bold shrink-0" onclick="activarGotero(this)" title="Elegir color de la imagen">🖊️ Elegir color de la imagen</button><button type="button" id="color-picker-btn" class="color-picker-btn text-[10px] bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded px-2 py-1 font-bold shrink-0" onclick="activarGotero(this)" title="Elegir color de la imagen">🖊️ Elegir color de la imagen</button>
+                    <input type="text" placeholder="Nombre" class="flex-1 p-1 border rounded text-[10px] color-name-input"><button type="button" class="color-picker-btn text-[10px] bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded px-2 py-1 font-bold shrink-0" onclick="activarGotero(this)" title="Elegir color de la foto">🖊️ Elegir color de la foto</button><button type="button" id="color-picker-btn" class="color-picker-btn text-[10px] bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded px-2 py-1 font-bold shrink-0" onclick="activarGotero(this)" title="Elegir color de la foto">🖊️ Elegir color de la foto</button>
                     <button onclick="this.closest('.color-row').remove()" class="text-red-500 font-bold px-1 text-xs">✕</button>
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-gray-600 block mb-0.5">Seleccionar Foto:</label>
-                    <input type="file" accept="image/*" onchange="detectarColorPredominante(this)" class="w-full text-[10px] file-input-prod"><img class="color-preview-img hidden w-full rounded mt-1 border" alt="Vista previa del producto" onclick="elegirColorDePixel(this, event)"><p class="color-picker-hint hidden text-[10px] text-amber-600 font-bold mt-1">Toca un píxel de la foto para elegir ese color</p>
+                    <input type="file" accept="image/*" onchange="detectarColorPredominante(this)" class="w-full text-[10px] file-input-prod"><div class="color-preview-wrap"><img class="color-preview-img hidden w-full rounded border" alt="Vista previa del producto" onclick="elegirColorDePixel(this, event)"><button type="button" class="color-picker-overlay" onclick="activarGotero(this.closest('.color-row').querySelector('.color-picker-btn'))" title="Elegir color de la foto" aria-label="Elegir color de la foto">🖊️</button></div><p class="color-picker-hint hidden text-[10px] text-amber-600 font-bold mt-1">Toca un píxel de la foto para elegir ese color</p>
                 </div>
             `;
             container.appendChild(row);
