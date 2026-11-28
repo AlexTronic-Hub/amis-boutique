@@ -1355,92 +1355,281 @@
         }
 
         // --- FUNCIÓN CORREGIDA CON VENTANA EMERGENTE INDEPENDIENTE ---
-        function imprimirTicket58mm(orderJson) {
-            const d = JSON.parse(decodeURIComponent(orderJson));
-            const ventana = window.open('', '_blank', 'width=300,height=500');
-            
-            ventana.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Ticket ${d.orderId}</title>
-                    <style>
-                        @page {
-                            size: 58mm auto;
-                            margin: 0;
-                        }
-                        body {
-                            width: 48mm;
-                            margin: 0 auto;
-                            padding: 2mm 0;
-                            font-family: 'Courier New', Courier, monospace;
-                            font-size: 10px;
-                            color: #000;
-                            background: #fff;
-                            line-height: 1.2;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div style="text-align: center; margin-bottom: 6px;">
-                        <div style="font-family: 'Times New Roman', serif; font-size: 15px; font-weight: bold; letter-spacing: 1px;">AMIS</div>
-                        <div style="font-family: 'Brush Script MT', cursive; font-size: 12px; margin-top: -3px;">collection &amp; boutique</div>
-                        <p style="margin: 2px 0 0 0; font-size: 8px;">Guadalajara, Jalisco</p>
-                    </div>
-                    
-                    <div style="border-bottom: 1px dashed #000; margin: 4px 0;"></div>
-                    
-                    <div style="font-size: 8.5px; line-height: 1.1;">
-                        <b>Folio:</b> ${d.orderId}<br>
-                        <b>Cliente:</b> ${d.clientName}<br>
-                        <b>Tel:</b> ${d.clientPhone}<br>
-                        <b>Entrega:</b> ${d.shipping}
-                    </div>
-                    
-                    <div style="border-bottom: 1px dashed #000; margin: 4px 0;"></div>
-                    
-                    <div style="font-size: 8.5px; font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 1px; margin-bottom: 3px; display: flex; justify-content: space-between;">
-                        <span>CANT / DESCRIPCIÓN</span>
-                        <span>IMP.</span>
-                    </div>
-                    
-                    <div style="font-size: 8.5px; line-height: 1.1;">
-                        ${(d.items || []).map(i => `
-                            <div style="margin-bottom: 3px;">
-                                <b>${i.quantity}x ${i.name}</b> (${i.color})<br>
-                                <span style="float: right;">$${i.price * i.quantity}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                    
-                    <div style="border-bottom: 1px dashed #000; margin: 4px 0;"></div>
-                    
-                    <div style="text-align: right; font-size: 9.5px; font-weight: bold; margin-bottom: 4px;">
-                        TOTAL: ${d.total}
-                    </div>
-                    
-                    <div style="border-bottom: 1px dashed #000; margin: 4px 0;"></div>
-                    
-                    <div style="text-align: center; font-size: 8px; line-height: 1;">
-                        <p style="margin: 0; font-weight: bold;">¡Gracias por tu compra!</p>
-                        <p style="margin: 2px 0;">¡Vuelva Pronto!</p>
-                        <p style="margin: 0;">IG: @amisboutique.official</p>
-                    </div>
+        
+function imprimirTicket58mm(orderJson) {
+    let d;
 
-                    <script>
-                        window.onload = function() {
-                            setTimeout(() => {
-                                window.print();
-                                window.close();
-                            }, 150);
-                        };
-                    <\/script>
-                </body>
-                </html>
-            `);
-            ventana.document.close();
-        }
+    // 1. Recuperar los datos del pedido
+    try {
+        d = JSON.parse(decodeURIComponent(orderJson));
+    } catch (error) {
+        console.error("Error al leer el pedido:", error);
+        alert("No se pudieron cargar los datos del pedido.");
+        return;
+    }
+
+    // 2. Abrir ventana de impresión
+    const ventana = window.open(
+        "",
+        "_blank",
+        "width=420,height=700"
+    );
+
+    // Comprobar si Chrome bloqueó la ventana emergente
+    if (!ventana) {
+        alert(
+            "Chrome bloqueó la ventana de impresión. " +
+            "Permite las ventanas emergentes para AMIS Boutique e inténtalo nuevamente."
+        );
+        return;
+    }
+
+    // 3. Evitar que caracteres especiales rompan el HTML
+    const escaparHTML = (valor) => {
+        return String(valor ?? "").replace(/[&<>"']/g, (caracter) => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[caracter]);
+    };
+
+    // 4. Generar los productos
+    const productos = (d.items || []).map((item) => {
+        const cantidad = Number(item.quantity) || 0;
+        const precio = Number(
+            String(item.price ?? 0).replace(/[^0-9.-]/g, "")
+        ) || 0;
+
+        const subtotal = precio * cantidad;
+
+        return `
+            <div class="producto">
+                <div class="descripcion">
+                    <strong>${escaparHTML(cantidad)}x ${escaparHTML(item.name)}</strong>
+                    <span>${escaparHTML(item.color || "")}</span>
+                </div>
+                <div class="precio">
+                    $${subtotal.toFixed(2)}
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    // 5. Construir el ticket
+    const contenido = `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+
+            <title>Ticket ${escaparHTML(d.orderId)}</title>
+
+            <style>
+                @page {
+                    size: 58mm auto;
+                    margin: 0;
+                }
+
+                * {
+                    box-sizing: border-box;
+                }
+
+                html, body {
+                    margin: 0;
+                    padding: 0;
+                    width: 58mm;
+                    background: #fff;
+                    color: #000;
+                }
+
+                body {
+                    font-family: "Courier New", monospace;
+                    font-size: 10px;
+                    line-height: 1.3;
+                    padding: 3mm 4mm;
+                }
+
+                .ticket {
+                    width: 50mm;
+                    margin: 0 auto;
+                }
+
+                .encabezado {
+                    text-align: center;
+                    margin-bottom: 8px;
+                }
+
+                .logo {
+                    font-family: "Times New Roman", serif;
+                    font-size: 19px;
+                    font-weight: bold;
+                    letter-spacing: 2px;
+                }
+
+                .sublogo {
+                    font-size: 12px;
+                    font-style: italic;
+                }
+
+                .ciudad {
+                    font-size: 9px;
+                    margin-top: 3px;
+                }
+
+                .separador {
+                    border-top: 1px dashed #000;
+                    margin: 7px 0;
+                }
+
+                .datos {
+                    font-size: 9px;
+                    overflow-wrap: anywhere;
+                }
+
+                .titulo-productos {
+                    display: flex;
+                    justify-content: space-between;
+                    font-size: 9px;
+                    font-weight: bold;
+                    border-bottom: 1px solid #000;
+                    padding-bottom: 3px;
+                    margin-bottom: 5px;
+                }
+
+                .producto {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    gap: 4px;
+                    margin-bottom: 6px;
+                    break-inside: avoid;
+                }
+
+                .descripcion {
+                    flex: 1;
+                    min-width: 0;
+                    overflow-wrap: anywhere;
+                }
+
+                .descripcion span {
+                    display: block;
+                    font-size: 9px;
+                }
+
+                .precio {
+                    white-space: nowrap;
+                    text-align: right;
+                }
+
+                .total {
+                    text-align: right;
+                    font-size: 12px;
+                    font-weight: bold;
+                    margin: 8px 0;
+                }
+
+                .pie {
+                    text-align: center;
+                    font-size: 9px;
+                    line-height: 1.5;
+                }
+
+                @media screen {
+                    body {
+                        margin: 0 auto;
+                    }
+                }
+
+                @media print {
+                    html, body {
+                        width: 58mm;
+                        margin: 0;
+                    }
+
+                    body {
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
+                    }
+                }
+            </style>
+        </head>
+
+        <body>
+            <div class="ticket">
+
+                <div class="encabezado">
+                    <div class="logo">AMIS</div>
+                    <div class="sublogo">collection &amp; boutique</div>
+                    <div class="ciudad">Guadalajara, Jalisco</div>
+                </div>
+
+                <div class="separador"></div>
+
+                <div class="datos">
+                    <b>Folio:</b> ${escaparHTML(d.orderId)}<br>
+                    <b>Cliente:</b> ${escaparHTML(d.clientName)}<br>
+                    <b>Tel:</b> ${escaparHTML(d.clientPhone)}<br>
+                    <b>Entrega:</b> ${escaparHTML(d.shipping)}
+                </div>
+
+                <div class="separador"></div>
+
+                <div class="titulo-productos">
+                    <span>CANT / DESCRIPCIÓN</span>
+                    <span>IMP.</span>
+                </div>
+
+                <div>
+                    ${productos || "<p>Sin productos registrados.</p>"}
+                </div>
+
+                <div class="separador"></div>
+
+                <div class="total">
+                    TOTAL: ${escaparHTML(d.total)}
+                </div>
+
+                <div class="separador"></div>
+
+                <div class="pie">
+                    <strong>¡Gracias por tu compra!</strong><br>
+                    ¡Vuelva Pronto!<br>
+                    IG: @amisboutique.official
+                </div>
+
+            </div>
+        </body>
+        </html>
+    `;
+
+    // 6. Escribir el documento y esperar a que esté listo
+    try {
+        ventana.document.open();
+        ventana.document.write(contenido);
+        ventana.document.close();
+
+        // Cerrar la ventana solamente después de terminar la impresión
+        ventana.onafterprint = function () {
+            ventana.close();
+        };
+
+        // Dar tiempo a Chrome para renderizar el ticket
+        ventana.onload = function () {
+            setTimeout(() => {
+                ventana.focus();
+                ventana.print();
+            }, 700);
+        };
+
+    } catch (error) {
+        console.error("Error al imprimir ticket:", error);
+        alert("Ocurrió un error al preparar el ticket.");
+        ventana.close();
+    }
+}
 
         function descargarPDFCarta(orderJson) {
             const d = JSON.parse(decodeURIComponent(orderJson));
