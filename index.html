@@ -1123,7 +1123,7 @@
             const productId = urlParams.get('producto');
             const categoryKey = urlParams.get('categoria');
             if (productId) await loadAndShowSingleProduct(productId);
-            else if (categoryKey) await loadCategoryProducts(categoryKey);
+            else if (categoryKey) await loadCategoryProducts(categoryKey, null, { pushHistory: false });
         }
 
         async function loadAndShowSingleProduct(prodId) {
@@ -1232,9 +1232,9 @@
             fetch("https://formsubmit.co/ajax/ventas@amisboutique.com", { method: "POST", body: formData }).catch(e => console.error(e));
         }
 
-        async function loadCategoryProducts(categoryKey, event) {
+        async function loadCategoryProducts(categoryKey, event, options = {}) {
             if (event) event.preventDefault();
-            window.history.pushState({}, '', `?categoria=${categoryKey}`);
+            const shouldPushHistory = options.pushHistory !== undefined ? options.pushHistory : !!event; if (shouldPushHistory && window.location.search !== `?categoria=${categoryKey}`) window.history.pushState({}, '', `?categoria=${categoryKey}`);
             document.getElementById('home-view').classList.add('hidden');
             const dynView = document.getElementById('dynamic-category-view');
             dynView.classList.remove('hidden');
@@ -1638,15 +1638,15 @@ function descargarPDFCarta(orderJson) {
         setupDropdown('data-toggle-btn', 'data-container-sub', 'data-arrow');
         setupDropdown('contact-toggle-btn', 'contact-submenu', 'contact-arrow');
 
-        function showHome(event) {
+        function showHome(event, options = {}) {
             if (event) event.preventDefault();
-            window.history.pushState({}, '', window.location.pathname);
+            const shouldPushHistory = options.pushHistory !== undefined ? options.pushHistory : !!event; if (shouldPushHistory && window.location.search) window.history.pushState({}, '', window.location.pathname);
             document.getElementById('home-view').classList.remove('hidden');
             document.getElementById('dynamic-category-view').classList.add('hidden');
             if (!mobileMenu.classList.contains('hidden')) toggleMobileMenu();
         }
 
-        function toggleCartModal() {
+        function renderViewFromURL() { const params = new URLSearchParams(window.location.search); const categoryKey = params.get('categoria'); const productId = params.get('producto'); if (productId) { loadAndShowSingleProduct(productId); return; } if (categoryKey) { loadCategoryProducts(categoryKey, null, { pushHistory: false }); return; } showHome(null, { pushHistory: false }); } window.addEventListener('popstate', renderViewFromURL); function toggleCartModal() {
             const modal = document.getElementById('cart-modal'), drawer = document.getElementById('cart-drawer-panel');
             if (modal.classList.contains('hidden')) {
                 modal.classList.remove('hidden');
