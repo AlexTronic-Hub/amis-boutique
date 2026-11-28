@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Pinyon+Script&display=swap" rel="stylesheet">
 
     <!-- Librería para generar PDFs (html2pdf.js) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script> <script src="https://cdn.jsdelivr.net/npm/qz-tray@2.2.4/qz-tray.js"></script>
 
     <!-- Firebase SDKs (Auth, Firestore y Storage) -->
     <script type="module">
@@ -1354,192 +1354,73 @@
             document.getElementById('pdf-items-tbody').innerHTML = (d.items || []).map(i => `<tr><td style="padding:10px;border:1px solid #ddd;">${i.quantity}</td><td style="padding:10px;border:1px solid #ddd;">${i.name}</td><td style="padding:10px;border:1px solid #ddd;">${i.color}</td><td style="padding:10px;border:1px solid #ddd;text-align:right;">$${i.price}</td><td style="padding:10px;border:1px solid #ddd;text-align:right;">$${i.price * i.quantity}</td></tr>`).join('');
         }
 
-        // --- FUNCIÓN DE TICKET TÉRMICO 58MM LIMPIA Y CORREGIDA ---
-        function imprimirTicket58mm(orderJson) {
-            let d;
-            try {
-                d = JSON.parse(decodeURIComponent(orderJson));
-            } catch (error) {
-                console.error("Error al procesar el pedido:", error);
-                alert("No se pudieron procesar los datos del ticket.");
-                return;
-            }
+        // --- FUNCIÓN DE TICKET TÉRMICO 58MM CON QZ TRAY ---
+function imprimirTicket58mm(orderJson) {
+    let d;
+    try {
+        d = JSON.parse(decodeURIComponent(orderJson));
+    } catch (error) {
+        console.error("Error al procesar el pedido:", error);
+        alert("No se pudieron procesar los datos del ticket.");
+        return;
+    }
+    if (typeof qz === "undefined") {
+        alert("No cargó QZ Tray. Revisa que agregaste el script de qz-tray.js en el <head> y recarga la página.");
+        return;
+    }
+    const limpiar = (texto) => {
+        return String(texto ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\x20-\x7E]/g, "");
+    };
+    const linea = (texto) => limpiar(texto).slice(0, 32);
+    const totalTexto = (typeof d.total === "number") ? "$" + d.total.toFixed(2) + " MXN" : String(d.total || "$0 MXN");
+    const conectarQZ = () => {
+        if (qz.websocket.isActive()) return Promise.resolve();
+        return qz.websocket.connect();
+    };
+    conectarQZ().then(() => {
+        return qz.printers.find("POS-58");
+    }).then((printer) => {
+        const config = qz.configs.create(printer);
+        const datos = [];
+        const agregar = (texto) => { datos.push({ type: "raw", format: "command", data: texto }); };
+        agregar("\x1b\x40");
+        agregar("\x1b\x61\x01");
+        agregar("AMIS\n");
+        agregar("collection & boutique\n");
+        agregar("Guadalajara, Jalisco\n");
+        agregar("--------------------------------\n");
+        agregar("\x1b\x61\x00");
+        agregar(linea("Folio: " + d.orderId) + "\n");
+        agregar(linea("Cliente: " + d.clientName) + "\n");
+        agregar(linea("Telefono: " + d.clientPhone) + "\n");
+        agregar(linea("Envio: " + d.shipping) + "\n");
+        agregar("--------------------------------\n");
+        agregar("PRODUCTOS\n");
+        (d.items || []).forEach((item) => {
+            const cantidad = Number(item.quantity) || 0;
+            const precio = Number(item.price) || 0;
+            agregar(linea(cantidad + "x " + item.name) + "\n");
+            agregar("     " + cantidad + " x " + (item.color || "Unico") + "  $" + (cantidad * precio).toFixed(2) + "\n");
+        });
+        agregar("--------------------------------\n");
+        agregar("TOTAL: " + totalTexto + "\n");
+        agregar("--------------------------------\n");
+        agregar("\x1b\x61\x01");
+        agregar("\nGracias por tu compra!\n");
+        agregar("Vuelva Pronto!\n");
+        agregar("IG: @amisboutique.official\n");
+        agregar("\n\n\n\x1d\x56\x00");
+        return qz.print(config, datos);
+    }).then(() => {
+        if (typeof showToast === "function") showToast("Ticket enviado a POS-58");
+        else alert("Ticket enviado a POS-58");
+    }).catch((error) => {
+        console.error("Error al imprimir con QZ Tray:", error);
+        alert("No se pudo imprimir. Abre QZ Tray en tu PC y, si Brave te lo pide, acepta su certificado en https://localhost:8181 y vuelve a intentarlo.");
+    });
+}
 
-            const ventana = window.open("", "_blank", "width=420,height=700");
-            if (!ventana) {
-                alert("Activa las ventanas emergentes para poder imprimir el ticket.");
-                return;
-            }
-
-            const escaparHTML = (texto) => {
-                return String(texto ?? "").replace(/[&<>"']/g, (caracter) => ({
-                    "&": "&amp;",
-                    "<": "&lt;",
-                    ">": "&gt;",
-                    '"': "&quot;",
-                    "'": "&#039;"
-                })[caracter]);
-            };
-
-            const productos = (d.items || []).map(item => {
-                const cantidad = Number(item.quantity) || 0;
-                const precioUnitario = Number(item.price) || 0;
-                const subtotalLinea = cantidad * precioUnitario;
-
-                return `
-                    <div class="producto">
-                        <div class="producto-nombre">
-                            ${escaparHTML(item.name)}
-                        </div>
-                        <div class="producto-detalle">
-                            ${escaparHTML(cantidad)} x ${escaparHTML(item.color || "Único")}
-                            <span>$${subtotalLinea.toFixed(2)}</span>
-                        </div>
-                    </div>
-                `;
-            }).join("");
-
-            const contenido = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Ticket ${escaparHTML(d.orderId)}</title>
-                    <style>
-                        @page {
-                            size: 58mm auto;
-                            margin: 0;
-                        }
-                        * {
-                            box-sizing: border-box;
-                        }
-                        html, body {
-                            width: 58mm;
-                            margin: 0;
-                            padding: 0;
-                            background: #fff;
-                            color: #000;
-                            font-family: Arial, sans-serif;
-                            font-size: 11px;
-                        }
-                        body {
-                            padding: 2mm 3mm;
-                        }
-                        .ticket {
-                            width: 100%;
-                        }
-                        .centrado {
-                            text-align: center;
-                        }
-                        .titulo {
-                            font-family: 'Times New Roman', serif;
-                            font-size: 17px;
-                            font-weight: bold;
-                            letter-spacing: 1px;
-                            margin-bottom: 2px;
-                        }
-                        .subtitulo {
-                            font-family: 'Brush Script MT', cursive;
-                            font-size: 11px;
-                            margin-bottom: 2px;
-                        }
-                        .separador {
-                            border-top: 1px dashed #000;
-                            margin: 6px 0;
-                        }
-                        .dato {
-                            margin: 3px 0;
-                            overflow-wrap: break-word;
-                            font-size: 10px;
-                        }
-                        .producto {
-                            margin: 6px 0;
-                        }
-                        .producto-nombre {
-                            font-weight: bold;
-                            overflow-wrap: break-word;
-                            font-size: 10.5px;
-                        }
-                        .producto-detalle {
-                            font-size: 10px;
-                            display: flex;
-                            justify-content: space-between;
-                            gap: 4px;
-                        }
-                        .total {
-                            font-size: 12px;
-                            font-weight: bold;
-                            text-align: right;
-                            margin-top: 8px;
-                        }
-                        .pie {
-                            text-align: center;
-                            font-size: 10px;
-                            margin-top: 10px;
-                            line-height: 1.3;
-                        }
-                        @media print {
-                            html, body {
-                                width: 58mm;
-                                margin: 0;
-                                padding: 0;
-                            }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="ticket">
-                        <div class="centrado">
-                            <div class="titulo">AMIS</div>
-                            <div class="subtitulo">collection &amp; boutique</div>
-                            <div style="font-size: 9px;">Guadalajara, Jalisco</div>
-                        </div>
-                        <div class="separador"></div>
-                        <div class="dato"><strong>Folio:</strong> ${escaparHTML(d.orderId)}</div>
-                        <div class="dato"><strong>Cliente:</strong> ${escaparHTML(d.clientName)}</div>
-                        <div class="dato"><strong>Teléfono:</strong> ${escaparHTML(d.clientPhone)}</div>
-                        <div class="dato"><strong>Envío:</strong> ${escaparHTML(d.shipping)}</div>
-                        <div class="separador"></div>
-                        <div style="font-size: 10px; font-weight: bold; margin-bottom: 4px;">PRODUCTOS</div>
-                        ${productos || "<div class='dato'>Sin productos</div>"}
-                        <div class="separador"></div>
-                        <div class="total">TOTAL: ${escaparHTML(d.total || "$0 MXN")}</div>
-                        <div class="separador"></div>
-                        <div class="pie">
-                            <strong>¡Gracias por tu compra!</strong><br>
-                            ¡Vuelva Pronto!<br>
-                            IG: @amisboutique.official
-                        </div>
-                    </div>
-                </body>
-                </html>
-            `;
-
-            ventana.addEventListener("load", function () {
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        ventana.focus();
-                        ventana.print();
-                    });
-                });
-            }, { once: true });
-
-            ventana.addEventListener("afterprint", function () {
-                ventana.close();
-            }, { once: true });
-
-            try {
-                ventana.document.open();
-                ventana.document.write(contenido);
-                ventana.document.close();
-            } catch (error) {
-                console.error("Error al generar el ticket:", error);
-                ventana.close();
-                alert("Ocurrió un error al generar el ticket.");
-            }
-        }
-
-        function descargarPDFCarta(orderJson) {
+function descargarPDFCarta(orderJson) {
             const d = JSON.parse(decodeURIComponent(orderJson));
             prepararDatosPDFCarta(d);
             const el = document.getElementById('pdf-carta-container');
