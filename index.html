@@ -399,12 +399,12 @@
                                                     <div class="flex items-center gap-2">
                                                         <label class="text-[10px] font-bold">Color:</label>
                                                         <input type="color" value="#000000" oninput="syncColorHex(this)" class="w-8 h-7 rounded border cursor-pointer color-picker-input">
-                                                        <input type="text" placeholder="#HEX" class="w-20 p-1 border rounded text-[10px] font-mono color-hex-input" value="#000000">
-                                                        <input type="text" placeholder="Nombre" class="flex-1 p-1 border rounded text-[10px] color-name-input">
+                                                        <input type="text" placeholder="#HEX" class="w-20 p-1 border rounded text-[10px] font-mono color-hex-input" value="#000000"><span class="color-swatch inline-block w-5 h-5 rounded border shrink-0" style="background-color:#000000" title="Color elegido"></span>
+                                                        <input type="text" placeholder="Nombre" class="flex-1 p-1 border rounded text-[10px] color-name-input"><button type="button" class="color-picker-btn text-[10px] bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded px-2 py-1 font-bold shrink-0" onclick="activarGotero(this)" title="Elegir color de la imagen">🖊️ Elegir color de la imagen</button>
                                                     </div>
                                                     <div>
                                                         <label class="text-[10px] font-bold text-gray-600 block mb-0.5">Seleccionar Foto:</label>
-                                                        <input type="file" accept="image/*" onchange="detectarColorPredominante(this)" class="w-full text-[10px] file-input-prod">
+                                                        <input type="file" accept="image/*" onchange="detectarColorPredominante(this)" class="w-full text-[10px] file-input-prod"><img class="color-preview-img hidden w-full rounded mt-1 border" alt="Vista previa del producto" onclick="elegirColorDePixel(this, event)"><p class="color-picker-hint hidden text-[10px] text-amber-600 font-bold mt-1">Toca un píxel de la foto para elegir ese color</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -827,13 +827,13 @@
                 <div class="flex items-center gap-2">
                     <label class="text-[10px] font-bold">Color:</label>
                     <input type="color" value="#000000" oninput="syncColorHex(this)" class="w-8 h-7 rounded border cursor-pointer color-picker-input">
-                    <input type="text" placeholder="#HEX" class="w-20 p-1 border rounded text-[10px] font-mono color-hex-input" value="#000000">
-                    <input type="text" placeholder="Nombre" class="flex-1 p-1 border rounded text-[10px] color-name-input">
+                    <input type="text" placeholder="#HEX" class="w-20 p-1 border rounded text-[10px] font-mono color-hex-input" value="#000000"><span class="color-swatch inline-block w-5 h-5 rounded border shrink-0" style="background-color:#000000" title="Color elegido"></span>
+                    <input type="text" placeholder="Nombre" class="flex-1 p-1 border rounded text-[10px] color-name-input"><button type="button" class="color-picker-btn text-[10px] bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded px-2 py-1 font-bold shrink-0" onclick="activarGotero(this)" title="Elegir color de la imagen">🖊️ Elegir color de la imagen</button><button type="button" id="color-picker-btn" class="color-picker-btn text-[10px] bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded px-2 py-1 font-bold shrink-0" onclick="activarGotero(this)" title="Elegir color de la imagen">🖊️ Elegir color de la imagen</button>
                     <button onclick="this.closest('.color-row').remove()" class="text-red-500 font-bold px-1 text-xs">✕</button>
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-gray-600 block mb-0.5">Seleccionar Foto:</label>
-                    <input type="file" accept="image/*" onchange="detectarColorPredominante(this)" class="w-full text-[10px] file-input-prod">
+                    <input type="file" accept="image/*" onchange="detectarColorPredominante(this)" class="w-full text-[10px] file-input-prod"><img class="color-preview-img hidden w-full rounded mt-1 border" alt="Vista previa del producto" onclick="elegirColorDePixel(this, event)"><p class="color-picker-hint hidden text-[10px] text-amber-600 font-bold mt-1">Toca un píxel de la foto para elegir ese color</p>
                 </div>
             `;
             container.appendChild(row);
@@ -852,13 +852,13 @@
         function detectarColorPredominante(inputElement) {
             const file = inputElement.files[0];
             if (!file) return;
-            const row = inputElement.closest('.color-row');
+            const row = inputElement.closest('.color-row'); row.dataset.colorPicked = '';
             const colorPicker = row.querySelector('.color-picker-input');
             const hexInput = row.querySelector('.color-hex-input');
             const nameInput = row.querySelector('.color-name-input');
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function(e) { const previewImg = row.querySelector('.color-preview-img'); if (previewImg) { previewImg.src = e.target.result; previewImg.classList.remove('hidden'); }
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
@@ -873,16 +873,16 @@
                     }
                     r = Math.floor(r / count); g = Math.floor(g / count); b = Math.floor(b / count);
                     const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
-                    colorPicker.value = hex;
+                    if (!row.dataset.colorPicked) { colorPicker.value = hex;
                     hexInput.value = hex;
-                    if (nameInput && !nameInput.value.trim()) nameInput.value = obtenerNombreColorAproximado(r, g, b);
+                    if (nameInput && !nameInput.value.trim()) nameInput.value = obtenerNombreColorAproximado(r, g, b); const swatchFallback = row.querySelector('.color-swatch'); if (swatchFallback) swatchFallback.style.backgroundColor = hex; }
                 };
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
 
-        function avanzarDiasHabiles(fechaBase, diasHabiles) {
+        /* Gotero de color (eyedropper) para agregar producto */ const COLORES_SUGERIDOS = [     { nombre: "Negro", hex: "#000000" },     { nombre: "Blanco", hex: "#FFFFFF" },     { nombre: "Gris", hex: "#808080" },     { nombre: "Rojo", hex: "#FF0000" },     { nombre: "Rosa", hex: "#FF69B4" },     { nombre: "Rojo oscuro", hex: "#8B0000" },     { nombre: "Naranja", hex: "#FFA500" },     { nombre: "Amarillo", hex: "#FFFF00" },     { nombre: "Verde", hex: "#008000" },     { nombre: "Verde claro", hex: "#90EE90" },     { nombre: "Azul", hex: "#0000FF" },     { nombre: "Azul marino", hex: "#000080" },     { nombre: "Celeste", hex: "#87CEEB" },     { nombre: "Morado", hex: "#800080" },     { nombre: "Lila", hex: "#C8A2C8" },     { nombre: "Café", hex: "#8B4513" },     { nombre: "Beige", hex: "#F5F5DC" },     { nombre: "Crema", hex: "#FFFDD0" },     { nombre: "Dorado", hex: "#FFD700" },     { nombre: "Plateado", hex: "#C0C0C0" },     { nombre: "Terracota", hex: "#E2725B" },     { nombre: "Vino", hex: "#722F37" },     { nombre: "Turquesa", hex: "#40E0D0" } ]; function hexARgbGotero(hex) {     const h = String(hex).replace('#', '');     return { r: parseInt(h.substring(0, 2), 16), g: parseInt(h.substring(2, 4), 16), b: parseInt(h.substring(4, 6), 16) }; } function nombreColorDesdeHex(hex) {     const rgb = hexARgbGotero(hex);     let mejor = COLORES_SUGERIDOS[0];     let menorDistancia = Infinity;     COLORES_SUGERIDOS.forEach(function(c) {         const crgb = hexARgbGotero(c.hex);         const distancia = Math.sqrt(Math.pow(rgb.r - crgb.r, 2) + Math.pow(rgb.g - crgb.g, 2) + Math.pow(rgb.b - crgb.b, 2));         if (distancia < menorDistancia) { menorDistancia = distancia; mejor = c; }     });     return mejor.nombre; } let goteroActivoRow = null; function desactivarGotero() {     if (goteroActivoRow) {         const img = goteroActivoRow.querySelector('.color-preview-img');         const hint = goteroActivoRow.querySelector('.color-picker-hint');         const btn = goteroActivoRow.querySelector('.color-picker-btn');         if (img) img.style.cursor = '';         if (hint) hint.classList.add('hidden');         if (btn) btn.classList.remove('bg-amber-200');         goteroActivoRow = null;     } } function activarGotero(btn) {     const row = btn.closest('.color-row');     const img = row ? row.querySelector('.color-preview-img') : null;     const hint = row ? row.querySelector('.color-picker-hint') : null;     if (!row || !img || !img.src || img.classList.contains('hidden')) {         if (typeof showToast === 'function') showToast('Primero sube una foto del producto', 'error'); else alert('Primero sube una foto del producto');         return;     }     if (goteroActivoRow === row) { desactivarGotero(); return; }     desactivarGotero();     goteroActivoRow = row;     img.style.cursor = 'crosshair';     if (hint) { hint.textContent = 'Toca un píxel de la foto para elegir ese color'; hint.classList.remove('hidden'); }     btn.classList.add('bg-amber-200'); } function elegirColorDePixel(img, event) {     const row = img.closest('.color-row');     if (!row || goteroActivoRow !== row) return;     const rect = img.getBoundingClientRect();     const scaleX = img.naturalWidth / rect.width;     const scaleY = img.naturalHeight / rect.height;     const x = Math.max(0, Math.min(img.naturalWidth - 1, Math.floor((event.clientX - rect.left) * scaleX)));     const y = Math.max(0, Math.min(img.naturalHeight - 1, Math.floor((event.clientY - rect.top) * scaleY)));     const canvas = document.createElement('canvas');     canvas.width = img.naturalWidth;     canvas.height = img.naturalHeight;     const ctx = canvas.getContext('2d');     ctx.drawImage(img, 0, 0);     const pixel = ctx.getImageData(x, y, 1, 1).data;     const hex = '#' + [pixel[0], pixel[1], pixel[2]].map(function(v) { return v.toString(16).padStart(2, '0'); }).join('').toUpperCase();     const nombre = nombreColorDesdeHex(hex);     const hexInput = row.querySelector('.color-hex-input');     const nameInput = row.querySelector('.color-name-input');     const colorPicker = row.querySelector('.color-picker-input');     const swatch = row.querySelector('.color-swatch');     row.dataset.colorPicked = hex;     if (hexInput) hexInput.value = hex;     if (nameInput) nameInput.value = nombre;     if (colorPicker) colorPicker.value = hex;     if (swatch) swatch.style.backgroundColor = hex; } document.addEventListener('keydown', function(e) { if (e.key === 'Escape') desactivarGotero(); }); function limpiarColorPicked() {     document.querySelectorAll('.color-row').forEach(function(r) { r.dataset.colorPicked = ''; });     desactivarGotero(); } function avanzarDiasHabiles(fechaBase, diasHabiles) {
             let resultado = new Date(fechaBase);
             let agregados = 0;
             while (agregados < diasHabiles) {
@@ -1182,7 +1182,7 @@
                     }
                 }
                 await addDoc(collection(window.FB_Db, "products"), { name, description, cost, price, category, colors, images, createdAt: new Date() });
-                showToast(`¡Producto guardado! Precio: $${price} MXN`);
+                showToast(`¡Producto guardado! Precio: $${price} MXN`); limpiarColorPicked();
                 loadCategoryProducts(category);
             } catch (e) { showToast("Error al subir.", "error"); }
         }
