@@ -155,7 +155,8 @@
         </div>
 
         <div style="position: absolute; bottom: 20mm; left: 20mm; right: 20mm; text-align: center; border-top: 1px solid #e5e7eb; padding-top: 15px; color: #666; font-size: 10px;">
-            <p style="margin: 0; font-weight: bold; color: #111;">¡Gracias por tu compra en AMIS Boutique!</p>
+            <p style="margin: 0; font-weight: bold; color: #111;">¡X Y\u0300Z $ W\x20V\nU
+T en AMIS Boutique!</p>
             <p style="margin: 3px 0 0 0;">Este documento es un comprobante oficial de tu pedido. Cambios y devoluciones válidos presentando ticket o comprobante en sucursal.</p>
         </div>
     </div>
@@ -1357,67 +1358,84 @@
         // --- FUNCIÓN DE TICKET TÉRMICO 58MM CON QZ TRAY ---
 function imprimirTicket58mm(orderJson) {
     let d;
-    try {
-        d = JSON.parse(decodeURIComponent(orderJson));
-    } catch (error) {
-        console.error("Error al procesar el pedido:", error);
-        alert("No se pudieron procesar los datos del ticket.");
-        return;
-    }
-    if (typeof qz === "undefined") {
-        alert("No cargó QZ Tray. Revisa que agregaste el script de qz-tray.js en el <head> y recarga la página.");
-        return;
-    }
-    const limpiar = (texto) => {
-        return String(texto ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\x20-\x7E]/g, "");
-    };
+    try { d = JSON.parse(decodeURIComponent(orderJson)); } catch (error) { console.error("Error al procesar el pedido:", error); alert("No se pudieron procesar los datos del ticket."); return; }
+    if (typeof qz === "undefined") { alert("No cargó QZ Tray. Revisa que agregaste el script de qz-tray.js en el <head> y recarga la página."); return; }
+    const limpiar = (texto) => { return String(texto ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\x20-\x7E]/g, ""); };
     const linea = (texto) => limpiar(texto).slice(0, 32);
-    const totalTexto = (typeof d.total === "number") ? "$" + d.total.toFixed(2) + " MXN" : String(d.total || "$0 MXN");
-    const conectarQZ = () => {
-        if (qz.websocket.isActive()) return Promise.resolve();
-        return qz.websocket.connect();
-    };
-    conectarQZ().then(() => {
-        return qz.printers.find("POS-58");
-    }).then((printer) => {
+    const totalNum = parseFloat(String(d.total ?? "0").replace(/[^0-9.]/g, "")) || 0;
+    const subtotalNum = totalNum / 1.16;
+    const ivaNum = totalNum - subtotalNum;
+    const dinero = (n) => n.toFixed(2);
+    const fecha = new Date().toLocaleString("es-MX", { timeZone: "America/Mexico_City", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false }).replace(",", "");
+    const unidades = ["", "UN", "DOS", "TRES", "CUATRO", "CINCO", "SEIS", "SIETE", "OCHO", "NUEVE", "DIEZ", "ONCE", "DOCE", "TRECE", "CATORCE", "QUINCE", "DIECISEIS", "DIECISIETE", "DIECIOCHO", "DIECINUEVE"];
+    const decenas = ["", "", "VEINTE", "TREINTA", "CUARENTA", "CINCUENTA", "SESENTA", "SETENTA", "OCHENTA", "NOVENTA"];
+    const centenas = ["", "CIENTO", "DOSCIENTOS", "TRESCIENTOS", "CUATROCIENTOS", "QUINIENTOS", "SEISCIENTOS", "SETECIENTOS", "OCHOCIENTOS", "NOVECIENTOS"];
+    function letras(n) {
+        n = Math.floor(n);
+        if (n === 0) return "CERO";
+        if (n === 100) return "CIEN";
+        let s = "";
+        if (n >= 1000) { const m = Math.floor(n / 1000); s += (m === 1 ? "MIL" : letras(m) + " MIL") + " "; n = n % 1000; }
+        if (n >= 100) { s += centenas[Math.floor(n / 100)] + " "; n = n % 100; }
+        if (n >= 20) { s += decenas[Math.floor(n / 10)]; if (n % 10) s += " Y " + unidades[n % 10]; }
+        else if (n > 0) { s += unidades[n]; }
+        return s.trim();
+    }
+    const centavos = Math.round((totalNum - Math.floor(totalNum)) * 100);
+    const enLetras = letras(totalNum) + " PESOS " + String(centavos).padStart(2, "0") + "/100 M.N.";
+    const totalArticulos = (d.items || []).reduce((a, i) => a + (Number(i.quantity) || 0), 0);
+    const conectarQZ = () => { if (qz.websocket.isActive()) return Promise.resolve(); return qz.websocket.connect(); };
+    conectarQZ().then(() => { return qz.printers.find("POS-58"); }).then((printer) => {
         const config = qz.configs.create(printer);
         const datos = [];
         const agregar = (texto) => { datos.push({ type: "raw", format: "command", data: texto }); };
         agregar("\x1b\x40");
         agregar("\x1b\x61\x01");
+        agregar("\x1b\x21\x30");
         agregar("AMIS\n");
+        agregar("\x1b\x21\x00");
         agregar("collection & boutique\n");
+        agregar("\nAMIS BOUTIQUE\n");
         agregar("Guadalajara, Jalisco\n");
+        agregar("TEL: 33 1246 7018\n");
         agregar("--------------------------------\n");
         agregar("\x1b\x61\x00");
-        agregar(linea("Folio: " + d.orderId) + "\n");
-        agregar(linea("Cliente: " + d.clientName) + "\n");
-        agregar(linea("Telefono: " + d.clientPhone) + "\n");
-        agregar(linea("Envio: " + d.shipping) + "\n");
+        agregar("TC # " + linea(String(d.orderId || "")) + "\n");
+        agregar("FECHA Y HORA\n");
+        agregar(fecha + "\n");
         agregar("--------------------------------\n");
-        agregar("PRODUCTOS\n");
+        agregar("Cliente: " + linea(String(d.clientName || "")) + "\n");
+        agregar("Tel: " + linea(String(d.clientPhone || "")) + "\n");
+        agregar("Envio: " + linea(String(d.shipping || "")) + "\n");
+        agregar("--------------------------------\n");
+        agregar("DESC      CANT   P.U.  IMPORTE\n");
         (d.items || []).forEach((item) => {
             const cantidad = Number(item.quantity) || 0;
             const precio = Number(item.price) || 0;
-            agregar(linea(cantidad + "x " + item.name) + "\n");
-            agregar("     " + cantidad + " x " + (item.color || "Unico") + "  $" + (cantidad * precio).toFixed(2) + "\n");
+            agregar(linea(item.name) + "\n");
+            const cant = cantidad.toFixed(1).padStart(5, " ");
+            const pu = dinero(precio).padStart(8, " ");
+            const imp = dinero(cantidad * precio).padStart(9, " ");
+            agregar("     " + cant + pu + imp + "\n");
         });
         agregar("--------------------------------\n");
-        agregar("TOTAL: " + totalTexto + "\n");
+        agregar("SUBTOTAL: $ " + dinero(subtotalNum).padStart(10, " ") + "\n");
+        agregar("IVA 16%:  $ " + dinero(ivaNum).padStart(10, " ") + "\n");
+        agregar("\x1b\x21\x08");
+        agregar("TOTAL: $ " + dinero(totalNum).padStart(10, " ") + "\n");
+        agregar("\x1b\x21\x00");
+        agregar(String(d.payment || "PAGO").toUpperCase().slice(0, 12) + ": $ " + dinero(totalNum).padStart(10, " ") + "\n");
+        agregar("CAMBIO: $ " + dinero(0).padStart(10, " ") + "\n");
         agregar("--------------------------------\n");
+        agregar("No. DE ARTICULOS: " + totalArticulos + "\n");
+        agregar("\n" + enLetras + "\n");
         agregar("\x1b\x61\x01");
-        agregar("\nGracias por tu compra!\n");
+        agregar("\n*** GRACIAS POR SU COMPRA ***\n");
         agregar("Vuelva Pronto!\n");
         agregar("IG: @amisboutique.official\n");
         agregar("\n\n\n\x1d\x56\x00");
         return qz.print(config, datos);
-    }).then(() => {
-        if (typeof showToast === "function") showToast("Ticket enviado a POS-58");
-        else alert("Ticket enviado a POS-58");
-    }).catch((error) => {
-        console.error("Error al imprimir con QZ Tray:", error);
-        alert("No se pudo imprimir. Abre QZ Tray en tu PC y, si Brave te lo pide, acepta su certificado en https://localhost:8181 y vuelve a intentarlo.");
-    });
+    }).then(() => { if (typeof showToast === "function") showToast("Ticket enviado a POS-58"); else alert("Ticket enviado a POS-58"); }).catch((error) => { console.error("Error al imprimir con QZ Tray:", error); alert("No se pudo imprimir. Abre QZ Tray en tu PC y, si Brave te lo pide, acepta su certificado en https://localhost:8181 y vuelve a intentarlo."); });
 }
 
 function descargarPDFCarta(orderJson) {
