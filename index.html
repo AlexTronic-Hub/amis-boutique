@@ -161,7 +161,7 @@
     </div>
 
     <!-- NOTIFICACIÓN FLOTANTE (TOAST) -->
-    <div id="toast-notification" style="position: fixed; top: 20px; right: 20px; z-index: 99999; opacity: 0; transform: translateY(-20px); transition: all 0.3s ease; pointer-events: none;">
+    <div id="toast-notification" style="position: fixed; top: 20px; right: 20px; z-index: 99999; opacity: 0; visibility: hidden; transform: translateY(-20px); transition: all 0.3s ease; pointer-events: none;">
         <div id="toast-card" style="background: #000; color: #fff; padding: 10px 16px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-size: 12px; display: flex; align-items: center; gap: 10px;">
             <span id="toast-icon">✨</span>
             <span id="toast-msg">¡Agregado al carrito con éxito!</span>
@@ -506,7 +506,7 @@
                             </button>
                             <div id="contact-submenu" class="hidden pl-4 mt-3 space-y-3 border-l-2 border-gray-100 text-sm">
                                 <a href="https://www.instagram.com/amisboutique.official" target="_blank" class="flex items-center gap-2.5 text-gray-700 hover:text-black transition font-medium">Instagram</a>
-                                <a href="https://www.facebook.com/share/1CMqeKz5Su/" target="_blank" class="flex items-center gap-2.5 text-gray-700 hover:text-black transition font-medium">Facebook</a>
+                                <a href="https://www.facebook.com/share/1JR2mx9frB/" target="_blank" class="flex items-center gap-2.5 text-gray-700 hover:text-black transition font-medium">Facebook</a>
                                 <a href="https://wa.me/523312467018" target="_blank" class="flex items-center gap-2.5 text-emerald-600 hover:text-emerald-700 transition font-medium">WhatsApp</a>
                             </div>
                         </div>
@@ -550,7 +550,7 @@
 
                     <div id="step-cart" class="py-4">
                         <div id="cart-items" class="space-y-4 max-h-80 overflow-y-auto border-b border-gray-100 pb-4">
-                            <p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>
+                            <p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p><button onclick="toggleCartModal(); showHome(event)" class="w-full bg-black text-white py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition mt-2">Seguir comprando</button>
                         </div>
                     </div>
 
@@ -731,7 +731,7 @@
                     <p class="text-gray-300 text-sm sm:text-base leading-relaxed">Descubre nuestra selección de moda, calzado y accesorios.</p>
                     <div class="pt-4 flex flex-wrap justify-center gap-4">
                         <button onclick="loadCategoryProducts('temporada', event)" class="bg-amber-400 text-black px-8 py-3 rounded-full text-xs tracking-widest uppercase font-bold hover:bg-amber-300 transition shadow-lg">Ver Colección Navideña</button>
-                        <button onclick="loadCategoryProducts('conjuntos', event)" class="border border-white text-white px-8 py-3 rounded-full text-xs tracking-widest uppercase hover:bg-white hover:text-black transition">Explorar Todo</button>
+                        <button onclick="loadCategoryProducts('todo', event)" class="border border-white text-white px-8 py-3 rounded-full text-xs tracking-widest uppercase hover:bg-white hover:text-black transition">Explorar Todo</button>
                     </div>
                 </div>
             </div>
@@ -756,8 +756,9 @@
             </div>
         </div>
 
-        <div id="dynamic-category-view" class="hidden space-y-6">
-            <div id="category-header"></div>
+        <footer class="mt-12 pt-8 border-t border-gray-200 text-center space-y-3 pb-8"><p class="font-serif font-bold text-lg">AMIS Boutique</p><p class="text-sm text-gray-600">Guadalajara, Jalisco · TEL: 33 1246 7018</p><p class="text-xs text-gray-500">Envío Local Estándar $69 · Envío Local Express $99 · Envío Nacional $149 · Envío gratis en compras mayores a $1499</p><p class="text-xs text-gray-500">Pago: Mercado Pago, Transferencia Bancaria</p><p class="text-xs text-gray-500">Cambios solo en casos específicos, escríbenos por WhatsApp</p><div class="flex justify-center gap-4 text-xs uppercase tracking-widest pt-2"><a href="https://www.instagram.com/amisboutique.official" target="_blank" class="underline">Instagram</a><a href="https://www.facebook.com/share/1JR2mx9frB/" target="_blank" class="underline">Facebook</a><a href="https://wa.me/523312467018" target="_blank" class="underline">WhatsApp</a></div></footer>
+            <div id="dynamic-category-view" class="hidden space-y-6">
+                <div id="category-header"></div>
             <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
     </main>
@@ -781,10 +782,10 @@
             const msg = document.getElementById('toast-msg');
             msg.textContent = message;
             if (toastTimeout) clearTimeout(toastTimeout);
-            toast.style.opacity = '1';
+            toast.style.visibility = 'visible'; toast.style.opacity = '1';
             toast.style.transform = 'translateY(0)';
             toastTimeout = setTimeout(() => {
-                toast.style.opacity = '0';
+                toast.style.opacity = '0'; toast.style.visibility = 'hidden';
                 toast.style.transform = 'translateY(-20px)';
             }, 3000);
         }
@@ -1239,16 +1240,16 @@
             dynView.classList.remove('hidden');
             const headerEl = document.getElementById('category-header');
             const gridEl = document.getElementById('products-grid');
-            headerEl.innerHTML = `<h2 class="text-2xl font-serif font-bold mb-4">${categoryKey.toUpperCase()}</h2>`;
+            headerEl.innerHTML = `<h2 class="text-2xl font-serif font-bold mb-4">${categoryKey === 'todo' ? 'Todo' : categoryKey.toUpperCase()}</h2>`;
             try {
                 const { collection, getDocs } = window.FB_Methods;
                 const querySnapshot = await getDocs(collection(window.FB_Db, "products"));
                 let html = '';
                 querySnapshot.forEach((docSnap) => {
                     const p = docSnap.data();
-                    if(p.category === categoryKey) html += renderProductCardHTML({ id: docSnap.id, ...p });
+                    if(categoryKey === 'todo' || p.category === categoryKey) html += renderProductCardHTML({ id: docSnap.id, ...p });
                 });
-                gridEl.innerHTML = html || '<p class="text-gray-500 italic py-8 text-center col-span-full">No hay productos en esta categoría.</p>';
+                gridEl.innerHTML = html || '<p class="text-gray-500 italic py-8 text-center col-span-full">No hay productos en esta categoría.</p><div><button onclick="showHome(event)">Ver otras categorias</button><a href="https://wa.me/523312467018" target="_blank">Consultar por WhatsApp</a></div>';
             } catch (e) { gridEl.innerHTML = '<p class="text-red-500 text-xs text-center py-8 col-span-full">Error al cargar.</p>'; }
         }
 
@@ -1691,7 +1692,7 @@ function descargarPDFCarta(orderJson) {
                 actionBtn.textContent = 'Ir a Pagar';
                 actionBtn.style.display = cart.length === 0 ? 'none' : 'block';
 
-                document.getElementById('cart-items').innerHTML = cart.length === 0 ? '<p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>' : cart.map((item, index) => `
+                document.getElementById('cart-items').innerHTML = cart.length === 0 ? '<p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p><button onclick="toggleCartModal(); showHome(event)" class="w-full bg-black text-white py-2.5 rounded-full text-xs tracking-widest uppercase hover:bg-gray-800 transition mt-2">Seguir comprando</button>' : cart.map((item, index) => `
                     <div class="flex justify-between items-center text-sm border-b pb-3">
                         <div>
                             <p class="font-medium">${item.name}</p>
