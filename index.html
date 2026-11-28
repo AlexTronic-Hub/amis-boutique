@@ -1359,72 +1359,59 @@
 function imprimirTicket58mm(orderJson) {
     let d;
 
-    // 1. Recuperar los datos del pedido
+    // 1. Validar y convertir los datos del pedido
     try {
         d = JSON.parse(decodeURIComponent(orderJson));
     } catch (error) {
-        console.error("Error al leer el pedido:", error);
-        alert("No se pudieron cargar los datos del pedido.");
+        console.error("Error al procesar el pedido:", error);
+        alert("No se pudieron procesar los datos del ticket.");
         return;
     }
 
     // 2. Abrir ventana de impresión
-    const ventana = window.open(
-        "",
-        "_blank",
-        "width=420,height=700"
-    );
+    const ventana = window.open("", "_blank", "width=420,height=700");
 
-    // Comprobar si Chrome bloqueó la ventana emergente
     if (!ventana) {
-        alert(
-            "Chrome bloqueó la ventana de impresión. " +
-            "Permite las ventanas emergentes para AMIS Boutique e inténtalo nuevamente."
-        );
+        alert("Activa las ventanas emergentes para poder imprimir el ticket.");
         return;
     }
 
-    // 3. Evitar que caracteres especiales rompan el HTML
-    const escaparHTML = (valor) => {
-        return String(valor ?? "").replace(/[&<>"']/g, (caracter) => ({
+    // 3. Escapar caracteres HTML
+    const escaparHTML = (texto) => {
+        return String(texto ?? "").replace(/[&<>"']/g, (caracter) => ({
             "&": "&amp;",
             "<": "&lt;",
             ">": "&gt;",
             '"': "&quot;",
-            "'": "&#39;"
+            "'": "&#039;"
         })[caracter]);
     };
 
-    // 4. Generar los productos
-    const productos = (d.items || []).map((item) => {
+    // 4. Generar lista de productos usando name, quantity, price y color
+    const productos = (d.items || []).map(item => {
         const cantidad = Number(item.quantity) || 0;
-        const precio = Number(
-            String(item.price ?? 0).replace(/[^0-9.-]/g, "")
-        ) || 0;
-
-        const subtotal = precio * cantidad;
+        const precioUnitario = Number(item.price) || 0;
+        const subtotalLinea = cantidad * precioUnitario;
 
         return `
             <div class="producto">
-                <div class="descripcion">
-                    <strong>${escaparHTML(cantidad)}x ${escaparHTML(item.name)}</strong>
-                    <span>${escaparHTML(item.color || "")}</span>
+                <div class="producto-nombre">
+                    ${escaparHTML(item.name)}
                 </div>
-                <div class="precio">
-                    $${subtotal.toFixed(2)}
+                <div class="producto-detalle">
+                    ${escaparHTML(cantidad)} x ${escaparHTML(item.color || "Único")}
+                    <span>$${subtotalLinea.toFixed(2)}</span>
                 </div>
             </div>
         `;
     }).join("");
 
-    // 5. Construir el ticket
+    // 5. Construir ticket utilizando los campos reales de Firestore / Objetos
     const contenido = `
         <!DOCTYPE html>
-        <html lang="es">
+        <html>
         <head>
             <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-
             <title>Ticket ${escaparHTML(d.orderId)}</title>
 
             <style>
@@ -1438,120 +1425,88 @@ function imprimirTicket58mm(orderJson) {
                 }
 
                 html, body {
+                    width: 58mm;
                     margin: 0;
                     padding: 0;
-                    width: 58mm;
                     background: #fff;
                     color: #000;
+                    font-family: Arial, sans-serif;
+                    font-size: 11px;
                 }
 
                 body {
-                    font-family: "Courier New", monospace;
-                    font-size: 10px;
-                    line-height: 1.3;
-                    padding: 3mm 4mm;
+                    padding: 2mm 3mm;
                 }
 
                 .ticket {
-                    width: 50mm;
-                    margin: 0 auto;
+                    width: 100%;
                 }
 
-                .encabezado {
+                .centrado {
                     text-align: center;
-                    margin-bottom: 8px;
                 }
 
-                .logo {
-                    font-family: "Times New Roman", serif;
-                    font-size: 19px;
+                .titulo {
+                    font-family: 'Times New Roman', serif;
+                    font-size: 17px;
                     font-weight: bold;
-                    letter-spacing: 2px;
+                    letter-spacing: 1px;
+                    margin-bottom: 2px;
                 }
 
-                .sublogo {
-                    font-size: 12px;
-                    font-style: italic;
-                }
-
-                .ciudad {
-                    font-size: 9px;
-                    margin-top: 3px;
+                .subtitulo {
+                    font-family: 'Brush Script MT', cursive;
+                    font-size: 11px;
+                    margin-bottom: 2px;
                 }
 
                 .separador {
                     border-top: 1px dashed #000;
-                    margin: 7px 0;
+                    margin: 6px 0;
                 }
 
-                .datos {
-                    font-size: 9px;
-                    overflow-wrap: anywhere;
-                }
-
-                .titulo-productos {
-                    display: flex;
-                    justify-content: space-between;
-                    font-size: 9px;
-                    font-weight: bold;
-                    border-bottom: 1px solid #000;
-                    padding-bottom: 3px;
-                    margin-bottom: 5px;
+                .dato {
+                    margin: 3px 0;
+                    overflow-wrap: break-word;
+                    font-size: 10px;
                 }
 
                 .producto {
+                    margin: 6px 0;
+                }
+
+                .producto-nombre {
+                    font-weight: bold;
+                    overflow-wrap: break-word;
+                    font-size: 10.5px;
+                }
+
+                .producto-detalle {
+                    font-size: 10px;
                     display: flex;
                     justify-content: space-between;
-                    align-items: flex-start;
                     gap: 4px;
-                    margin-bottom: 6px;
-                    break-inside: avoid;
-                }
-
-                .descripcion {
-                    flex: 1;
-                    min-width: 0;
-                    overflow-wrap: anywhere;
-                }
-
-                .descripcion span {
-                    display: block;
-                    font-size: 9px;
-                }
-
-                .precio {
-                    white-space: nowrap;
-                    text-align: right;
                 }
 
                 .total {
-                    text-align: right;
                     font-size: 12px;
                     font-weight: bold;
-                    margin: 8px 0;
+                    text-align: right;
+                    margin-top: 8px;
                 }
 
                 .pie {
                     text-align: center;
-                    font-size: 9px;
-                    line-height: 1.5;
-                }
-
-                @media screen {
-                    body {
-                        margin: 0 auto;
-                    }
+                    font-size: 10px;
+                    margin-top: 10px;
+                    line-height: 1.3;
                 }
 
                 @media print {
                     html, body {
                         width: 58mm;
                         margin: 0;
-                    }
-
-                    body {
-                        -webkit-print-color-adjust: exact;
-                        print-color-adjust: exact;
+                        padding: 0;
                     }
                 }
             </style>
@@ -1560,36 +1515,40 @@ function imprimirTicket58mm(orderJson) {
         <body>
             <div class="ticket">
 
-                <div class="encabezado">
-                    <div class="logo">AMIS</div>
-                    <div class="sublogo">collection &amp; boutique</div>
-                    <div class="ciudad">Guadalajara, Jalisco</div>
+                <div class="centrado">
+                    <div class="titulo">AMIS</div>
+                    <div class="subtitulo">collection &amp; boutique</div>
+                    <div style="font-size: 9px;">Guadalajara, Jalisco</div>
                 </div>
 
                 <div class="separador"></div>
 
-                <div class="datos">
-                    <b>Folio:</b> ${escaparHTML(d.orderId)}<br>
-                    <b>Cliente:</b> ${escaparHTML(d.clientName)}<br>
-                    <b>Tel:</b> ${escaparHTML(d.clientPhone)}<br>
-                    <b>Entrega:</b> ${escaparHTML(d.shipping)}
+                <div class="dato">
+                    <strong>Folio:</strong> ${escaparHTML(d.orderId)}
+                </div>
+
+                <div class="dato">
+                    <strong>Cliente:</strong> ${escaparHTML(d.clientName)}
+                </div>
+
+                <div class="dato">
+                    <strong>Teléfono:</strong> ${escaparHTML(d.clientPhone)}
+                </div>
+
+                <div class="dato">
+                    <strong>Envío:</strong> ${escaparHTML(d.shipping)}
                 </div>
 
                 <div class="separador"></div>
 
-                <div class="titulo-productos">
-                    <span>CANT / DESCRIPCIÓN</span>
-                    <span>IMP.</span>
-                </div>
+                <div style="font-size: 10px; font-weight: bold; margin-bottom: 4px;">PRODUCTOS</div>
 
-                <div>
-                    ${productos || "<p>Sin productos registrados.</p>"}
-                </div>
+                ${productos || "<div class='dato'>Sin productos</div>"}
 
                 <div class="separador"></div>
 
                 <div class="total">
-                    TOTAL: ${escaparHTML(d.total)}
+                    TOTAL: ${escaparHTML(d.total || "$0 MXN")}
                 </div>
 
                 <div class="separador"></div>
@@ -1605,29 +1564,30 @@ function imprimirTicket58mm(orderJson) {
         </html>
     `;
 
-    // 6. Escribir el documento y esperar a que esté listo
+    // 6. Registrar eventos ANTES de escribir el documento
+    ventana.addEventListener("load", function () {
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                ventana.focus();
+                ventana.print();
+            });
+        });
+    }, { once: true });
+
+    // 7. Cerrar ventana después de imprimir
+    ventana.addEventListener("afterprint", function () {
+        ventana.close();
+    }, { once: true });
+
+    // 8. Escribir el contenido
     try {
         ventana.document.open();
         ventana.document.write(contenido);
         ventana.document.close();
-
-        // Cerrar la ventana solamente después de terminar la impresión
-        ventana.onafterprint = function () {
-            ventana.close();
-        };
-
-        // Dar tiempo a Chrome para renderizar el ticket
-        ventana.onload = function () {
-            setTimeout(() => {
-                ventana.focus();
-                ventana.print();
-            }, 700);
-        };
-
     } catch (error) {
-        console.error("Error al imprimir ticket:", error);
-        alert("Ocurrió un error al preparar el ticket.");
+        console.error("Error al generar el ticket:", error);
         ventana.close();
+        alert("Ocurrió un error al generar el ticket.");
     }
 }
 
