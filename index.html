@@ -859,7 +859,7 @@
             const nameInput = row.querySelector('.color-name-input');
 
             const reader = new FileReader();
-            reader.onload = function(e) { const previewImg = row.querySelector('.color-preview-img'); if (previewImg) { previewImg.src = e.target.result; previewImg.classList.remove('hidden'); }
+            reader.onload = async function(e) { const previewImg = row.querySelector('.color-preview-img'); if (previewImg) { previewImg.src = await comprimirImagen(file); previewImg.classList.remove('hidden'); }
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
@@ -1144,7 +1144,7 @@
             } catch (e) { gridEl.innerHTML = '<p class="text-red-500 text-xs text-center py-8 col-span-full">Error al cargar.</p>'; }
         }
 
-        async function guardarNuevoProducto() {
+        async function comprimirImagen(file){if(!file)return"";try{const original=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file);});const img=await new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=original;});const scale=img.width>1000?1000/img.width:1;const canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,canvas.width,canvas.height);return canvas.toDataURL('image/jpeg',0.75);}catch(e){return await new Promise((resolve)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>resolve("");r.readAsDataURL(file);});}} async function guardarNuevoProducto() {
             const name = document.getElementById('new-prod-name').value.trim();
             const description = document.getElementById('new-prod-desc').value.trim();
             const costVal = document.getElementById('new-prod-cost').value.trim();
@@ -1169,14 +1169,14 @@
                                 const img = new Image();
                                 img.onload = () => {
                                     const canvas = document.createElement('canvas');
-                                    canvas.width = 800; canvas.height = 800;
+                                    const maxWidth = 1000; const scale = img.width > maxWidth ? maxWidth / img.width : 1; canvas.width = Math.round(img.width * scale); canvas.height = Math.round(img.height * scale);
                                     const ctx = canvas.getContext('2d');
-                                    ctx.drawImage(img, 0, 0, 800, 800);
-                                    resolve(canvas.toDataURL('image/jpeg', 0.7));
+                                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                                    try{resolve(canvas.toDataURL('image/jpeg', 0.75));}catch(err){resolve(e.target.result);}
                                 };
-                                img.src = e.target.result;
+                                img.onerror = () => resolve(e.target.result); img.src = e.target.result;
                             };
-                            reader.readAsDataURL(file);
+                            reader.onerror = () => resolve(""); reader.readAsDataURL(file);
                         });
                         colors.push({ hex, name: cname, image: compressedBase64 });
                         images.push(compressedBase64);
