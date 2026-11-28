@@ -702,7 +702,26 @@
         </div>
     </div>
 
-    <!-- CONTENIDO PRINCIPAL -->
+    <div id="mp-success-view" class="hidden min-h-screen bg-white">
+  <div class="bg-emerald-600 text-white text-center px-4 py-10">
+    <div class="w-12 h-12 bg-white text-emerald-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">✓</div>
+    <h2 id="mp-success-title" class="font-serif text-2xl font-bold mt-4">¡Muchas Gracias!</h2>
+    <p id="mp-success-subtitle" class="text-sm mt-2">Tu pago ha sido procesado con éxito.</p>
+  </div>
+  <div class="max-w-md mx-auto px-4 -mt-6">
+    <div class="bg-white rounded-2xl shadow-xl p-6 text-center">
+      <p class="text-xs text-gray-500">Pedido: <span id="mp-order-id" class="font-bold text-gray-800"></span></p>
+      <p id="mp-order-total" class="text-3xl font-bold mt-2"></p>
+      <p id="mp-order-payment" class="text-xs text-gray-500 mt-2"></p>
+    </div>
+    <p class="text-center text-sm text-gray-500 mt-6">Redirigiendo a la tienda:</p>
+    <p class="text-center text-2xl font-bold mt-1"><span id="mp-countdown">10</span></p>
+    <button onclick="closeMpSuccessAndReload()" class="w-full bg-black text-white py-3 rounded-full text-xs tracking-widest uppercase mt-4">Volver a la tienda</button>
+    <a id="mp-whatsapp-link" href="#" target="_blank" class="w-full bg-emerald-600 text-white py-3 rounded-full text-xs tracking-widest uppercase mt-3 flex items-center justify-center gap-2 font-medium">Enviar pedido por WhatsApp</a>
+  </div>
+  <p class="text-center text-xs text-gray-400 mt-8 pb-8">AMIS Boutique · Guadalajara, Jalisco</p>
+</div>
+<!-- CONTENIDO PRINCIPAL -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div id="home-view" class="space-y-8">
             <div class="relative hero-bokeh-bg text-white rounded-3xl p-8 sm:p-16 overflow-hidden shadow-xl text-center">
@@ -1063,8 +1082,29 @@
                         ? `Hola Amis Boutique! 👋 Ya generé mi ficha de pago en OXXO. Mi número de pedido es: *${pendingData.orderId}*`
                         : `Hola Amis Boutique! 👋 Ya realicé mi pago por Mercado Pago. Mi número de pedido es: *${pendingData.orderId}*`;
 
-                    document.getElementById('whatsapp-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${encodeURIComponent(mensajeWA)}`;
-                    document.getElementById('order-success-modal').classList.remove('hidden');
+                    document.getElementById('mp-order-id').textContent = pendingData.orderId;
+            document.getElementById('mp-order-total').textContent = pendingData.total;
+            document.getElementById('mp-order-payment').textContent = isPendingOxxo ? "Pago pendiente en tienda" : "Pago: " + pendingData.payment;
+            if (isPendingOxxo) {
+                document.getElementById('mp-success-title').textContent = "¡Ficha generada!";
+                document.getElementById('mp-success-subtitle').textContent = "Tu ficha de pago fue generada. Paga en tienda (OXXO, Seven Eleven o donde te indique Mercado Pago) para completar tu pedido.";
+                const mpBanner = document.querySelector('#mp-success-view > div');
+                if (mpBanner) mpBanner.className = mpBanner.className.replace('bg-emerald-600', 'bg-amber-500');
+            }
+            document.getElementById('mp-whatsapp-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${encodeURIComponent(mensajeWA)}`;
+            document.getElementById('order-success-modal').classList.add('hidden');
+            document.getElementById('home-view').classList.add('hidden');
+            const mpDynView = document.getElementById('dynamic-category-view');
+            if (mpDynView) mpDynView.classList.add('hidden');
+            document.getElementById('mp-success-view').classList.remove('hidden');
+            let mpCountdown = 10;
+            document.getElementById('mp-countdown').textContent = mpCountdown;
+            window.mpCountdownInterval = setInterval(() => {
+                mpCountdown--;
+                document.getElementById('mp-countdown').textContent = mpCountdown;
+                if (mpCountdown <= 0) closeMpSuccessAndReload();
+            }, 1000);
+                    // mp-success-view
 
                     localStorage.removeItem('amis_pending_order');
                     localStorage.removeItem('amis_cart');
@@ -1712,12 +1752,12 @@ function descargarPDFCarta(orderJson) {
 
                 if (paymentMethod === 'Mercado Pago') {
                     localStorage.setItem('amis_pending_order', JSON.stringify({ orderId, clientName, clientPhone, clientEmail, clientAddress, shipping: shippingMethod, payment: paymentMethod, items: cart, total: `$${total} MXN`, numericTotal: total }));
-                    showToast("Conectando con Mercado Pago...", "success");
+                    const costoEnvio = obtenerCostoEnvioActual(); showToast("Conectando con Mercado Pago...", "success");
                     try {
                         const res = await fetch("/api/crear-preferencia", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ items: cart.map(i => ({ title: `${i.name} (${i.color})`, quantity: Number(i.quantity), unit_price: Number(i.price) })), backUrl: window.location.origin + window.location.pathname, orderId })
+                            body: JSON.stringify({ items: cart.map(i => ({ title: `${i.name} (${i.color})`, quantity: Number(i.quantity), unit_price: Number(i.price) })), backUrl: window.location.origin + window.location.pathname, orderId, shippingCost: costoEnvio, shippingMethod: shippingMethod })
                         });
                         const data = await res.json();
                         if (data.init_point) { window.location.href = data.init_point; return; }
@@ -1736,7 +1776,11 @@ function descargarPDFCarta(orderJson) {
             }
         }
 
-        function closeSuccessModalAndReload() {
+        function closeMpSuccessAndReload() {
+    if (window.mpCountdownInterval) clearInterval(window.mpCountdownInterval);
+    location.href = window.location.origin + window.location.pathname;
+}
+function closeSuccessModalAndReload() {
             document.getElementById('order-success-modal').classList.add('hidden');
             localStorage.removeItem('amis_cart');
             location.reload();

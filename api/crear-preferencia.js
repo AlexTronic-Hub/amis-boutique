@@ -8,17 +8,19 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { items, backUrl, orderId } = req.body;
+    const { items, backUrl, orderId, shippingCost, shippingMethod } = req.body;
 
     const preference = new Preference(client);
+    const mappedItems = items.map(item => ({
+      title: String(item.title),
+      unit_price: Number(item.unit_price),
+      quantity: Number(item.quantity || 1),
+      currency_id: 'MXN'
+    }));
+    if (Number(shippingCost) > 0) mappedItems.push({ title: "Envio - " + String(shippingMethod || "Envio"), quantity: 1, unit_price: Number(shippingCost), currency_id: "MXN" });
     const result = await preference.create({
       body: {
-        items: items.map(item => ({
-          title: String(item.title),
-          unit_price: Number(item.unit_price),
-          quantity: Number(item.quantity || 1),
-          currency_id: 'MXN'
-        })),
+        items: mappedItems,
         external_reference: orderId || '',
         back_urls: {
           success: `${backUrl || 'https://amisboutique.com'}?mp_result=approved`,
