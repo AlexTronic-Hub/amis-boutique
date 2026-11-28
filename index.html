@@ -768,7 +768,7 @@
         const CORREO_BOUTIQUE = "ventas@amisboutique.com";
         const WHATSAPP_TIENDA = "523312467018";
 
-        let cart = JSON.parse(localStorage.getItem('amis_cart') || '[]');
+        let cart = JSON.parse(localStorage.getItem('amis_cart') || '[]'); try{var _f=document.querySelector('main footer');var _d=document.getElementById('dynamic-category-view');if(_f&&_d&&_d.parentNode){_d.parentNode.insertBefore(_f,_d.nextSibling);}}catch(e){}
         let checkoutStep = 1;
         let currentUser = null;
         let userData = null;
@@ -1240,16 +1240,16 @@
             dynView.classList.remove('hidden');
             const headerEl = document.getElementById('category-header');
             const gridEl = document.getElementById('products-grid');
-            headerEl.innerHTML = `<h2 class="text-2xl font-serif font-bold mb-4">${categoryKey === 'todo' ? 'Todo' : categoryKey.toUpperCase()}</h2>`;
+            headerEl.innerHTML = `<h2 class="text-2xl font-serif font-bold mb-4">${categoryKey === 'todo' ? 'Todo' : categoryKey.toUpperCase()}</h2>`; window._amisCatReq=(window._amisCatReq||0)+1; var _myReq=window._amisCatReq; var _esCat=function(p){return categoryKey==='todo'||((categoryKey==='temporada'||categoryKey==='navidad')?(p.category==='temporada'||p.category==='navidad'):p.category===categoryKey);}; gridEl.innerHTML='<p class="text-gray-500 italic py-8 text-center col-span-full">Cargando productos...</p><div class="col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"><div class="bg-white rounded-2xl border border-gray-100 p-5 animate-pulse"><div class="bg-gray-200 h-64 rounded-xl mb-4"></div><div class="bg-gray-200 h-4 rounded w-3/4 mb-2"></div><div class="bg-gray-200 h-4 rounded w-1/2"></div></div><div class="bg-white rounded-2xl border border-gray-100 p-5 animate-pulse"><div class="bg-gray-200 h-64 rounded-xl mb-4"></div><div class="bg-gray-200 h-4 rounded w-3/4 mb-2"></div><div class="bg-gray-200 h-4 rounded w-1/2"></div></div><div class="bg-white rounded-2xl border border-gray-100 p-5 animate-pulse"><div class="bg-gray-200 h-64 rounded-xl mb-4"></div><div class="bg-gray-200 h-4 rounded w-3/4 mb-2"></div><div class="bg-gray-200 h-4 rounded w-1/2"></div></div></div>'; try{if(!window._amisProductsCache){try{var _g=localStorage.getItem('amis_products_cache');if(_g)window._amisProductsCache=JSON.parse(_g);}catch(e){}} if(window._amisProductsCache&&window._amisProductsCache.length){var _ch=window._amisProductsCache.filter(_esCat).map(function(p){return renderProductCardHTML(p);}).join(''); if(_ch)gridEl.innerHTML=_ch;}}catch(e){}
             try {
-                const { collection, getDocs } = window.FB_Methods;
-                const querySnapshot = await getDocs(collection(window.FB_Db, "products"));
+                const { collection, getDocs } = window.FB_Methods; window._amisProductsCache=[];
+                const querySnapshot = await getDocs(collection(window.FB_Db, "products")); window._amisProductsCache=[]; querySnapshot.forEach(function(_ds){try{window._amisProductsCache.push({id:_ds.id, ..._ds.data()});}catch(e){}});
                 let html = '';
                 querySnapshot.forEach((docSnap) => {
                     const p = docSnap.data();
                     if(categoryKey === 'todo' || ((categoryKey === 'temporada' || categoryKey === 'navidad') ? (p.category === 'temporada' || p.category === 'navidad') : p.category === categoryKey)) html += renderProductCardHTML({ id: docSnap.id, ...p });
                 });
-                gridEl.innerHTML = html || '<p class="text-gray-500 italic py-8 text-center col-span-full">No hay productos en esta categoría.</p><div class="col-span-full flex flex-col gap-3 w-full max-w-md mx-auto px-4"><button onclick="showHome(event)" class="w-full bg-black text-white py-3 px-6 rounded-full font-bold text-sm uppercase tracking-widest border border-black">Ver otras categorias</button><a href="https://wa.me/523312467018" target="_blank" class="block w-full text-center bg-white text-black py-3 px-6 rounded-full font-bold text-sm uppercase tracking-widest border border-black">Consultar por WhatsApp</a></div>';
+                if(_myReq!==window._amisCatReq)return; try{localStorage.setItem('amis_products_cache',JSON.stringify(window._amisProductsCache||[]));}catch(e){} gridEl.innerHTML = html || '<p class="text-gray-500 italic py-8 text-center col-span-full">No hay productos en esta categoría.</p><div class="col-span-full flex flex-col gap-3 w-full max-w-md mx-auto px-4"><button onclick="showHome(event)" class="w-full bg-black text-white py-3 px-6 rounded-full font-bold text-sm uppercase tracking-widest border border-black">Ver otras categorias</button><a href="https://wa.me/523312467018" target="_blank" class="block w-full text-center bg-white text-black py-3 px-6 rounded-full font-bold text-sm uppercase tracking-widest border border-black">Consultar por WhatsApp</a></div>';
             } catch (e) { gridEl.innerHTML = '<p class="text-red-500 text-xs text-center py-8 col-span-full">Error al cargar.</p>'; }
         }
 
