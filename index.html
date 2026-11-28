@@ -1355,7 +1355,8 @@
         }
 
         // --- FUNCIÓN DE TICKET TÉRMICO 58MM CON QZ TRAY ---
-function imprimirTicket58mm(orderJson) {
+const AMIS_LOGO = "data:image/png;base64,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"; 
+        function imprimirTicket58mm(orderJson) {
     let d;
     try { d = JSON.parse(decodeURIComponent(orderJson)); } catch (error) { console.error("Error al procesar el pedido:", error); alert("No se pudieron procesar los datos del ticket."); return; }
     if (typeof qz === "undefined") { alert("No cargó QZ Tray. Revisa que agregaste el script de qz-tray.js en el <head> y recarga la página."); return; }
@@ -1390,10 +1391,6 @@ function imprimirTicket58mm(orderJson) {
         const agregar = (texto) => { datos.push({ type: "raw", format: "command", data: texto }); };
         agregar("\x1b\x40");
         agregar("\x1b\x61\x01");
-        agregar("\x1b\x21\x30");
-        agregar("AMIS\n");
-        agregar("\x1b\x21\x00");
-        agregar("collection & boutique\n");
         agregar("\nAMIS BOUTIQUE\n");
         agregar("Guadalajara, Jalisco\n");
         agregar("TEL: 33 1246 7018\n");
@@ -1433,7 +1430,7 @@ function imprimirTicket58mm(orderJson) {
         agregar("Vuelva Pronto!\n");
         agregar("IG: @amisboutique.official\n");
         agregar("\n\n\n\x1d\x56\x00");
-        return qz.print(config, datos);
+        return qz.print(config, [{type: "image", format: "image", data: AMIS_LOGO}]).then(() => { return qz.print(config, datos); });
     }).then(() => { if (typeof showToast === "function") showToast("Ticket enviado a POS-58"); else alert("Ticket enviado a POS-58"); }).catch((error) => { console.error("Error al imprimir con QZ Tray:", error); alert("No se pudo imprimir. Abre QZ Tray en tu PC y, si Brave te lo pide, acepta su certificado en https://localhost:8181 y vuelve a intentarlo."); });
 }
 
